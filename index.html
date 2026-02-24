@@ -3,92 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emerald Tour Leaderboard</title>
+    <title>Emerald Tour - Member Portal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 10px; }
         .leaderboard-container { max-width: 1450px; margin: 0 auto; background-color: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
-        /* Header - Logo Stretched */
+        /* Deepened Header to prevent logo cutoff */
         .header { 
             background: #124d12; 
             padding: 0; 
             text-align: center; 
             border-bottom: 4px solid #FFD700; 
-            height: 150px; 
+            height: 220px; /* Increased depth */
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .header img { width: 100%; height: 100%; object-fit: cover; }
-
-        .venue { background: #444; color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 16px; border-bottom: 1px solid #000; }
+        .header img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; /* Changed to contain so it's never cut off */
+            background-color: #124d12;
+        }
         
-        /* Controls & Inputs */
-        .controls, .player-input { padding: 10px; background-color: #f0f0f0; text-align: center; border-bottom: 1px solid #ddd; }
-        .controls button, .player-input button { padding: 8px 16px; background-color: #006400; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
-        .controls button:hover { background-color: #2e8b57; }
-        .player-input input { padding: 8px; width: 250px; }
+        .venue-bar { background: #444; color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 16px; border-bottom: 1px solid #000; }
 
         /* Tables */
+        .table-responsive { width: 100%; overflow-x: auto; border-bottom: 1px solid #ddd; }
         table { width: 100%; border-collapse: collapse; }
-        th { background-color: #e6e6e6; padding: 10px; text-align: center; font-size: 11px; border-bottom: 2px solid #ddd; text-transform: uppercase; color: #444; }
-        td { padding: 8px 10px; border-bottom: 1px solid #ddd; font-size: 13px; white-space: nowrap; text-align: center; }
-        .player-cell { text-align: left; font-weight: bold; }
+        th { background-color: #e6e6e6; padding: 10px 12px; font-size: 11px; border-bottom: 2px solid #ddd; text-transform: uppercase; color: #444; }
+        td { padding: 8px 12px; border-bottom: 1px solid #ddd; font-size: 13px; white-space: nowrap; }
         
-        /* Column Widths */
-        .col-pos { width: 45px; font-weight: bold; color: #228B22; }
-        .col-stat { width: 70px; }
-        .col-money { width: 100px; font-weight: bold; }
-        .col-bonus { width: 85px; background-color: #f9f9f9; }
+        /* Column Controls */
+        .col-pos { width: 45px; text-align: center; font-weight: bold; color: #228B22; }
+        .col-stat { width: 70px; text-align: center; }
+        .col-money { width: 110px; text-align: center; font-weight: bold; }
+        .col-bonus { width: 75px; text-align: center; background-color: #fcfcfc; color: #666; font-size: 12px; border-left: 1px solid #eee; }
         
-        /* Season Alignment */
+        /* Player Name Styling */
+        .player-name { font-weight: bold; }
+
+        /* Standings Alignment */
         .standings-right { text-align: right; padding-right: 25px; }
+        
+        /* Highlights & Divider */
         .top-tier { background: linear-gradient(to right, #eef7ee, #ffffff) !important; }
         .cutoff-row td { border-bottom: 4px solid #228B22 !important; }
 
         .section-title { background: #228B22; color: white; padding: 10px 15px; font-size: 16px; font-weight: bold; border-left: 8px solid #FFD700; }
         .hidden { display: none; }
-        .score-input { width: 45px; text-align: center; border: 1px solid #ccc; border-radius: 3px; }
-        .bonus-input { width: 55px; text-align: center; border: 1px solid #ddd; }
+        
+        /* Hall of Fame */
+        .hof-container { padding: 30px 10px; background: #1a1a1a; color: white; }
+        .hof-header { text-align: center; font-size: 22px; color: #FFD700; margin-bottom: 20px; border-bottom: 2px solid #FFD700; padding-bottom: 10px; }
+        .hof-cards { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .hof-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 6px; padding: 15px; width: 220px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="leaderboard-container">
-    <div class="header"><img src="logo.png" alt="Emerald Tour Logo"></div>
-    <div class="venue" contenteditable="true">Season 1, Week 1 - Tournament Venue</div>
-
-    <div class="player-input">
-        <input type="text" id="new-player-name" placeholder="Enter player name">
-        <button id="add-player">Add Player</button>
+    <div class="header">	
+        <img src="logo.png" alt="Emerald Tour Logo">
     </div>
 
-    <div class="controls">
-        <button id="toggle-r3-r4">Show Rounds 3 & 4</button>
-        <button id="save-btn">Save Data</button>
-    </div>
+    <div id="venue-display" class="venue-bar">Tournament Loading...</div>
 
-    <div class="section-title">Tournament Leaderboard</div>
-    <div style="overflow-x: auto;">
-        <table id="leaderboard-table">
+    <div class="table-responsive">
+        <table>
             <thead>
                 <tr>
                     <th class="col-pos">POS</th>
                     <th style="text-align:left">PLAYER</th>
                     <th class="col-stat">R1</th>
                     <th class="col-stat">R2</th>
-                    <th class="col-stat r3-col hidden">R3</th>
-                    <th class="col-stat r4-col hidden">R4</th>
+                    <th id="th-r3" class="col-stat hidden">R3</th>
+                    <th id="th-r4" class="col-stat hidden">R4</th>
                     <th class="col-stat">TOT</th>
                     <th class="col-money">PRIZE</th>
-                    <th class="col-bonus">FiR %</th>
-                    <th class="col-bonus">GiR %</th>
-                    <th class="col-bonus">SCRAM %</th>
-                    <th class="col-bonus">NTP (FT)</th>
+                    <th class="col-bonus">FiR%</th>
+                    <th class="col-bonus">GiR%</th>
+                    <th class="col-bonus">SCRAM</th>
+                    <th class="col-bonus">NTP</th>
                 </tr>
             </thead>
             <tbody id="leaderboard-body"></tbody>
@@ -96,8 +95,9 @@
     </div>
 
     <div class="section-title">Season Standings</div>
-    <div style="overflow-x: auto;">
-        <table id="standings-table">
+
+    <div class="table-responsive">
+        <table>
             <thead>
                 <tr>
                     <th class="col-pos">POS</th>
@@ -110,103 +110,130 @@
             <tbody id="standings-body"></tbody>
         </table>
     </div>
+
+    <div class="hof-container">
+        <div class="hof-header">🏆 Hall of Fame 🏆</div>
+        <div id="hof-display" class="hof-cards"></div>
+    </div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'emerald_tour_data';
-    let tourData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
-        showR3R4: false,
-        players: [],
-        seasonPoints: {},
-        seasonEarnings: {},
-        seasonEvents: {}
-    };
+    const DATA_URL = 'data.json'; 
 
-    function render() {
+    async function loadTourData() {
+        try {
+            const response = await fetch(DATA_URL);
+            const data = await response.json();
+            renderAll(data);
+        } catch (err) {
+            console.error("Data could not be loaded.", err);
+            document.getElementById('venue-display').textContent = "Waiting for Data Feed...";
+        }
+    }
+
+    function renderAll(tourData) {
+        document.getElementById('venue-display').textContent = tourData.venue;
+
+        // Toggle R3/R4 Headers
+        if(tourData.showR3R4) {
+            document.getElementById('th-r3').classList.remove('hidden');
+            document.getElementById('th-r4').classList.remove('hidden');
+        }
+
+        // 1. Leaderboard
         const lbBody = document.getElementById('leaderboard-body');
-        const stBody = document.getElementById('standings-body');
-        lbBody.innerHTML = '';
-        stBody.innerHTML = '';
-
-        // 1. Leaderboard Logic
-        tourData.players.forEach((p, idx) => {
+        const sortedLB = [...tourData.players].sort((a,b) => calculateTotal(a) - calculateTotal(b));
+        
+        sortedLB.forEach((p, idx) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="col-pos">${idx + 1}</td>
-                <td class="player-cell">${p.name}</td>
-                <td><input type="number" class="score-input" value="${p.r1 || ''}" onchange="updateScore(${idx}, 'r1', this.value)"></td>
-                <td><input type="number" class="score-input" value="${p.r2 || ''}" onchange="updateScore(${idx}, 'r2', this.value)"></td>
-                <td class="r3-col ${tourData.showR3R4 ? '' : 'hidden'}"><input type="number" class="score-input" value="${p.r3 || ''}" onchange="updateScore(${idx}, 'r3', this.value)"></td>
-                <td class="r4-col ${tourData.showR3R4 ? '' : 'hidden'}"><input type="number" class="score-input" value="${p.r4 || ''}" onchange="updateScore(${idx}, 'r4', this.value)"></td>
-                <td style="font-weight:bold;">${(parseInt(p.r1||0) + parseInt(p.r2||0) + parseInt(p.r3||0) + parseInt(p.r4||0)) || '-'}</td>
+                <td class="player-name">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="fa-brands ${p.console || 'fa-gamepad'}" style="color:${getConsoleColor(p.console)}"></i>
+                        <span class="fi fi-${(p.country || 'un').toLowerCase()}"></span>
+                        ${p.name}
+                    </div>
+                </td>
+                <td class="col-stat">${p.r1 || '-'}</td>
+                <td class="col-stat">${p.r2 || '-'}</td>
+                <td class="col-stat ${tourData.showR3R4 ? '' : 'hidden'}">${p.r3 || '-'}</td>
+                <td class="col-stat ${tourData.showR3R4 ? '' : 'hidden'}">${p.r4 || '-'}</td>
+                <td class="col-stat"><strong>${calculateTotal(p) === 999 ? '-' : calculateTotal(p)}</strong></td>
                 <td class="col-money">${p.prize || '$0'}</td>
-                <td class="col-bonus"><input type="text" class="bonus-input" value="${p.fir || ''}" onchange="updateScore(${idx}, 'fir', this.value)"></td>
-                <td class="col-bonus"><input type="text" class="bonus-input" value="${p.gir || ''}" onchange="updateScore(${idx}, 'gir', this.value)"></td>
-                <td class="col-bonus"><input type="text" class="bonus-input" value="${p.scram || ''}" onchange="updateScore(${idx}, 'scram', this.value)"></td>
-                <td class="col-bonus"><input type="text" class="bonus-input" value="${p.ntp || ''}" onchange="updateScore(${idx}, 'ntp', this.value)"></td>
+                <td class="col-bonus">${p.fir || '-'}</td>
+                <td class="col-bonus">${p.gir || '-'}</td>
+                <td class="col-bonus">${p.scrambling || '-'}</td>
+                <td class="col-bonus">${p.ntp || '-'}</td>
             `;
             lbBody.appendChild(tr);
         });
 
-        // 2. Standings Logic (Bold names & 50% Divider)
-        const standings = tourData.players.map(p => ({
-            name: p.name,
-            points: tourData.seasonPoints[p.name] || 0,
-            earnings: tourData.seasonEarnings[p.name] || 0,
-            events: tourData.seasonEvents[p.name] || 0
-        })).sort((a,b) => b.points - a.points);
+        // 2. Standings
+        const stBody = document.getElementById('standings-body');
+        const standings = Object.keys(tourData.seasonPoints || {}).map(name => {
+            const pInfo = tourData.players.find(pl => pl.name === name) || {};
+            return {
+                name,
+                points: tourData.seasonPoints[name] || 0,
+                earnings: tourData.seasonEarnings[name] || 0,
+                events: tourData.seasonEvents[name] || 0,
+                console: pInfo.console || 'fa-gamepad',
+                country: pInfo.country || 'un'
+            };
+        }).sort((a, b) => b.points - a.points);
 
-        const cutoff = Math.ceil(standings.length / 2) - 1;
+        const cutoffIdx = Math.ceil(standings.length / 2) - 1;
 
         standings.forEach((p, idx) => {
             const tr = document.createElement('tr');
-            if (idx <= cutoff) tr.classList.add('top-tier');
-            if (idx === cutoff) tr.classList.add('cutoff-row');
+            if (idx <= cutoffIdx) tr.classList.add('top-tier');
+            if (idx === cutoffIdx) tr.classList.add('cutoff-row');
             
             tr.innerHTML = `
                 <td class="col-pos">${idx + 1}</td>
-                <td class="player-cell">${p.name}</td>
+                <td class="player-name">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="fa-brands ${p.console}" style="color:${getConsoleColor(p.console)}"></i>
+                        <span class="fi fi-${p.country.toLowerCase()}"></span>
+                        ${p.name}
+                    </div>
+                </td>
                 <td class="standings-right">${p.points.toLocaleString()}</td>
                 <td class="standings-right" style="font-weight:bold;">$${p.earnings.toLocaleString()}</td>
                 <td class="standings-right">${p.events}</td>
             `;
             stBody.appendChild(tr);
         });
+
+        // 3. HOF
+        const hofDisplay = document.getElementById('hof-display');
+        const sortedHOF = [...standings].sort((a,b) => b.earnings - a.earnings).slice(0,3);
+        const medals = ['🥇', '🥈', '🥉'];
+        sortedHOF.forEach((p, i) => {
+            const card = document.createElement('div');
+            card.className = 'hof-card';
+            card.innerHTML = `
+                <div style="font-size:24px;">${medals[i]}</div>
+                <div style="font-size:14px; font-weight:bold; margin:5px 0;">${p.name}</div>
+                <div style="font-size:12px; color:#FFD700">$${p.earnings.toLocaleString()}</div>
+            `;
+            hofDisplay.appendChild(card);
+        });
     }
 
-    function updateScore(idx, key, val) {
-        tourData.players[idx][key] = val;
-        save();
+    function calculateTotal(p) {
+        let s = [p.r1, p.r2, p.r3, p.r4].filter(v => v && v > 0);
+        return s.length > 0 ? s.reduce((a, b) => parseInt(a) + parseInt(b), 0) : 999;
     }
 
-    function save() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(tourData));
+    function getConsoleColor(console) {
+        if (console === 'fa-playstation') return '#003791';
+        if (console === 'fa-xbox') return '#107C10';
+        return '#555';
     }
 
-    document.getElementById('add-player').onclick = () => {
-        const name = document.getElementById('new-player-name').value;
-        if (name) {
-            tourData.players.push({ name, r1: '', r2: '', r3: '', r4: '', fir: '', gir: '', scram: '', ntp: '', prize: '$0' });
-            document.getElementById('new-player-name').value = '';
-            save();
-            render();
-        }
-    };
-
-    document.getElementById('toggle-r3-r4').onclick = () => {
-        tourData.showR3R4 = !tourData.showR3R4;
-        document.getElementById('toggle-r3-r4').textContent = tourData.showR3R4 ? "Hide Rounds 3 & 4" : "Show Rounds 3 & 4";
-        save();
-        render();
-    };
-
-    document.getElementById('save-btn').onclick = () => {
-        save();
-        alert("Data Saved Successfully!");
-        render();
-    };
-
-    window.onload = render;
+    window.onload = loadTourData;
 </script>
 </body>
 </html>
