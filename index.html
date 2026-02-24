@@ -10,13 +10,13 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 10px; }
         .leaderboard-container { max-width: 1450px; margin: 0 auto; background-color: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
-        /* Deepened Header to prevent logo cutoff */
+        /* Top Header */
         .header { 
             background: #124d12; 
             padding: 0; 
             text-align: center; 
             border-bottom: 4px solid #FFD700; 
-            height: 220px; /* Increased depth */
+            height: 220px; 
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -25,7 +25,7 @@
         .header img { 
             width: 100%; 
             height: 100%; 
-            object-fit: contain; /* Changed to contain so it's never cut off */
+            object-fit: contain; 
             background-color: #124d12;
         }
         
@@ -37,16 +37,28 @@
         th { background-color: #e6e6e6; padding: 10px 12px; font-size: 11px; border-bottom: 2px solid #ddd; text-transform: uppercase; color: #444; }
         td { padding: 8px 12px; border-bottom: 1px solid #ddd; font-size: 13px; white-space: nowrap; }
         
+        /* Middle Logo Divider */
+        .middle-logo-divider {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+        }
+        .middle-logo-divider img {
+            max-width: 100%; /* Ensures it fits on mobile screens */
+            max-height: 150px; /* Limits vertical height so it's not overwhelming */
+            width: auto;
+            object-fit: contain;
+        }
+
         /* Column Controls */
         .col-pos { width: 45px; text-align: center; font-weight: bold; color: #228B22; }
         .col-stat { width: 70px; text-align: center; }
         .col-money { width: 110px; text-align: center; font-weight: bold; }
         .col-bonus { width: 75px; text-align: center; background-color: #fcfcfc; color: #666; font-size: 12px; border-left: 1px solid #eee; }
         
-        /* Player Name Styling */
         .player-name { font-weight: bold; }
-
-        /* Standings Alignment */
         .standings-right { text-align: right; padding-right: 25px; }
         
         /* Highlights & Divider */
@@ -56,7 +68,6 @@
         .section-title { background: #228B22; color: white; padding: 10px 15px; font-size: 16px; font-weight: bold; border-left: 8px solid #FFD700; }
         .hidden { display: none; }
         
-        /* Hall of Fame */
         .hof-container { padding: 30px 10px; background: #1a1a1a; color: white; }
         .hof-header { text-align: center; font-size: 22px; color: #FFD700; margin-bottom: 20px; border-bottom: 2px solid #FFD700; padding-bottom: 10px; }
         .hof-cards { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
@@ -92,13 +103,10 @@
             </thead>
             <tbody id="leaderboard-body"></tbody>
         </table>
-		<div class="middle-logo-container">
-            <img src="2k25 logo.png" alt="New Emerald Tour Center Logo">
-        </div>
+    </div>
 
-        <div class="bonus-table-container">
-            <div class="bonus-header" id="season-header">SEASON STATS (Events: 0)</div>
-            <table id="bonus-table" class="bonus-table">
+    <div class="middle-logo-divider">
+        <img src="2k25 logo.png" alt="Middle Logo">
     </div>
 
     <div class="section-title">Season Standings</div>
@@ -141,13 +149,11 @@
     function renderAll(tourData) {
         document.getElementById('venue-display').textContent = tourData.venue;
 
-        // Toggle R3/R4 Headers
         if(tourData.showR3R4) {
             document.getElementById('th-r3').classList.remove('hidden');
             document.getElementById('th-r4').classList.remove('hidden');
         }
 
-        // 1. Leaderboard
         const lbBody = document.getElementById('leaderboard-body');
         const sortedLB = [...tourData.players].sort((a,b) => calculateTotal(a) - calculateTotal(b));
         
@@ -176,7 +182,6 @@
             lbBody.appendChild(tr);
         });
 
-        // 2. Standings
         const stBody = document.getElementById('standings-body');
         const standings = Object.keys(tourData.seasonPoints || {}).map(name => {
             const pInfo = tourData.players.find(pl => pl.name === name) || {};
@@ -213,7 +218,6 @@
             stBody.appendChild(tr);
         });
 
-        // 3. HOF
         const hofDisplay = document.getElementById('hof-display');
         const sortedHOF = [...standings].sort((a,b) => b.earnings - a.earnings).slice(0,3);
         const medals = ['🥇', '🥈', '🥉'];
