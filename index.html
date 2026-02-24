@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
-        .leaderboard-container { max-width: 1400px; margin: 0 auto; background-color: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .leaderboard-container { max-width: 1450px; margin: 0 auto; background-color: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 		.header { background: linear-gradient(135deg, #124d12 0%, #228B22 50%, #1a5e1a 100%); color: white; padding: 25px 80px; text-align: center; font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; border-bottom: 4px solid #FFD700; position: relative; display: flex; align-items: center; justify-content: center; }
 		.header img { position: absolute; top: 50%; transform: translateY(-50%); height: 50px; }
 		.logo-left { left: 40px; } .logo-right { right: 50px; }
@@ -24,12 +24,11 @@
         .pos { font-weight: bold; width: 50px; text-align: center; }
         .to-par { font-weight: bold; text-align: center; width: 60px; font-size: 17px; }
         .under { color: #8B0000; } .even { color: #1AA260; }
-        .round-score, .total, .prize, .stat-col { text-align: center; width: 70px; }
+        .round-score, .total, .prize, .stat-col { text-align: center; width: 65px; }
         .prize { font-weight: bold; color: #000; width: 100px; }
-        .stat-col { background-color: #f9f9f9; color: #555; font-size: 14px; }
-        .bonus-winner { background-color: #B3D9D9 !important; font-weight: bold; color: #000; }
+        .stat-col { background-color: #fcfcfc; color: #666; font-size: 13px; border-left: 1px solid #eee; }
         
-        .section-title { background: #228B22; color: white; padding: 15px; font-size: 20px; font-weight: bold; margin-top: 30px; }
+        .section-title { background: #228B22; color: white; padding: 15px; font-size: 20px; font-weight: bold; margin-top: 30px; border-left: 10px solid #FFD700; }
         .hof-container { margin-top: 40px; padding: 30px; background: #1a1a1a; border-radius: 12px; color: white; }
         .hof-header { text-align: center; font-size: 28px; color: #FFD700; margin-bottom: 25px; border-bottom: 2px solid #FFD700; padding-bottom: 10px; }
         .hof-cards { display: flex; justify-content: space-around; gap: 20px; flex-wrap: wrap; }
@@ -43,7 +42,7 @@
 <div class="leaderboard-container">
     <div class="header">	
         <img src="2k25 logo.png" class="logo-left">
-        <span id="header-text">Emerald Tour Leaderboard</span>
+        <span id="header-text">Emerald Tour</span>
         <img src="FedEx-Cup-logo.png" class="logo-right">
     </div>
 
@@ -53,7 +52,7 @@
         <div class="info-item">Prize Pool: <span id="prize-pool">-</span></div>
     </div>
 
-    <div id="venue-display" class="venue">Tournament Loading...</div>
+    <div id="venue-display" class="venue">Loading Tournament Data...</div>
 
     <table>
         <thead>
@@ -96,29 +95,25 @@
 </div>
 
 <script>
-    /* To update: Paste your JSON export from the Admin tool 
-       into the variable below. 
-    */
-    const tourData = {
-        "header": "Emerald Tour Leaderboard",
-        "date": "February 2026",
-        "venue": "Season 1, Week 4 - Pebble Beach",
-        "coursePar": "72",
-        "prizePool": 500000,
-        "showR3R4": true,
-        "players": [], // <--- PASTE PLAYERS HERE
-        "seasonEarnings": {},
-        "seasonPoints": {},
-        "seasonEvents": {},
-        "eventHistory": []
-    };
+    // 1. UPDATE THIS URL to point to your data.json on GitHub
+    const DATA_URL = 'data.json'; 
 
-    function init() {
-        if (!tourData) return;
+    async function loadTourData() {
+        try {
+            const response = await fetch(DATA_URL);
+            const tourData = await response.json();
+            renderAll(tourData);
+        } catch (err) {
+            console.error("Error loading tour data:", err);
+            document.getElementById('venue-display').textContent = "Error loading data. Check data.json path.";
+        }
+    }
 
-        document.getElementById('header-text').textContent = tourData.header;
-        document.getElementById('date-field').textContent = tourData.date;
-        document.getElementById('course-par').textContent = tourData.coursePar;
+    function renderAll(tourData) {
+        // Headers
+        document.getElementById('header-text').textContent = tourData.header || "Emerald Tour";
+        document.getElementById('date-field').textContent = tourData.date || "-";
+        document.getElementById('course-par').textContent = tourData.coursePar || "-";
         document.getElementById('prize-pool').textContent = '$' + (tourData.prizePool || 0).toLocaleString();
         
         const venueEl = document.getElementById('venue-display');
@@ -130,23 +125,11 @@
             document.getElementById('th-r4').classList.add('hidden');
         }
 
-        renderLeaderboard();
-        renderStandings();
-        renderHOF();
-    }
-
-    function renderLeaderboard() {
-        const body = document.getElementById('leaderboard-body');
-        body.innerHTML = '';
-
-        // Sort players by score for the display
-        const sorted = [...tourData.players].sort((a,b) => {
-            const scoreA = calculateRawTotal(a);
-            const scoreB = calculateRawTotal(b);
-            return scoreA - scoreB;
-        });
-
-        sorted.forEach((p, idx) => {
+        // 1. Leaderboard
+        const lbBody = document.getElementById('leaderboard-body');
+        const sortedLB = [...tourData.players].sort((a,b) => calculateRawTotal(a, tourData) - calculateRawTotal(b, tourData));
+        
+        sortedLB.forEach((p, idx) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="pos">${idx + 1}</td>
@@ -157,48 +140,25 @@
                         <strong>${p.name}</strong>
                     </div>
                 </td>
-                <td class="to-par ${getToParClass(p)}">${calculateToPar(p)}</td>
+                <td class="to-par ${getToParClass(p, tourData)}">${calculateToPar(p, tourData)}</td>
                 <td class="round-score">${p.r1 || '-'}</td>
                 <td class="round-score">${p.r2 || '-'}</td>
                 <td class="round-score ${tourData.showR3R4 ? '' : 'hidden'}">${p.r3 || '-'}</td>
                 <td class="round-score ${tourData.showR3R4 ? '' : 'hidden'}">${p.r4 || '-'}</td>
-                <td class="total"><strong>${calculateRawTotal(p) || '-'}</strong></td>
+                <td class="total"><strong>${calculateRawTotal(p, tourData) || '-'}</strong></td>
                 <td class="prize">${p.prize || '$0'}</td>
                 <td class="stat-col">${p.fir || '-'}</td>
                 <td class="stat-col">${p.gir || '-'}</td>
                 <td class="stat-col">${p.scrambling || '-'}</td>
                 <td class="stat-col">${p.ntp || '-'}</td>
             `;
-            body.appendChild(tr);
+            lbBody.appendChild(tr);
         });
-    }
 
-    function calculateRawTotal(p) {
-        let scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s > 0);
-        return scores.length > 0 ? scores.reduce((a, b) => parseInt(a) + parseInt(b), 0) : 999;
-    }
-
-    function calculateToPar(p) {
-        let scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s > 0);
-        if (scores.length === 0) return '-';
-        let total = scores.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-        let rel = total - (parseInt(tourData.coursePar) * scores.length);
-        return rel === 0 ? 'E' : (rel > 0 ? `+${rel}` : rel);
-    }
-
-    function getToParClass(p) {
-        let scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s > 0);
-        if (scores.length === 0) return '';
-        let total = scores.reduce((a, b) => parseInt(a) + parseInt(b), 0);
-        let rel = total - (parseInt(tourData.coursePar) * scores.length);
-        return rel < 0 ? 'under' : (rel === 0 ? 'even' : '');
-    }
-
-    function renderStandings() {
-        const body = document.getElementById('standings-body');
+        // 2. Standings
+        const stBody = document.getElementById('standings-body');
         const players = Object.keys(tourData.seasonPoints || {});
-        
-        players.sort((a,b) => tourData.seasonPoints[b] - tourData.seasonPoints[a]);
+        players.sort((a,b) => (tourData.seasonPoints[b] || 0) - (tourData.seasonPoints[a] || 0));
 
         players.forEach(name => {
             const tr = document.createElement('tr');
@@ -208,31 +168,52 @@
                 <td class="total" style="font-weight:bold">$${(tourData.seasonEarnings[name] || 0).toLocaleString()}</td>
                 <td class="total">${tourData.seasonEvents[name] || 0}</td>
             `;
-            body.appendChild(tr);
+            stBody.appendChild(tr);
         });
-    }
 
-    function renderHOF() {
-        const display = document.getElementById('hof-display');
-        const sorted = Object.entries(tourData.seasonEarnings || {})
+        // 3. Hall of Fame
+        const hofDisplay = document.getElementById('hof-display');
+        const sortedHOF = Object.entries(tourData.seasonEarnings || {})
             .sort(([,a],[,b]) => b-a).slice(0,3);
         
         const medals = ['🥇', '🥈', '🥉'];
-        sorted.forEach(([name, cash], i) => {
+        sortedHOF.forEach(([name, cash], i) => {
             const wins = tourData.eventHistory?.filter(e => e.winner === name).length || 0;
             const card = document.createElement('div');
             card.className = 'hof-card';
             card.innerHTML = `
                 <div style="font-size:40px;">${medals[i]}</div>
                 <div style="font-size:20px; font-weight:bold; margin:10px 0;">${name}</div>
-                <div class="hof-stat">Career: <span>$${cash.toLocaleString()}</span></div>
+                <div class="hof-stat">Earnings: <span>$${cash.toLocaleString()}</span></div>
                 <div class="hof-stat">Wins: <span>${wins}</span></div>
             `;
-            display.appendChild(card);
+            hofDisplay.appendChild(card);
         });
     }
 
-    window.onload = init;
+    // Helper functions
+    function calculateRawTotal(p) {
+        let scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s > 0);
+        return scores.length > 0 ? scores.reduce((a, b) => parseInt(a) + parseInt(b), 0) : 999;
+    }
+
+    function calculateToPar(p, data) {
+        let scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s > 0);
+        if (scores.length === 0) return '-';
+        let total = scores.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+        let rel = total - (parseInt(data.coursePar) * scores.length);
+        return rel === 0 ? 'E' : (rel > 0 ? `+${rel}` : rel);
+    }
+
+    function getToParClass(p, data) {
+        let scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s > 0);
+        if (scores.length === 0) return '';
+        let total = scores.reduce((a, b) => parseInt(a) + parseInt(b), 0);
+        let rel = total - (parseInt(data.coursePar) * scores.length);
+        return rel < 0 ? 'under' : (rel === 0 ? 'even' : '');
+    }
+
+    window.onload = loadTourData;
 </script>
 </body>
 </html>
