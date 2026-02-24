@@ -147,40 +147,48 @@
     }
 
     function renderAll(tourData) {
-        document.getElementById('venue-display').textContent = tourData.venue;
+    document.getElementById('venue-display').textContent = tourData.venue;
 
-        if(tourData.showR3R4) {
-            document.getElementById('th-r3').classList.remove('hidden');
-            document.getElementById('th-r4').classList.remove('hidden');
-        }
+    // AUTOMATIC CHECK: See if any player has scores for R3 or R4
+    const hasR3Data = tourData.players.some(p => p.r3 && p.r3 !== '' && p.r3 > 0);
+    const hasR4Data = tourData.players.some(p => p.r4 && p.r4 !== '' && p.r4 > 0);
+    const shouldShowExtended = tourData.showR3R4 || hasR3Data || hasR4Data;
 
-        const lbBody = document.getElementById('leaderboard-body');
-        const sortedLB = [...tourData.players].sort((a,b) => calculateTotal(a) - calculateTotal(b));
-        
-        sortedLB.forEach((p, idx) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="col-pos">${idx + 1}</td>
-                <td class="player-name">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <i class="fa-brands ${p.console || 'fa-gamepad'}" style="color:${getConsoleColor(p.console)}"></i>
-                        <span class="fi fi-${(p.country || 'un').toLowerCase()}"></span>
-                        ${p.name}
-                    </div>
-                </td>
-                <td class="col-stat">${p.r1 || '-'}</td>
-                <td class="col-stat">${p.r2 || '-'}</td>
-                <td class="col-stat ${tourData.showR3R4 ? '' : 'hidden'}">${p.r3 || '-'}</td>
-                <td class="col-stat ${tourData.showR3R4 ? '' : 'hidden'}">${p.r4 || '-'}</td>
-                <td class="col-stat"><strong>${calculateTotal(p) === 999 ? '-' : calculateTotal(p)}</strong></td>
-                <td class="col-money">${p.prize || '$0'}</td>
-                <td class="col-bonus">${p.fir || '-'}</td>
-                <td class="col-bonus">${p.gir || '-'}</td>
-                <td class="col-bonus">${p.scrambling || '-'}</td>
-                <td class="col-bonus">${p.ntp || '-'}</td>
-            `;
-            lbBody.appendChild(tr);
-        });
+    // Show or hide headers based on data presence
+    if (shouldShowExtended) {
+        document.getElementById('th-r3').classList.remove('hidden');
+        document.getElementById('th-r4').classList.remove('hidden');
+    }
+
+    // 1. Leaderboard Rendering
+    const lbBody = document.getElementById('leaderboard-body');
+    lbBody.innerHTML = ''; // Clear existing content
+    const sortedLB = [...tourData.players].sort((a,b) => calculateTotal(a) - calculateTotal(b));
+    
+    sortedLB.forEach((p, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="col-pos">${idx + 1}</td>
+            <td class="player-name">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <i class="fa-brands ${p.console || 'fa-gamepad'}" style="color:${getConsoleColor(p.console)}"></i>
+                    <span class="fi fi-${(p.country || 'un').toLowerCase()}"></span>
+                    ${p.name}
+                </div>
+            </td>
+            <td class="col-stat">${p.r1 || '-'}</td>
+            <td class="col-stat">${p.r2 || '-'}</td>
+            <td class="col-stat ${shouldShowExtended ? '' : 'hidden'}">${p.r3 || '-'}</td>
+            <td class="col-stat ${shouldShowExtended ? '' : 'hidden'}">${p.r4 || '-'}</td>
+            <td class="col-stat"><strong>${calculateTotal(p) === 999 ? '-' : calculateTotal(p)}</strong></td>
+            <td class="col-money">${p.prize || '$0'}</td>
+            <td class="col-bonus">${p.fir || '-'}</td>
+            <td class="col-bonus">${p.gir || '-'}</td>
+            <td class="col-bonus">${p.scrambling || '-'}</td>
+            <td class="col-bonus">${p.ntp || '-'}</td>
+        `;
+        lbBody.appendChild(tr);
+    });
 
         const stBody = document.getElementById('standings-body');
         const standings = Object.keys(tourData.seasonPoints || {}).map(name => {
