@@ -44,6 +44,7 @@
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9em; }
         
         .center { text-align: center !important; }
+        .right { text-align: right !important; }
 
         .pos { font-weight: bold; width: 40px; text-align: center; }
         .player-cell { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
@@ -58,8 +59,9 @@
         .under { color: #d9534f; }
         .total { font-weight: bold; background: #f9f9f9; width: 60px; }
         
-        .col-earnings { min-width: 110px; white-space: nowrap; color: var(--emerald); font-weight: bold; }
-        .prize { color: var(--emerald); font-weight: bold; text-align: right; white-space: nowrap; padding-right: 20px; }
+        /* Alignment Styles */
+        .col-earnings { min-width: 110px; white-space: nowrap; color: var(--emerald); font-weight: bold; text-align: right; }
+        .prize { color: var(--emerald); font-weight: bold; text-align: right; white-space: nowrap; }
 
         .bonus-stat { color: #666; font-size: 0.85em; width: 60px; }
 
@@ -94,7 +96,7 @@
                     <th class="r34 hidden center">R3</th>
                     <th class="r34 hidden center">R4</th>
                     <th class="center">Total</th>
-                    <th style="text-align:right">Prize</th>
+                    <th class="right">Prize</th>
                     <th class="center">FiR</th>
                     <th class="center">GiR</th>
                     <th class="center">Scram</th>
@@ -105,19 +107,16 @@
         </table>
     </div>
 
-    <h2>Season Standings & Stats</h2>
+    <h2>Season Standings</h2>
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
+                    <th class="center">Pos</th>
                     <th>Player</th>
                     <th class="center">Season Pts</th>
-                    <th class="center">Earnings</th>
+                    <th class="right">Earnings</th>
                     <th class="center">Events</th>
-                    <th class="center">FiR %</th>
-                    <th class="center">GiR %</th>
-                    <th class="center">Scram</th>
-                    <th class="center">NTP</th>
                 </tr>
             </thead>
             <tbody id="standings-body"></tbody>
@@ -169,7 +168,7 @@
                         <td class="r34 center ${hasR3 ? '' : 'hidden'}">${p.r3 || '-'}</td>
                         <td class="r34 center ${hasR3 ? '' : 'hidden'}">${p.r4 || '-'}</td>
                         <td class="total center">${total || '-'}</td>
-                        <td class="prize">${p.prize || '$0'}</td>
+                        <td class="prize right">${p.prize || '$0'}</td>
                         <td class="center bonus-stat">${p.fir || '-'}</td>
                         <td class="center bonus-stat">${p.gir || '-'}</td>
                         <td class="center bonus-stat">${p.scrambling || '-'}</td>
@@ -181,14 +180,12 @@
 
             // Season Standings rendering
             const sortedPlayers = Object.keys(data.seasonPoints || {}).sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
-            sortedPlayers.forEach(name => {
-                const bonus = data.seasonBonusStats ? data.seasonBonusStats[name] : null;
-                
-                // Find original console/country from player list to duplicate here
+            sortedPlayers.forEach((name, index) => {
                 const pInfo = data.players.find(p => p.name === name) || {};
 
                 const row = `
                     <tr>
+                        <td class="pos center">${index + 1}</td>
                         <td>
                             <div class="player-cell">
                                 <i class="fa-brands ${pInfo.console || 'fa-gamepad'}"></i>
@@ -197,12 +194,8 @@
                             </div>
                         </td>
                         <td class="center">${(data.seasonPoints[name] || 0).toLocaleString()}</td>
-                        <td class="center col-earnings">$ ${(data.seasonEarnings[name] || 0).toLocaleString()}</td>
+                        <td class="right col-earnings">$ ${(data.seasonEarnings[name] || 0).toLocaleString()}</td>
                         <td class="center">${data.seasonEvents[name] || 0}</td>
-                        <td class="center">${bonus?.fir || '-'}</td>
-                        <td class="center">${bonus?.gir || '-'}</td>
-                        <td class="center">${bonus?.scrambling || '-'}</td>
-                        <td class="center">${bonus?.ntp || '-'}</td>
                     </tr>
                 `;
                 stBody.innerHTML += row;
