@@ -22,7 +22,7 @@
         .header { background: #000; line-height: 0; }
         .header img { width: 100%; height: auto; display: block; }
         
-        /* Separate Venue Information Bar */
+        /* Venue Information Bar */
         .venue-bar { 
             display: flex; 
             flex-wrap: wrap; 
@@ -36,30 +36,32 @@
             border-bottom: 3px solid #0e3a0e;
         }
 
-        /* Responsive Table Wrapper */
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         
         h2 { background: #eee; margin: 0; padding: 15px; border-bottom: 2px solid var(--emerald); color: #333; font-size: 1.2em; }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; } 
-        th { background: #f8f8f8; color: #666; font-size: 0.8em; text-transform: uppercase; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; } 
+        th { background: #f8f8f8; color: #666; font-size: 0.75em; text-transform: uppercase; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9em; }
         
         .center { text-align: center !important; }
 
         .pos { font-weight: bold; width: 40px; text-align: center; }
         .player-cell { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
         
+        /* Console Icon Colors */
         .fa-playstation { color: var(--ps-blue); }
         .fa-xbox { color: var(--xbox-green); }
         .fa-steam { color: var(--steam-blue); }
         .fa-gamepad { color: #555; }
 
-        .to-par { font-weight: bold; width: 70px; }
+        .to-par { font-weight: bold; width: 60px; }
         .under { color: #d9534f; }
-        .total { font-weight: bold; background: #f9f9f9; width: 70px; }
+        .total { font-weight: bold; background: #f9f9f9; width: 60px; }
         
         .col-earnings { min-width: 110px; white-space: nowrap; color: var(--emerald); font-weight: bold; }
-        .prize { color: var(--emerald); font-weight: bold; text-align: right; white-space: nowrap; }
+        .prize { color: var(--emerald); font-weight: bold; text-align: right; white-space: nowrap; padding-right: 20px; }
+
+        .bonus-stat { color: #666; font-size: 0.85em; width: 60px; }
 
         tr:nth-child(even) { background-color: #fafafa; }
         .hidden { display: none; }
@@ -93,6 +95,10 @@
                     <th class="r34 hidden center">R4</th>
                     <th class="center">Total</th>
                     <th style="text-align:right">Prize</th>
+                    <th class="center">FiR</th>
+                    <th class="center">GiR</th>
+                    <th class="center">Scram</th>
+                    <th class="center">NTP</th>
                 </tr>
             </thead>
             <tbody id="leaderboard-body"></tbody>
@@ -139,6 +145,7 @@
             const hasR3 = data.players.some(p => p.r3 && p.r3 > 0);
             if(hasR3) document.querySelectorAll('.r34').forEach(el => el.classList.remove('hidden'));
 
+            // Leaderboard rendering
             data.players.forEach((p, index) => {
                 const par = parseInt(data.coursePar) || 72;
                 let total = 0, rounds = 0;
@@ -163,17 +170,32 @@
                         <td class="r34 center ${hasR3 ? '' : 'hidden'}">${p.r4 || '-'}</td>
                         <td class="total center">${total || '-'}</td>
                         <td class="prize">${p.prize || '$0'}</td>
+                        <td class="center bonus-stat">${p.fir || '-'}</td>
+                        <td class="center bonus-stat">${p.gir || '-'}</td>
+                        <td class="center bonus-stat">${p.scrambling || '-'}</td>
+                        <td class="center bonus-stat">${p.ntp || '-'}</td>
                     </tr>
                 `;
                 lbBody.innerHTML += row;
             });
 
+            // Season Standings rendering
             const sortedPlayers = Object.keys(data.seasonPoints || {}).sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
             sortedPlayers.forEach(name => {
                 const bonus = data.seasonBonusStats ? data.seasonBonusStats[name] : null;
+                
+                // Find original console/country from player list to duplicate here
+                const pInfo = data.players.find(p => p.name === name) || {};
+
                 const row = `
                     <tr>
-                        <td style="font-weight:bold">${name}</td>
+                        <td>
+                            <div class="player-cell">
+                                <i class="fa-brands ${pInfo.console || 'fa-gamepad'}"></i>
+                                <span class="fi fi-${pInfo.country || 'un'}"></span>
+                                <span style="font-weight:bold">${name}</span>
+                            </div>
+                        </td>
                         <td class="center">${(data.seasonPoints[name] || 0).toLocaleString()}</td>
                         <td class="center col-earnings">$ ${(data.seasonEarnings[name] || 0).toLocaleString()}</td>
                         <td class="center">${data.seasonEvents[name] || 0}</td>
