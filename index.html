@@ -18,11 +18,23 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; margin: 10px; }
         .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        /* Header & Logo */
-        .header { background: linear-gradient(135deg, var(--dark-emerald), var(--emerald)); color: white; padding: 20px; text-align: center; }
-        .header img { max-width: 300px; height: auto; margin-bottom: 15px; }
+        /* Full Width Logo Header */
+        .header { background: #000; line-height: 0; }
+        .header img { width: 100%; height: auto; display: block; }
         
-        .event-info { display: flex; flex-wrap: wrap; justify-content: space-around; background: #0e3a0e; padding: 10px; font-weight: bold; font-size: 0.85em; gap: 10px; }
+        /* Separate Venue Information Bar */
+        .venue-bar { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: space-around; 
+            background: linear-gradient(135deg, var(--dark-emerald), var(--emerald)); 
+            color: white; 
+            padding: 12px 10px; 
+            font-weight: bold; 
+            font-size: 0.9em; 
+            gap: 10px;
+            border-bottom: 3px solid #0e3a0e;
+        }
 
         /* Responsive Table Wrapper */
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -37,7 +49,6 @@
         .pos { font-weight: bold; width: 40px; text-align: center; }
         .player-cell { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
         
-        /* Console Icon Colors */
         .fa-playstation { color: var(--ps-blue); }
         .fa-xbox { color: var(--xbox-green); }
         .fa-steam { color: var(--steam-blue); }
@@ -47,7 +58,6 @@
         .under { color: #d9534f; }
         .total { font-weight: bold; background: #f9f9f9; width: 70px; }
         
-        /* Wider Earnings Column */
         .col-earnings { min-width: 110px; white-space: nowrap; color: var(--emerald); font-weight: bold; }
         .prize { color: var(--emerald); font-weight: bold; text-align: right; white-space: nowrap; }
 
@@ -60,12 +70,13 @@
 <div class="container">
     <div class="header">
         <img src="logo.png" alt="Emerald Tour Logo">
-        <div class="event-info">
-            <span id="display-venue">---</span>
-            <span id="display-date">---</span>
-            <span>PAR: <span id="display-par">--</span></span>
-            <span>PURSE: <span id="display-purse">--</span></span>
-        </div>
+    </div>
+
+    <div class="venue-bar">
+        <span id="display-venue">---</span>
+        <span id="display-date">---</span>
+        <span>PAR: <span id="display-par">--</span></span>
+        <span>PURSE: <span id="display-purse">--</span></span>
     </div>
 
     <h2>Current Event Leaderboard</h2>
@@ -117,7 +128,6 @@
             if (!response.ok) throw new Error("JSON not found");
             const data = await response.json();
 
-            // Header info remains dynamic from JSON
             document.getElementById('display-venue').textContent = data.venue || "---";
             document.getElementById('display-date').textContent = data.date || "---";
             document.getElementById('display-par').textContent = data.coursePar || "--";
