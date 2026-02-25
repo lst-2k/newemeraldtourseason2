@@ -18,21 +18,21 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; margin: 10px; }
         .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        /* Header */
-        .header { background: linear-gradient(135deg, var(--dark-emerald), var(--emerald)); color: white; padding: 25px; text-align: center; }
-        .header h1 { margin: 0; font-size: 2em; text-transform: uppercase; letter-spacing: 2px; }
+        /* Header & Logo */
+        .header { background: linear-gradient(135deg, var(--dark-emerald), var(--emerald)); color: white; padding: 20px; text-align: center; }
+        .header img { max-width: 300px; height: auto; margin-bottom: 15px; }
+        
         .event-info { display: flex; flex-wrap: wrap; justify-content: space-around; background: #0e3a0e; padding: 10px; font-weight: bold; font-size: 0.85em; gap: 10px; }
 
         /* Responsive Table Wrapper */
         .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         
         h2 { background: #eee; margin: 0; padding: 15px; border-bottom: 2px solid var(--emerald); color: #333; font-size: 1.2em; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; } /* Min-width ensures scroll triggers */
+        table { width: 100%; border-collapse: collapse; min-width: 700px; } 
         th { background: #f8f8f8; color: #666; font-size: 0.8em; text-transform: uppercase; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
         td { padding: 12px; border-bottom: 1px solid #eee; }
         
-        /* Centering Requirements */
-        th.center, td.center { text-align: center !important; }
+        .center { text-align: center !important; }
 
         .pos { font-weight: bold; width: 40px; text-align: center; }
         .player-cell { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
@@ -46,6 +46,9 @@
         .to-par { font-weight: bold; width: 70px; }
         .under { color: #d9534f; }
         .total { font-weight: bold; background: #f9f9f9; width: 70px; }
+        
+        /* Wider Earnings Column */
+        .col-earnings { min-width: 110px; white-space: nowrap; color: var(--emerald); font-weight: bold; }
         .prize { color: var(--emerald); font-weight: bold; text-align: right; white-space: nowrap; }
 
         tr:nth-child(even) { background-color: #fafafa; }
@@ -56,7 +59,7 @@
 
 <div class="container">
     <div class="header">
-        <h1 id="main-title">EMERALD TOUR</h1>
+        <img src="logo.png" alt="Emerald Tour Logo">
         <div class="event-info">
             <span id="display-venue">---</span>
             <span id="display-date">---</span>
@@ -114,7 +117,7 @@
             if (!response.ok) throw new Error("JSON not found");
             const data = await response.json();
 
-            document.getElementById('main-title').textContent = data.header || "EMERALD TOUR";
+            // Header info remains dynamic from JSON
             document.getElementById('display-venue').textContent = data.venue || "---";
             document.getElementById('display-date').textContent = data.date || "---";
             document.getElementById('display-par').textContent = data.coursePar || "--";
@@ -162,7 +165,7 @@
                     <tr>
                         <td style="font-weight:bold">${name}</td>
                         <td class="center">${(data.seasonPoints[name] || 0).toLocaleString()}</td>
-                        <td class="center" style="color:var(--emerald)">$ ${(data.seasonEarnings[name] || 0).toLocaleString()}</td>
+                        <td class="center col-earnings">$ ${(data.seasonEarnings[name] || 0).toLocaleString()}</td>
                         <td class="center">${data.seasonEvents[name] || 0}</td>
                         <td class="center">${bonus?.fir || '-'}</td>
                         <td class="center">${bonus?.gir || '-'}</td>
