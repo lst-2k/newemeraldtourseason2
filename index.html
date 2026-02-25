@@ -3,306 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emerald Tour - Member Portal</title>
+    <title>Emerald Tour - Professional Leaderboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; margin: 0; padding: 10px; }
-        .leaderboard-container { max-width: 1450px; margin: 0 auto; background-color: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        :root { --emerald: #228B22; --dark-emerald: #124d12; --gold: #FFD700; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; margin: 20px; }
+        .leaderboard-container { max-width: 1300px; margin: 0 auto; background-color: white; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         
-        .header { background: #124d12; padding: 0; text-align: center; border-bottom: 4px solid #FFD700; height: 220px; display: flex; align-items: center; justify-content: center; }
-        .header img { width: 100%; height: 100%; object-fit: contain; }
+        .header { background: linear-gradient(135deg, var(--dark-emerald) 0%, var(--emerald) 50%, var(--dark-emerald) 100%); color: white; padding: 25px 80px; text-align: center; font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; border-bottom: 4px solid var(--gold); position: relative; display: flex; align-items: center; justify-content: center; }
+        .header img { position: absolute; top: 50%; transform: translateY(-50%); height: 50px; width: auto; }
+        .logo-left { left: 40px; } .logo-right { right: 50px; }
         
-        .venue-bar { background: #444; color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 16px; border-bottom: 1px solid #000; }
+        .info-bar { display: flex; justify-content: space-around; background: #333; color: white; padding: 12px; font-size: 14px; text-transform: uppercase; }
+        .info-item span { color: var(--gold); margin-left: 8px; font-weight: bold; }
+        .venue { background: #444; color: #FFFFF7; padding: 12px; text-align: center; font-size: 18px; font-weight: bold; border-bottom: 1px solid #000; }
 
-        .table-responsive { width: 100%; overflow-x: auto; border-bottom: 1px solid #ddd; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background-color: #e6e6e6; padding: 10px 12px; font-size: 11px; border-bottom: 2px solid #ddd; text-transform: uppercase; color: #444; }
-        td { padding: 8px 12px; border-bottom: 1px solid #ddd; font-size: 13px; white-space: nowrap; }
-        
-        /* To Par Colors */
-        .to-par { font-weight: bold; text-align: center; font-size: 15px; }
-        .to-par.under { color: #8B0000; } 
-        .to-par.even   { color: #1AA260; }
-        .to-par.over   { color: #000000; }
+        .controls { padding: 15px; background-color: var(--emerald); display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid #ddd; }
+        .controls button { padding: 8px 16px; font-size: 12px; background-color: #006400; color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .controls button:hover { background-color: #1a5e1a; }
+        .btn-danger { background-color: #8b0000 !important; }
 
-        .middle-logo-divider { text-align: center; padding: 30px 20px; background-color: #fff; display: flex; justify-content: center; }
-        .middle-logo-divider img { max-width: 100%; max-height: 150px; width: auto; object-fit: contain; }
+        .player-input { padding: 15px; background-color: #f8f8f8; text-align: center; border-bottom: 1px solid #ddd; }
+        .player-input input { padding: 8px; width: 250px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
 
-        .col-pos { width: 45px; text-align: center; font-weight: bold; color: #228B22; }
-        .col-stat { width: 70px; text-align: center; }
-        .col-money { width: 110px; text-align: center; font-weight: bold; }
-        .col-bonus { width: 75px; text-align: center; background-color: #fcfcfc; color: #666; font-size: 12px; border-left: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { background-color: #eee; padding: 12px; text-align: left; font-size: 13px; border-bottom: 2px solid #ddd; }
+        td { padding: 8px 12px; border-bottom: 1px solid #ddd; font-size: 15px; vertical-align: middle; }
+
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
         
-        .section-title { background: #228B22; color: white; padding: 10px 15px; font-size: 16px; font-weight: bold; border-left: 8px solid #FFD700; }
-        .player-name { font-weight: bold; }
-        .standings-right { text-align: right; padding-right: 25px; }
+        .score-input { width: 45px; text-align: center; border: 1px solid #ccc; padding: 5px; font-size: 15px; border-radius: 3px; }
+        .score-input:focus { background-color: #fff9c4; outline: 2px solid var(--emerald); }
+
+        .pos { font-weight: bold; text-align: center; width: 55px; }
+        .player-content { display: flex; align-items: center; gap: 10px; }
+        .console-icon { cursor: pointer; width: 20px; color: #555; font-size: 16px; }
+        .delete-btn { cursor: pointer; color: #cc0000; font-size: 14px; margin-right: 5px; opacity: 0.7; transition: 0.2s; }
+        .delete-btn:hover { opacity: 1; transform: scale(1.1); }
+        .to-par { font-weight: bold; text-align: center; width: 65px; }
+        .under { color: #d32f2f; }
+        .prize-cell { font-weight: bold; text-align: right; width: 110px; }
+
+        .section-header { background: #222; color: var(--gold); padding: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .history-container { background: #fff; border-top: 2px solid #444; }
+        .history-table th { background: #f0f0f0; color: #333; }
+
+        .hof-container { padding: 30px; background: #1a1a1a; color: white; text-align: center; }
+        .hof-cards { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        .hof-card { border: 1px solid var(--gold); padding: 15px; border-radius: 8px; width: 180px; background: rgba(255,255,255,0.05); }
         .hidden { display: none; }
-        
-        /* Cutoff logic */
-        .top-tier { background: linear-gradient(to right, #eef7ee, #ffffff) !important; }
-        .cutoff-row td { border-bottom: 4px solid #228B22 !important; }
-
-        /* Container adjustments for mobile spacing */
-		.hof-cards {
-			display: flex;
-			justify-content: center;
-			gap: 20px;
-			flex-wrap: wrap;
-			padding: 30px 10px;
-			perspective: 1000px;
-		}
-
-		.hof-card {
-			background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-			border: 1px solid rgba(255, 215, 0, 0.4);
-			border-radius: 12px;
-			padding: 20px 15px;
-			width: 160px; /* Slimmer for mobile side-by-side display */
-			text-align: center;
-			position: relative;
-			
-			/* THE 3D EFFECT: Default Tilt and Lift */
-			transform: rotateX(10deg) rotateY(-5deg); 
-			box-shadow: 
-				5px 5px 0px rgba(0, 0, 0, 0.2),   /* Side thickness */
-				10px 15px 25px rgba(0, 0, 0, 0.5); /* Ground shadow */
-			
-			transition: transform 0.3s ease;
-		}
-
-		/* Add a "shine" layer to the top of the card */
-		.hof-card::after {
-			content: "";
-			position: absolute;
-			top: 0; left: 0; right: 0; bottom: 0;
-			border-radius: 12px;
-			background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
-			pointer-events: none;
-		}
-
-		/* Specific styling for the Gold winner to stand out more */
-		.hof-card:nth-child(1) {
-			border: 2px solid #FFD700;
-			transform: rotateX(10deg) rotateY(-5deg) scale(1.05);
-			z-index: 2; /* Keeps it on top of other cards */
-		}
-
-		/* For mobile: if they DO tap it, it "depresses" like a button */
-		.hof-card:active {
-			transform: rotateX(0deg) rotateY(0deg) scale(0.98);
-			box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-		}
-
-		.hof-medal {
-			font-size: 36px;
-			margin-bottom: 5px;
-			/* Makes the emoji look 3D */
-			filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.5));
-		}
     </style>
 </head>
 <body>
 
-<div class="leaderboard-container">
-    <div class="header"><img src="logo.png" alt="Logo"></div>
-    <div id="venue-display" class="venue-bar">Tournament Loading...</div>
-
-    <div class="table-responsive">
-        <table>
-            <thead>
-                <tr>
-                    <th class="col-pos">POS</th>
-                    <th style="text-align:left">PLAYER</th>
-                    <th class="col-stat">TO PAR</th>
-                    <th class="col-stat">R1</th>
-                    <th class="col-stat">R2</th>
-                    <th id="th-r3" class="col-stat hidden">R3</th>
-                    <th id="th-r4" class="col-stat hidden">R4</th>
-                    <th class="col-stat">TOT</th>
-                    <th class="col-money">PRIZE</th>
-                    <th class="col-bonus">FiR%</th>
-                    <th class="col-bonus">GiR%</th>
-                    <th class="col-bonus">SCRAM</th>
-                    <th class="col-bonus">NTP</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboard-body"></tbody>
-        </table>
+<div id="capture-area" class="leaderboard-container">
+    <div class="header">
+        <img src="2k25 logo.png" class="logo-left">
+        <span id="header-text-content" contenteditable="true">● Emerald Tour Leaderboard</span>
+        <img src="FedEx-Cup-logo.png" class="logo-right">
     </div>
 
-    <div class="middle-logo-divider"><img src="2k25 logo.png"></div>
-    <div class="section-title">Season Standings</div>
+    <div class="info-bar">
+        <div class="info-item">Date: <span id="date-field" contenteditable="true">Feb 2026</span></div>
+        <div class="info-item">Par: <span id="course-par" contenteditable="true">72</span></div>
+        <div class="info-item">Prize Pool: $<span id="prize-pool" contenteditable="true">500,000</span></div>
+    </div>
+    
+    <div class="venue" id="current-venue" contenteditable="true">Season 1, Week 1 - Ritz-Carlton Golf Club</div>
 
-    <div class="table-responsive">
-        <table>
+    <div class="player-input">
+        <input type="text" id="new-player-name" placeholder="Enter Player Name">
+        <button id="add-player">Add Player</button>
+    </div>
+
+    <div class="controls">
+        <button id="toggle-r3-r4">Show R3/R4</button>
+        <button id="export-png">Export PNG</button>
+        <button id="export-json">Export JSON</button>
+        <button id="import-json">Import JSON</button>
+        <button id="new-tournament" class="btn-danger">Finalize Tournament</button>
+        <button id="clear-season" class="btn-danger">Reset All Data</button>
+    </div>
+
+    <table id="leaderboard-table">
+        <thead>
+            <tr>
+                <th style="width:55px">POS</th>
+                <th style="width:300px">PLAYER</th>
+                <th style="width:65px">TO PAR</th>
+                <th>R1</th><th>R2</th>
+                <th class="r-extra hidden">R3</th>
+                <th class="r-extra hidden">R4</th>
+                <th style="width:60px">TOT</th>
+                <th class="prize-cell">PRIZE (v$)</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboard-body"></tbody>
+    </table>
+
+    <div class="section-header">Live Season Standings</div>
+    <table id="bonus-table">
+        <thead>
+            <tr>
+                <th style="width:250px">PLAYER</th>
+                <th>POINTS</th>
+                <th>EARNINGS</th>
+                <th>EV</th>
+                <th>FiR%</th>
+                <th>GiR%</th>
+                <th>SCR%</th>
+                <th>NTP</th>
+            </tr>
+        </thead>
+        <tbody id="bonus-body"></tbody>
+    </table>
+
+    <div class="section-header">Tournament History</div>
+    <div class="history-container">
+        <table class="history-table">
             <thead>
                 <tr>
-                    <th class="col-pos">POS</th>
-                    <th style="text-align:left">PLAYER</th>
-                    <th class="standings-right">POINTS</th>
-                    <th class="standings-right">EARNINGS</th>
-                    <th class="standings-right">EVENTS</th>
+                    <th>EVENT / VENUE</th>
+                    <th>WINNER</th>
+                    <th>SCORE</th>
+                    <th>PRIZE POOL</th>
                 </tr>
             </thead>
-            <tbody id="standings-body"></tbody>
+            <tbody id="history-body"></tbody>
         </table>
     </div>
 
     <div class="hof-container">
-        <div class="hof-header">🏆 Hall of Fame 🏆</div>
-        <div id="hof-display" class="hof-cards"></div>
+        <h3>🏆 EMERALD TOUR HALL OF FAME 🏆</h3>
+        <div class="hof-cards" id="hof-display"></div>
     </div>
 </div>
 
-<script>
-    const DATA_URL = 'data.json'; 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+	<script>
+    // --- DOM ELEMENTS ---
+    const tableBody = document.getElementById('leaderboard-body');
+    const bonusBody = document.getElementById('bonus-body');
+    const courseParElement = document.getElementById('course-par');
+    const dateField = document.getElementById('date-field');
+    const venueField = document.querySelector('.venue');
+    const prizePoolElement = document.getElementById('prize-pool');
+    const toggleButton = document.getElementById('toggle-r3-r4');
+    const newPlayerInput = document.getElementById('new-player-name');
+    let showR3R4 = false;
 
-    async function loadTourData() {
-        try {
-            const response = await fetch(DATA_URL);
-            const data = await response.json();
-            renderAll(data);
-        } catch (err) { console.error("Error loading data:", err); }
+    // --- STORAGE KEYS ---
+    const STORAGE_KEY = 'golfLeaderboardData';
+    const SEASON_EARNINGS_KEY = 'golfSeasonEarnings';
+    const SEASON_POINTS_KEY = 'golfSeasonPoints';
+    const SEASON_EVENTS_KEY = 'golfSeasonEvents';
+    const BONUS_STATS_KEY = 'golfSeasonBonusStats'; // New key to preserve stats
+    const HISTORY_KEY = 'golfEventHistory';
+
+    // --- STATE ---
+    let seasonEarnings = JSON.parse(localStorage.getItem(SEASON_EARNINGS_KEY) || '{}');
+    let seasonPoints = JSON.parse(localStorage.getItem(SEASON_POINTS_KEY) || '{}');
+    let seasonEvents = JSON.parse(localStorage.getItem(SEASON_EVENTS_KEY) || '{}');
+    let seasonBonusStats = JSON.parse(localStorage.getItem(BONUS_STATS_KEY) || '{}');
+    let eventHistory = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+
+    const payoutPercentages = [0, 18.00, 10.90, 6.90, 4.90, 4.10, 3.70, 3.40, 3.10, 2.90, 2.70, 2.50, 2.30, 2.10, 2.00, 1.90, 1.70];
+    const pointsTable = [500, 300, 190, 135, 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 57, 54, 51, 48, 45, 42];
+
+    // --- CORE FUNCTIONS ---
+    function getCurrentPrizePool() { return parseInt(prizePoolElement.textContent.replace(/[$,]/g, '')) || 500000; }
+
+    function createMainRow(p) {
+        const tr = document.createElement('tr');
+        tr.dataset.player = p.name.trim();
+        tr.innerHTML = `
+            <td class="pos"></td>
+            <td class="player">
+                <div class="player-content">
+                    <i class="fa-solid fa-trash delete-btn" title="Delete"></i>
+                    <i class="console-icon fa-brands ${p.console || 'fa-gamepad'}"></i>
+                    <span class="fi fi-${(p.country || 'un').toLowerCase()}"></span>
+                    <span class="player-text editable" contenteditable="true">${p.name}</span>
+                </div>
+            </td>
+            <td class="to-par" data-type="topar">-</td>
+            <td class="round-score"><input type="number" class="score-input" value="${p.r1 || ''}"></td>
+            <td class="round-score"><input type="number" class="score-input" value="${p.r2 || ''}"></td>
+            <td class="round-score r-extra ${showR3R4 ? '' : 'hidden'}"><input type="number" class="score-input" value="${p.r3 || ''}"></td>
+            <td class="round-score r-extra ${showR3R4 ? '' : 'hidden'}"><input type="number" class="score-input" value="${p.r4 || ''}"></td>
+            <td class="total" data-type="total">-</td>
+            <td class="prize" data-type="prize">${p.prize || '$0'}</td>
+        `;
+
+        tr.querySelectorAll('.score-input').forEach(input => {
+            input.oninput = () => updateRowVisuals(tr); 
+            input.onblur = sortAndRender; 
+        });
+
+        tr.querySelector('.delete-btn').onclick = () => {
+            if(confirm('Delete ' + p.name + '?')) {
+                tr.remove();
+                document.querySelector('#bonus-body tr[data-player="' + p.name + '"]')?.remove();
+                sortAndRender();
+            }
+        };
+
+        const icon = tr.querySelector('.console-icon');
+        icon.onclick = () => {
+            const icons = ['fa-gamepad', 'fa-playstation', 'fa-xbox', 'fa-steam'];
+            icon.className = 'console-icon fa-brands ' + icons[(icons.indexOf(icon.classList[2]) + 1) % 4];
+            saveData();
+        };
+
+        return tr;
     }
 
-    function calculateToParValue(p, par) {
+    function createBonusRow(p) {
+        const tr = document.createElement('tr');
+        tr.dataset.player = p.name.trim();
+        // Load preserved stats if they exist
+        const stats = seasonBonusStats[p.name] || {};
+        tr.innerHTML = `
+            <td class="player">${p.name}</td>
+            <td class="season-points">${(seasonPoints[p.name] || 0).toLocaleString()}</td>
+            <td class="season-earnings">$ ${(seasonEarnings[p.name] || 0).toLocaleString()}</td>
+            <td class="season-events">${seasonEvents[p.name] || 0}</td>
+            <td class="editable bonus-input fir" contenteditable="true">${p.fir || stats.fir || ''}</td>
+            <td class="editable bonus-input gir" contenteditable="true">${p.gir || stats.gir || ''}</td>
+            <td class="editable bonus-input scrambling" contenteditable="true">${p.scrambling || stats.scrambling || ''}</td>
+            <td class="editable bonus-input ntp" contenteditable="true">${p.ntp || stats.ntp || ''}</td>
+        `;
+        return tr;
+    }
+
+    function updateRowVisuals(tr) {
+        const par = parseInt(courseParElement.textContent) || 72;
         let total = 0, played = 0;
-        [p.r1, p.r2, p.r3, p.r4].forEach(r => {
-            let val = parseInt(r);
-            if (!isNaN(val) && val > 0) { total += val; played++; }
+        tr.querySelectorAll('.score-input').forEach(inp => {
+            const val = parseInt(inp.value);
+            if (!inp.parentElement.classList.contains('hidden') && val > 0) {
+                total += val; played++;
+            }
         });
-        return played > 0 ? total - (par * played) : null;
+        const tp = played > 0 ? total - (par * played) : null;
+        tr.querySelector('[data-type="total"]').textContent = total || '-';
+        const tpCell = tr.querySelector('[data-type="topar"]');
+        tpCell.textContent = tp === 0 ? 'E' : (tp > 0 ? '+' + tp : (tp === null ? '-' : tp));
+        tpCell.className = 'to-par ' + (tp < 0 ? 'under' : tp > 0 ? 'over' : '');
     }
 
-    function getToParClass(score) {
-        if (score === null) return '';
-        if (score < 0) return 'under';
-        if (score === 0) return 'even';
-        return 'over';
-    }
-
-    function formatToPar(score) {
-        if (score === null) return '-';
-        if (score === 0) return 'E';
-        return (score > 0 ? '+' : '') + score;
-    }
-
-    function calculateTotal(p) {
-        let s = [p.r1, p.r2, p.r3, p.r4].filter(v => v && v > 0);
-        return s.length > 0 ? s.reduce((a, b) => parseInt(a) + parseInt(b), 0) : 999;
-    }
-
-    function getConsoleColor(console) {
-        if (console === 'fa-playstation') return '#003791';
-        if (console === 'fa-xbox') return '#107C10';
-        return '#555';
-    }
-
-    function renderAll(tourData) {
-        document.getElementById('venue-display').textContent = tourData.venue;
-        const par = parseInt(tourData.coursePar) || 72;
-
-        const hasR3 = tourData.players.some(p => p.r3 > 0);
-        const hasR4 = tourData.players.some(p => p.r4 > 0);
-        const showExtended = tourData.showR3R4 || hasR3 || hasR4;
-
-        if (showExtended) {
-            document.getElementById('th-r3').classList.remove('hidden');
-            document.getElementById('th-r4').classList.remove('hidden');
-        }
-
-        // 1. LEADERBOARD
-        const lbBody = document.getElementById('leaderboard-body');
-        lbBody.innerHTML = '';
-        const sortedLB = [...tourData.players].sort((a,b) => calculateTotal(a) - calculateTotal(b));
-        
-        sortedLB.forEach((p, idx) => {
-            const toParVal = calculateToParValue(p, par);
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="col-pos">${idx + 1}</td>
-                <td class="player-name">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <i class="fa-brands ${p.console || 'fa-gamepad'}" style="color:${getConsoleColor(p.console)}"></i>
-                        <span class="fi fi-${(p.country || 'un').toLowerCase()}"></span>
-                        ${p.name}
-                    </div>
-                </td>
-                <td class="to-par ${getToParClass(toParVal)}">${formatToPar(toParVal)}</td>
-                <td class="col-stat">${p.r1 || '-'}</td>
-                <td class="col-stat">${p.r2 || '-'}</td>
-                <td class="col-stat ${showExtended ? '' : 'hidden'}">${p.r3 || '-'}</td>
-                <td class="col-stat ${showExtended ? '' : 'hidden'}">${p.r4 || '-'}</td>
-                <td class="col-stat"><strong>${calculateTotal(p) === 999 ? '-' : calculateTotal(p)}</strong></td>
-                <td class="col-money">${p.prize || '$0'}</td>
-                <td class="col-bonus">${p.fir || '-'}</td>
-                <td class="col-bonus">${p.gir || '-'}</td>
-                <td class="col-bonus">${p.scrambling || '-'}</td>
-                <td class="col-bonus">${p.ntp || '-'}</td>
-            `;
-            lbBody.appendChild(tr);
+    function sortAndRender() {
+        const rows = Array.from(tableBody.children);
+        const sorted = rows.sort((a,b) => {
+            const totalA = parseInt(a.querySelector('[data-type="total"]').textContent) || 9999;
+            const totalB = parseInt(b.querySelector('[data-type="total"]').textContent) || 9999;
+            return totalA - totalB;
         });
 
-        // 2. SEASON STANDINGS
-        const stBody = document.getElementById('standings-body');
-        stBody.innerHTML = '';
+        const pool = getCurrentPrizePool();
+        let rank = 1, i = 0;
         
-        // Map data from the separate JSON objects
-        const standings = Object.keys(tourData.seasonPoints || {}).map(name => {
-            const pInfo = tourData.players.find(pl => pl.name === name) || {};
-            return {
-                name,
-                points: tourData.seasonPoints[name] || 0,
-                earnings: tourData.seasonEarnings[name] || 0,
-                events: tourData.seasonEvents[name] || 0,
-                console: pInfo.console || 'fa-gamepad',
-                country: pInfo.country || 'un'
-            };
-        }).sort((a, b) => b.points - a.points);
+        sorted.forEach(r => {
+            r.querySelector('.pos').textContent = '-';
+            r.querySelector('[data-type="prize"]').textContent = '$0';
+        });
 
-        const cutoffIdx = Math.ceil(standings.length / 2) - 1;
-
-        standings.forEach((p, idx) => {
-            const tr = document.createElement('tr');
-            if (idx <= cutoffIdx) tr.classList.add('top-tier');
-            if (idx === cutoffIdx) tr.classList.add('cutoff-row');
+        while(i < sorted.length) {
+            const totalStr = sorted[i].querySelector('[data-type="total"]').textContent;
+            if (totalStr === '-') break;
+            let tieCount = 0;
+            while(i + tieCount < sorted.length && sorted[i+tieCount].querySelector('[data-type="total"]').textContent === totalStr) tieCount++;
             
-            tr.innerHTML = `
-                <td class="col-pos">${idx + 1}</td>
-                <td class="player-name">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <i class="fa-brands ${p.console}" style="color:${getConsoleColor(p.console)}"></i>
-                        <span class="fi fi-${p.country.toLowerCase()}"></span>
-                        ${p.name}
-                    </div>
-                </td>
-                <td class="standings-right">${p.points.toLocaleString()}</td>
-                <td class="standings-right" style="font-weight:bold;">$${p.earnings.toLocaleString()}</td>
-                <td class="standings-right">${p.events}</td>
-            `;
-            stBody.appendChild(tr);
-        });
+            let prizeSum = 0;
+            let pointsSum = 0;
+            for(let p = rank; p < rank + tieCount; p++) {
+                if(p <= 16) prizeSum += pool * (payoutPercentages[p]/100);
+                if(p <= 20) pointsSum += pointsTable[p-1];
+            }
+            
+            const sharedPrize = Math.round(prizeSum/tieCount);
+            const sharedPoints = Math.round(pointsSum/tieCount);
 
-        // 3. HALL OF FAME
-        const hofDisplay = document.getElementById('hof-display');
-        hofDisplay.innerHTML = '';
-        const sortedHOF = [...standings].sort((a,b) => b.earnings - a.earnings).slice(0,3);
-        const medals = ['🥇', '🥈', '🥉'];
-        
-        sortedHOF.forEach((p, i) => {
-            const card = document.createElement('div');
-            card.className = 'hof-card';
-            card.innerHTML = `
-                <div style="font-size:24px;">${medals[i]}</div>
-                <div style="font-size:14px; font-weight:bold; margin:5px 0;">${p.name}</div>
-                <div style="font-size:12px; color:#FFD700">$${p.earnings.toLocaleString()}</div>
-            `;
-            hofDisplay.appendChild(card);
-        });
+            for(let j = 0; j < tieCount; j++) {
+                const r = sorted[i+j];
+                const playerName = r.dataset.player;
+                r.querySelector('.pos').textContent = tieCount > 1 ? 'T' + rank : rank;
+                r.querySelector('[data-type="prize"]').textContent = '$' + sharedPrize.toLocaleString();
+
+                const bRow = bonusBody.querySelector('tr[data-player="' + playerName + '"]');
+                if (bRow) {
+                    bRow.querySelector('.season-points').textContent = ((seasonPoints[playerName] || 0) + sharedPoints).toLocaleString();
+                    bRow.querySelector('.season-earnings').textContent = '$ ' + ((seasonEarnings[playerName] || 0) + sharedPrize).toLocaleString();
+                }
+            }
+            i += tieCount; rank += tieCount;
+        }
+        sorted.forEach(r => tableBody.appendChild(r));
+        saveData();
     }
 
-    window.onload = loadTourData;
+    function exportToJSON() {
+        const data = {
+            header: document.getElementById('header-text-content').textContent.trim(),
+            date: dateField.textContent.trim(),
+            venue: venueField.textContent.trim(),
+            coursePar: courseParElement.textContent.trim(),
+            prizePool: prizePoolElement.textContent.trim(),
+            seasonEarnings, seasonPoints, seasonEvents, eventHistory, seasonBonusStats,
+            players: Array.from(tableBody.querySelectorAll('tr')).map(r => {
+                const name = r.dataset.player;
+                const bRow = bonusBody.querySelector('tr[data-player="' + name + '"]');
+                return {
+                    name,
+                    console: r.querySelector('.console-icon').classList[2],
+                    country: r.querySelector('.fi').classList[1].split('-')[1],
+                    r1: r.querySelectorAll('.score-input')[0].value,
+                    r2: r.querySelectorAll('.score-input')[1].value,
+                    r3: r.querySelectorAll('.score-input')[2].value,
+                    r4: r.querySelectorAll('.score-input')[3].value,
+                    prize: r.querySelector('[data-type="prize"]').textContent,
+                    livePoints: bRow ? bRow.querySelector('.season-points').textContent : '0',
+                    fir: bRow ? bRow.querySelector('.fir').textContent : '',
+                    gir: bRow ? bRow.querySelector('.gir').textContent : '',
+                    scrambling: bRow ? bRow.querySelector('.scrambling').textContent : '',
+                    ntp: bRow ? bRow.querySelector('.ntp').textContent : ''
+                };
+            })
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'emerald_tour_full_backup.json'; a.click();
+    }
+
+    document.getElementById('new-tournament').onclick = () => {
+        if (!confirm("Finalize tournament? This updates Season totals AND preserves FiR/GiR/SCR/NTP stats.")) return;
+        
+        tableBody.querySelectorAll('tr').forEach(r => {
+            const name = r.dataset.player;
+            const prize = parseInt(r.querySelector('[data-type="prize"]').textContent.replace(/[$,]/g, '')) || 0;
+            const rank = parseInt(r.querySelector('.pos').textContent.replace('T','')) || 99;
+            const points = (rank <= 20) ? pointsTable[rank-1] : 0;
+
+            if (r.querySelector('[data-type="total"]').textContent !== '-') {
+                seasonEarnings[name] = (seasonEarnings[name] || 0) + prize;
+                seasonPoints[name] = (seasonPoints[name] || 0) + points;
+                seasonEvents[name] = (seasonEvents[name] || 0) + 1;
+
+                // PRESERVE BONUS STATS
+                const bRow = bonusBody.querySelector('tr[data-player="' + name + '"]');
+                if(bRow) {
+                    seasonBonusStats[name] = {
+                        fir: bRow.querySelector('.fir').textContent,
+                        gir: bRow.querySelector('.gir').textContent,
+                        scrambling: bRow.querySelector('.scrambling').textContent,
+                        ntp: bRow.querySelector('.ntp').textContent
+                    };
+                }
+            }
+        });
+        
+        localStorage.setItem(SEASON_EARNINGS_KEY, JSON.stringify(seasonEarnings));
+        localStorage.setItem(SEASON_POINTS_KEY, JSON.stringify(seasonPoints));
+        localStorage.setItem(SEASON_EVENTS_KEY, JSON.stringify(seasonEvents));
+        localStorage.setItem(BONUS_STATS_KEY, JSON.stringify(seasonBonusStats));
+        
+        alert("Season finalized and Bonus Stats preserved!");
+        location.reload();
+    };
+
+    document.getElementById('clear-season').onclick = () => {
+        if (!confirm("Clear current scores? Season Standings and preserved stats remain.")) return;
+        tableBody.querySelectorAll('.score-input').forEach(i => i.value = '');
+        sortAndRender();
+    };
+
+    document.getElementById('import-json').onclick = () => {
+        const input = document.createElement('input'); input.type = 'file';
+        input.onchange = e => {
+            const reader = new FileReader();
+            reader.onload = f => {
+                const d = JSON.parse(f.target.result);
+                localStorage.clear();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+                if(d.seasonEarnings) localStorage.setItem(SEASON_EARNINGS_KEY, JSON.stringify(d.seasonEarnings));
+                if(d.seasonPoints) localStorage.setItem(SEASON_POINTS_KEY, JSON.stringify(d.seasonPoints));
+                if(d.seasonEvents) localStorage.setItem(SEASON_EVENTS_KEY, JSON.stringify(d.seasonEvents));
+                if(d.seasonBonusStats) localStorage.setItem(BONUS_STATS_KEY, JSON.stringify(d.seasonBonusStats));
+                location.reload();
+            };
+            reader.readAsText(e.target.files[0]);
+        };
+        input.click();
+    };
+
+    function saveData() {
+        const players = Array.from(tableBody.children).map(r => ({
+            name: r.dataset.player,
+            console: r.querySelector('.console-icon').classList[2],
+            country: r.querySelector('.fi').classList[1].split('-')[1],
+            r1: r.querySelectorAll('.score-input')[0].value,
+            r2: r.querySelectorAll('.score-input')[1].value,
+            r3: r.querySelectorAll('.score-input')[2].value,
+            r4: r.querySelectorAll('.score-input')[3].value,
+            prize: r.querySelector('[data-type="prize"]').textContent
+        }));
+        
+        // Save temporary round data
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            header: document.getElementById('header-text-content').textContent,
+            date: dateField.textContent, venue: venueField.textContent,
+            coursePar: courseParElement.textContent, players
+        }));
+
+        // Also save current live bonus inputs so they don't vanish on refresh
+        const currentLiveBonus = {};
+        bonusBody.querySelectorAll('tr').forEach(tr => {
+            currentLiveBonus[tr.dataset.player] = {
+                fir: tr.querySelector('.fir').textContent,
+                gir: tr.querySelector('.gir').textContent,
+                scrambling: tr.querySelector('.scrambling').textContent,
+                ntp: tr.querySelector('.ntp').textContent
+            };
+        });
+        localStorage.setItem(BONUS_STATS_KEY, JSON.stringify(currentLiveBonus));
+    }
+
+    function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const saved = JSON.parse(raw);
+        tableBody.innerHTML = ''; bonusBody.innerHTML = '';
+        saved.players.forEach(p => {
+            tableBody.appendChild(createMainRow(p));
+            bonusBody.appendChild(createBonusRow(p));
+        });
+        sortAndRender();
+    }
+
+    document.getElementById('add-player').onclick = () => {
+        const name = newPlayerInput.value.trim();
+        if(!name) return;
+        tableBody.appendChild(createMainRow({name: name}));
+        bonusBody.appendChild(createBonusRow({name: name}));
+        newPlayerInput.value = '';
+        sortAndRender();
+    };
+
+    toggleButton.onclick = () => {
+        showR3R4 = !showR3R4;
+        document.querySelectorAll('th.r-extra, td.r-extra').forEach(el => el.classList.toggle('hidden'));
+        toggleButton.textContent = showR3R4 ? 'Hide R3/R4' : 'Show R3/R4';
+        sortAndRender();
+    };
+
+    document.getElementById('export-json').onclick = exportToJSON;
+    window.onload = loadData;
 </script>
 </body>
 </html>
