@@ -1,7 +1,7 @@
 {
   "header": "EMERALD TOUR",
-  "venue": "The Royal Golf Club",
-  "date": "Feb 2026",
+  "venue": "Victor Pines",
+  "date": "25 Feb 2026",
   "coursePar": "72",
   "prizePool": "$500,000",
   "players": [
@@ -14,10 +14,24 @@
       "r3": "",
       "r4": "",
       "prize": "$90,000",
-      "fir": "",
+      "fir": "80",
       "gir": "",
       "scrambling": "",
       "ntp": ""
+    },
+    {
+      "name": "Geordieboy85",
+      "console": "fa-playstation",
+      "country": "gb",
+      "r1": "70",
+      "r2": "72",
+      "r3": "",
+      "r4": "",
+      "prize": "$54,500",
+      "fir": "",
+      "gir": "",
+      "scrambling": "",
+      "ntp": "21"
     },
     {
       "name": "x3offthetee",
@@ -27,10 +41,10 @@
       "r2": "71",
       "r3": "71",
       "r4": "71",
-      "prize": "$54,500",
+      "prize": "$34,500",
       "fir": "",
-      "gir": "",
-      "scrambling": "",
+      "gir": "77",
+      "scrambling": "66",
       "ntp": ""
     }
   ],
