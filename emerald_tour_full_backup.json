@@ -47,42 +47,12 @@
       "scrambling": "",
       "ntp": ""
     },
-    {
-      "name": "bfctino",
-      "console": "fa-playstation",
-      "country": "gb",
-      "r1": "",
-      "r2": "",
-      "r3": "",
-      "r4": "",
-      "prize": "$0",
-      "fir": "",
-      "gir": "",
-      "scrambling": "",
-      "ntp": ""
-    },
-    {
-      "name": "Arfabubble",
-      "console": "fa-playstation",
-      "country": "gb",
-      "r1": "",
-      "r2": "",
-      "r3": "",
-      "r4": "",
-      "prize": "$0",
-      "fir": "",
-      "gir": "",
-      "scrambling": "",
-      "ntp": ""
-    }
   ],
   "seasonPoints": {
-    "3offthetee": 1423,
-    "Colly": 2600,
     "Wing": 1607,
     "Kalessin": 1653,
     "Tenbobnote": 1668,
-    "Geordieboy": 937,
+    "Geordieboy85": 937,
     "Dubz": 368,
     "Arfabubble": 180,
     "Hammersman": 984,
@@ -93,8 +63,8 @@
     "Koof": 313,
     "SimChars": 155,
     "Horusphoenix": 135,
-    "x3offthetee": 800,
-    "Colly45x": 500
+    "x3offthetee": 1423,
+    "Colly45x": 2600
   },
   "seasonEarnings": {
     "3offthetee": 841091,
