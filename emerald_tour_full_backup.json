@@ -46,13 +46,15 @@
       "gir": "",
       "scrambling": "",
       "ntp": ""
-    },
+    }
   ],
   "seasonPoints": {
+    "3offthetee": 1423,
+    "Colly": 2600,
     "Wing": 1607,
     "Kalessin": 1653,
     "Tenbobnote": 1668,
-    "Geordieboy85": 937,
+    "Geordieboy": 937,
     "Dubz": 368,
     "Arfabubble": 180,
     "Hammersman": 984,
@@ -63,8 +65,9 @@
     "Koof": 313,
     "SimChars": 155,
     "Horusphoenix": 135,
-    "x3offthetee": 1423,
-    "Colly45x": 2600
+    "x3offthetee": 990,
+    "Colly45x": 1000,
+    "Geordieboy85": 300
   },
   "seasonEarnings": {
     "3offthetee": 841091,
@@ -83,8 +86,9 @@
     "Koof": 201407,
     "SimChars": 81982,
     "Horusphoenix": 99055,
-    "x3offthetee": 204500,
-    "Colly45x": 110000
+    "x3offthetee": 239000,
+    "Colly45x": 200000,
+    "Geordieboy85": 54500
   },
   "seasonEvents": {
     "3offthetee": 8,
@@ -103,7 +107,8 @@
     "Koof": 3,
     "SimChars": 2,
     "Horusphoenix": 1,
-    "x3offthetee": 2,
-    "Colly45x": 1
+    "x3offthetee": 3,
+    "Colly45x": 2,
+    "Geordieboy85": 1
   }
 }
