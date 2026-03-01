@@ -1,7 +1,7 @@
 {
   "header": "EMERALD TOUR",
-  "venue": "Victor Pines",
-  "date": "25 Feb 2026",
+  "venue": "The Royal Golf Club",
+  "date": "Feb 2026",
   "coursePar": "72",
   "prizePool": "$500,000",
   "players": [
@@ -14,7 +14,7 @@
       "r3": "",
       "r4": "",
       "prize": "$90,000",
-      "fir": "80",
+      "fir": "",
       "gir": "",
       "scrambling": "",
       "ntp": ""
@@ -31,7 +31,7 @@
       "fir": "",
       "gir": "",
       "scrambling": "",
-      "ntp": "21"
+      "ntp": ""
     },
     {
       "name": "x3offthetee",
@@ -43,8 +43,36 @@
       "r4": "71",
       "prize": "$34,500",
       "fir": "",
-      "gir": "77",
-      "scrambling": "66",
+      "gir": "",
+      "scrambling": "",
+      "ntp": ""
+    },
+    {
+      "name": "bfctino",
+      "console": "fa-playstation",
+      "country": "gb",
+      "r1": "",
+      "r2": "",
+      "r3": "",
+      "r4": "",
+      "prize": "$0",
+      "fir": "",
+      "gir": "",
+      "scrambling": "",
+      "ntp": ""
+    },
+    {
+      "name": "Arfabubble",
+      "console": "fa-playstation",
+      "country": "gb",
+      "r1": "",
+      "r2": "",
+      "r3": "",
+      "r4": "",
+      "prize": "$0",
+      "fir": "",
+      "gir": "",
+      "scrambling": "",
       "ntp": ""
     }
   ],
