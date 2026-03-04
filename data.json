@@ -9,11 +9,11 @@
       "name": "Colly45x",
       "console": "fa-xbox",
       "country": "gb",
-      "r1": "64",
-      "r2": "76",
+      "r1": "72",
+      "r2": "74",
       "r3": "",
       "r4": "",
-      "prize": "$90,000",
+      "prize": "$72,250",
       "fir": "",
       "gir": "",
       "scrambling": "",
@@ -23,11 +23,11 @@
       "name": "Geordieboy85",
       "console": "fa-playstation",
       "country": "gb",
-      "r1": "70",
-      "r2": "72",
+      "r1": "76",
+      "r2": "70",
       "r3": "",
       "r4": "",
-      "prize": "$54,500",
+      "prize": "$72,250",
       "fir": "",
       "gir": "",
       "scrambling": "",
@@ -37,7 +37,7 @@
       "name": "x3offthetee",
       "console": "fa-xbox",
       "country": "gb",
-      "r1": "73",
+      "r1": "77",
       "r2": "71",
       "r3": "",
       "r4": "",
@@ -51,7 +51,7 @@
       "name": "Mr Longpole",
       "console": "fa-xbox",
       "country": "gb",
-      "r1": "71",
+      "r1": "75",
       "r2": "74",
       "r3": "",
       "r4": "",
@@ -62,7 +62,22 @@
       "ntp": ""
     }
   ],
-  "seasonPoints": {},
-  "seasonEarnings": {},
-  "seasonEvents": {}
+  "seasonPoints": {
+    "Colly45x": 500,
+    "Geordieboy85": 500,
+    "x3offthetee": 190,
+    "Mr Longpole": 135
+  },
+  "seasonEarnings": {
+    "Colly45x": 72250,
+    "Geordieboy85": 72250,
+    "x3offthetee": 34500,
+    "Mr Longpole": 24500
+  },
+  "seasonEvents": {
+    "Colly45x": 1,
+    "Geordieboy85": 1,
+    "x3offthetee": 1,
+    "Mr Longpole": 1
+  }
 }
