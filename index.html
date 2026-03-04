@@ -28,6 +28,18 @@
             display: block;
         }
 
+        /* Middle Logo */
+        .mid-logo-container {
+            width: 100%;
+            text-align: center;
+            margin: 20px 0 40px 0;
+        }
+        .mid-logo {
+            max-width: 400px;
+            width: 80%;
+            height: auto;
+        }
+
         /* Broadcast Style Header */
         .event-info-bar {
             text-align: center;
@@ -55,7 +67,7 @@
         .table-container {
             width: 100%;
             overflow-x: auto;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 8px;
         }
@@ -76,7 +88,6 @@
 
         td { padding: 12px 10px; border-bottom: 1px solid #eee; background: white; }
 
-        /* One Line Player Info */
         .player-cell {
             display: flex;
             align-items: center;
@@ -84,7 +95,6 @@
             white-space: nowrap;
         }
 
-        /* Colors & Bonus Stats */
         .under-par { color: #d9534f; font-weight: bold; }
         .even-par { color: #228B22; font-weight: bold; }
         .over-par { color: #000; }
@@ -93,7 +103,6 @@
         .total-cell { font-weight: bold; text-align: center; background: #fafffa; border-left: 2px solid #eee; }
         .hidden-col { display: none; }
 
-        /* Podium styling */
         #season-body tr:nth-child(1) td { background: #fffdf2; border-left: 6px solid var(--gold); }
         #season-body tr:nth-child(2) td { background: #f9f9f9; border-left: 6px solid var(--silver); }
         #season-body tr:nth-child(3) td { background: #fffaf7; border-left: 6px solid var(--bronze); }
@@ -140,6 +149,10 @@
         </table>
     </div>
 
+    <div class="mid-logo-container">
+        <img src="2k25 logo.png" alt="PGA 2K25 Logo" class="mid-logo">
+    </div>
+
     <h3>Season Standings</h3>
     <div class="table-container">
         <table id="season-table">
@@ -161,13 +174,10 @@
     fetch('data.json')
         .then(response => response.json())
         .then(data => {
-            // Update the new Broadcast Header
             document.getElementById('display-week').textContent = data.venue || "SEASON 1 | WEEK 1";
             document.getElementById('display-date').textContent = data.date || "DATE TBD";
             
             const coursePar = parseInt(data.coursePar) || 72;
-            
-            // Auto-hide R3/R4 logic
             const hasR3 = data.players.some(p => p.r3 && p.r3 !== "");
             const hasR4 = data.players.some(p => p.r4 && p.r4 !== "");
             
@@ -176,15 +186,10 @@
 
             renderTournament(data.players, coursePar, hasR3, hasR4);
             renderSeason(data.seasonPoints, data.seasonEarnings, data.seasonEvents, data.players);
-        })
-        .catch(err => {
-            document.getElementById('display-week').textContent = "ERROR LOADING DATA";
-            console.error(err);
         });
 
     function renderTournament(players, coursePar, showR3, showR4) {
         const tbody = document.getElementById('tournament-body');
-        // Sort by total score
         const sorted = [...players].sort((a,b) => (parseInt(calculateTotal(a)) || 999) - (parseInt(calculateTotal(b)) || 999));
         
         tbody.innerHTML = sorted.map((p, i) => `
@@ -215,14 +220,7 @@
         const tbody = document.getElementById('season-body');
         const standings = Object.keys(points).map(name => {
             const pInfo = players.find(p => p.name === name) || { console: 'fa-user', country: 'un' };
-            return { 
-                name, 
-                pts: points[name], 
-                cash: earnings[name], 
-                evs: events[name], 
-                console: pInfo.console, 
-                country: pInfo.country 
-            };
+            return { name, pts: points[name], cash: earnings[name], evs: events[name], console: pInfo.console, country: pInfo.country };
         }).sort((a, b) => b.pts - a.pts);
 
         tbody.innerHTML = standings.map((player, index) => {
