@@ -11,15 +11,13 @@
         
         * { box-sizing: border-box; }
         
-        /* 1. ALLOW BODY TO SCROLL NATURALLY */
         body { 
             font-family: 'Segoe UI', sans-serif; 
             margin: 0; background: #f4f4f4; color: var(--dark); 
             min-height: 100vh;
-            display: block; /* Changed from Flex to block for natural scrolling */
         }
         
-        /* 2. IMAGES SCROLL NORMALLY */
+        /* HEADER IMAGES (SCROLL AWAY) */
         .full-img-container { 
             width: 100%; 
             background: white;
@@ -32,17 +30,18 @@
             display: block;
         }
         
+        /* STICKY VENUE BAR */
         .event-info-bar { 
             background: var(--emerald); color: white; 
             padding: 15px; text-align: center;
-            position: sticky; /* Optional: Keep the green bar visible at top */
+            position: sticky; 
             top: 0;
             z-index: 1000;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .major-event { background: linear-gradient(135deg, #4b0082, #2e004f) !important; }
 
-        /* 3. SIDE BY SIDE COLUMNS */
+        /* MAIN LAYOUT */
         .main-content { 
             display: flex; 
             flex-direction: row; 
@@ -57,29 +56,30 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
             display: flex; 
             flex-direction: column; 
-            /* Let these grow with content or be fixed */
             flex: 1;
+            min-width: 0; /* Prevents flex items from breaking layout */
         }
         
         #leaderboard-card { flex: 2.5; } 
         #standings-card { flex: 1; }
 
-        /* Disable internal scroll so they scroll with the page */
-        .scroll-body { 
-            padding: 0;
+        /* INDEPENDENT HORIZONTAL SCROLL WRAPPER */
+        .table-responsive { 
+            width: 100%;
+            overflow-x: auto; /* Independent horizontal scroll */
+            -webkit-overflow-scrolling: touch; /* Smooth for iOS */
         }
 
-        /* 4. STICKY TABLE HEADERS */
-        /* This keeps the column names at the top of the screen as you scroll players */
+        /* STICKY TABLE HEADERS */
         th { 
             background: #f8f9fa; 
             padding: 10px; 
             text-align: left; 
             font-size: 0.7em; 
             position: sticky; 
-            top: 70px; /* Offset for the green bar height */
+            top: 0; /* Sticky to the top of the scroll-card */
             z-index: 5; 
-            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); 
+            white-space: nowrap;
         }
         
         h2 { 
@@ -89,17 +89,26 @@
             font-size: 1.1em;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.85em; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            min-width: 600px; /* Ensures table is wide enough to trigger scroll on mobile */
+        }
+
+        td { 
+            padding: 8px; 
+            border-bottom: 1px solid #eee; 
+            font-size: 0.85em; 
+            white-space: nowrap; /* Keeps data on one line */
+        }
 
         .playoff-zone { background-color: rgba(34, 139, 34, 0.08) !important; border-left: 5px solid var(--emerald); }
-        .standings-player { display: flex; align-items: center; white-space: nowrap; }
+        .standings-player { display: flex; align-items: center; gap: 5px; }
         .q-marker { color: var(--emerald); font-weight: bold; margin-left: 5px; }
 
-        /* Mobile layout */
         @media (max-width: 1000px) {
             .main-content { flex-direction: column; }
-            th { top: 60px; } /* Adjust offset for mobile bar height */
+            #standings-card table { min-width: 400px; }
         }
     </style>
 </head>
@@ -117,7 +126,7 @@
 <div class="main-content">
     <div class="scroll-card" id="leaderboard-card">
         <h2>Tournament Leaderboard</h2>
-        <div class="scroll-body">
+        <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
@@ -143,7 +152,7 @@
 
     <div class="scroll-card" id="standings-card">
         <h2>Standings <small style="font-size:0.5em;">(Top 50%=Q)</small></h2>
-        <div class="scroll-body">
+        <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
