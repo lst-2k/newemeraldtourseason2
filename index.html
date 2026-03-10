@@ -151,6 +151,8 @@
                     <th class="col-r3">R3</th>
                     <th class="col-r4">R4</th>
                     <th style="text-align:center">Total</th>
+					<th style="text-align:center">Points</th>
+					<th style="text-align:center">Prize</th>
                     <th style="text-align:center">FiR</th>
                     <th style="text-align:center">GiR</th>
                     <th style="text-align:center">Scram</th>
@@ -200,33 +202,37 @@
             renderSeason(data.seasonPoints, data.seasonEarnings, data.seasonEvents, data.players);
         });
 
-    function renderTournament(players, coursePar, showR3, showR4) {
-        const tbody = document.getElementById('tournament-body');
-        const sorted = [...players].sort((a,b) => (parseInt(calculateTotal(a)) || 999) - (parseInt(calculateTotal(b)) || 999));
-        
-        tbody.innerHTML = sorted.map((p, i) => `
-            <tr>
-                <td>${i + 1}</td>
-                <td>
-                    <div class="player-cell">
-                        <i class="fa-brands ${p.console}"></i>
-                        <span class="fi fi-${p.country}"></span>
-                        <strong>${p.name}</strong>
-                    </div>
-                </td>
-                <td>${formatToPar(p, coursePar)}</td>
-                <td>${p.r1 || '-'}</td>
-                <td>${p.r2 || '-'}</td>
-                <td class="${showR3 ? '' : 'hidden-col'}">${p.r3 || '-'}</td>
-                <td class="${showR4 ? '' : 'hidden-col'}">${p.r4 || '-'}</td>
-                <td class="total-cell">${calculateTotal(p)}</td>
-                <td class="bonus-stat">${p.fir || '-'}</td>
-                <td class="bonus-stat">${p.gir || '-'}</td>
-                <td class="bonus-stat">${p.scrambling || '-'}</td>
-                <td class="bonus-stat">${p.ntp || '-'}</td>
-            </tr>
-        `).join('');
-    }
+		function renderTournament(players, coursePar, showR3, showR4) {
+			const tbody = document.getElementById('tournament-body');
+			const sorted = [...players].sort((a,b) => (parseInt(calculateTotal(a)) || 999) - (parseInt(calculateTotal(b)) || 999));
+			
+			tbody.innerHTML = sorted.map((p, i) => `
+				<tr>
+					<td>${i + 1}</td>
+					<td>
+						<div class="player-cell">
+							<i class="fa-brands ${p.console}"></i>
+							<span class="fi fi-${p.country}"></span>
+							<strong>${p.name}</strong>
+						</div>
+					</td>
+					<td>${formatToPar(p, coursePar)}</td>
+					<td>${p.r1 || '-'}</td>
+					<td>${p.r2 || '-'}</td>
+					<td class="${showR3 ? '' : 'hidden-col'}">${p.r3 || '-'}</td>
+					<td class="${showR4 ? '' : 'hidden-col'}">${p.r4 || '-'}</td>
+					<td class="total-cell">${calculateTotal(p)}</td>
+					
+					<td style="text-align:center; font-weight:bold; color:var(--emerald);">${p.points || '-'}</td>
+					<td style="text-align:center; font-weight:bold;">${p.prize || '$0'}</td>
+					
+					<td class="bonus-stat">${p.fir || '-'}</td>
+					<td class="bonus-stat">${p.gir || '-'}</td>
+					<td class="bonus-stat">${p.scrambling || '-'}</td>
+					<td class="bonus-stat">${p.ntp || '-'}</td>
+				</tr>
+			`).join('');
+		}
 
     function renderSeason(points, earnings, events, players) {
         const tbody = document.getElementById('season-body');
