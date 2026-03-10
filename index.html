@@ -11,92 +11,111 @@
         
         * { box-sizing: border-box; }
         
-        /* 1. FIXED SCREEN LAYOUT */
         body { 
             font-family: 'Segoe UI', sans-serif; 
             margin: 0; background: #f4f4f4; color: var(--dark); 
-            height: 100vh; /* Locks body to screen height */
+            height: 100vh; 
             display: flex; 
             flex-direction: column; 
-            overflow: hidden; /* Prevents whole-page bouncing/scrolling */
+            overflow: hidden; 
         }
         
-        /* 2. EQUAL HEIGHT STACKED HEADER */
+        /* HEADER SECTION */
         header { flex-shrink: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         
         .full-img-container { 
             width: 100%; 
-            height: 120px; /* Equal height for both logo and event */
-            overflow: hidden; 
-            display: flex; 
+            /* height is auto to respect the image's natural aspect ratio without cropping */
+            background: white;
+            display: flex;
+            justify-content: center;
         }
-        .full-img-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        
-        .logo-row { background: white; border-bottom: 1px solid #eee; }
-        .event-row { border-bottom: 4px solid var(--emerald); }
 
+        /* This ensures the image is shown in full without any cropping */
+        .full-img-container img { 
+            width: 100%; 
+            height: auto; 
+            display: block;
+            object-fit: contain; 
+        }
+        
         .event-info-bar { 
             background: var(--emerald); color: white; 
-            padding: 10px; text-align: center; position: relative;
+            padding: 12px; text-align: center; position: relative;
         }
         .major-event { background: linear-gradient(135deg, #4b0082, #2e004f) !important; }
 
-        /* 3. INDEPENDENT SCROLLING COLUMNS */
+        /* MAIN CONTENT - MAX WIDTH TABLES */
         .main-content { 
             display: flex; 
             flex-direction: row; 
-            gap: 15px; 
-            padding: 15px; 
-            flex: 1; /* Takes up all remaining vertical space */
-            overflow: hidden; /* Important: keeps the containers from growing */
+            gap: 10px; 
+            padding: 10px; 
+            flex: 1; 
+            overflow: hidden; 
+            width: 100%;
         }
 
         .scroll-card { 
             background: white; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
             display: flex; 
             flex-direction: column; 
-            height: 100%; /* Fills the flex container */
+            height: 100%; 
         }
         
-        #leaderboard-card { flex: 2.2; } /* Leaderboard gets more width */
+        #leaderboard-card { flex: 2.5; } 
         #standings-card { flex: 1; }
 
         .scroll-body { 
-            overflow-y: auto; /* This enables independent scrolling */
+            overflow-y: auto; 
             flex: 1; 
-            padding: 0 15px 15px 15px; 
-            -webkit-overflow-scrolling: touch; /* Smooth scroll for iPhone Safari */
+            padding: 0; /* Remove padding to maximize table width */
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* Sticky Table Headers inside the scroll area */
-        h2 { position: sticky; top: 0; background: white; margin: 0; padding: 15px; z-index: 10; border-bottom: 1px solid #eee; font-size: 1.1em; }
-        th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 0.7em; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
+        h2 { 
+            position: sticky; top: 0; background: white; margin: 0; 
+            padding: 12px; z-index: 10; border-bottom: 1px solid #eee; 
+            font-size: 1em; 
+        }
+
+        /* TABLES STRETCHED TO MAX WIDTH */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            table-layout: auto; 
+        }
+        
+        th { 
+            background: #f8f9fa; padding: 10px; text-align: left; 
+            font-size: 0.7em; position: sticky; top: 0; z-index: 5; 
+            box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); 
+        }
         
         td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.85em; }
 
-        /* Style tweaks */
         .playoff-zone { background-color: rgba(34, 139, 34, 0.08) !important; border-left: 5px solid var(--emerald); }
         .standings-player { display: flex; align-items: center; white-space: nowrap; }
-        .q-marker { color: var(--emerald); font-weight: bold; margin-left: 6px; }
+        .q-marker { color: var(--emerald); font-weight: bold; margin-left: 4px; }
 
         @media (max-width: 1000px) {
             .main-content { flex-direction: column; overflow-y: auto; }
             body { overflow: auto; }
-            .scroll-card { height: auto; min-height: 400px; }
+            .scroll-card { height: auto; min-height: 500px; width: 100%; }
         }
     </style>
 </head>
 <body>
 
-<header id="main-header">
-    <div class="full-img-container logo-row"><img src="logo.png" alt="Tour Logo"></div>
-    <div class="full-img-container event-row"><img src="event.png" alt="Event Image"></div>
+<header>
+    <div class="full-img-container"><img src="logo.png" alt="Logo"></div>
+    <div class="full-img-container" style="border-bottom: 4px solid var(--emerald);"><img src="event.png" alt="Event"></div>
     <div class="event-info-bar" id="branding-bar">
-        <h1 id="display-week" style="margin:0; font-size: 1.3em;">SEASON 1 | WEEK 1</h1>
-        <div id="display-date" style="opacity: 0.9; font-size: 0.85em;">Loading...</div>
-        <div style="margin-top:3px; font-size: 0.75em; font-weight: bold;">PAR: <span id="course-par">72</span></div>
+        <h1 id="display-week" style="margin:0; font-size: 1.2em;">WEEK 1</h1>
+        <div id="display-date" style="opacity: 0.9; font-size: 0.8em;">...</div>
+        <div style="font-size: 0.7em; font-weight: bold;">PAR: <span id="course-par">72</span></div>
     </div>
 </header>
 
@@ -109,7 +128,7 @@
                     <tr>
                         <th>Pos</th>
                         <th>Player</th>
-                        <th>To Par</th>
+                        <th>+/-</th>
                         <th>R1</th>
                         <th>R2</th>
                         <th class="col-r3">R3</th>
@@ -118,7 +137,7 @@
                         <th style="text-align:center">Pts</th>
                         <th>FiR</th>
                         <th>GiR</th>
-                        <th>Scram</th>
+                        <th>Scr</th>
                         <th>NTP</th>
                     </tr>
                 </thead>
@@ -128,7 +147,7 @@
     </div>
 
     <div class="scroll-card" id="standings-card">
-        <h2>Standings <small style="font-size:0.5em; color:var(--emerald);">(Top 50%=Q)</small></h2>
+        <h2>Standings <small style="font-size:0.5em;">(Top 50%=Q)</small></h2>
         <div class="scroll-body">
             <table>
                 <thead>
@@ -159,7 +178,7 @@
             const titleEl = document.getElementById('display-week');
             if (data.isSignature) {
                 brandingBar.classList.add('major-event');
-                titleEl.innerHTML = `${data.venue} <span style="background:#ffd700; color:black; padding:2px 5px; border-radius:3px; font-size:0.7em; margin-left:8px;">MAJOR</span>`;
+                titleEl.innerHTML = `${data.venue} <span style="background:#ffd700; color:black; padding:2px 4px; border-radius:3px; font-size:0.6em; margin-left:5px;">MAJOR</span>`;
             } else {
                 brandingBar.classList.remove('major-event');
                 titleEl.textContent = data.venue;
@@ -194,7 +213,7 @@
             return `
                 <tr>
                     <td>${displayPos}</td>
-                    <td><div class="standings-player"><i class="fa-brands ${p.console}"></i><span class="fi fi-${p.country}" style="margin:0 5px;"></span><strong>${p.name}</strong></div></td>
+                    <td><div class="standings-player"><i class="fa-brands ${p.console}"></i><span class="fi fi-${p.country}" style="margin:0 3px;"></span><strong>${p.name}</strong></div></td>
                     <td style="font-weight:bold; color:${toPar.toString().includes('-')?'red':'inherit'}">${toPar}</td>
                     <td>${p.r1 || '-'}</td>
                     <td>${p.r2 || '-'}</td>
