@@ -10,49 +10,81 @@
         :root { --emerald: #228B22; --dark: #1a1a1a; }
         
         * { box-sizing: border-box; }
+        
+        /* 1. FIXED SCREEN LAYOUT */
         body { 
             font-family: 'Segoe UI', sans-serif; 
             margin: 0; background: #f4f4f4; color: var(--dark); 
-            height: 100vh; display: flex; flex-direction: column; overflow: hidden; 
+            height: 100vh; /* Locks body to screen height */
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; /* Prevents whole-page bouncing/scrolling */
         }
         
-        /* STACKED HEADER */
+        /* 2. EQUAL HEIGHT STACKED HEADER */
         header { flex-shrink: 0; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         
-        .full-img-container { width: 100%; overflow: hidden; display: flex; }
-        .full-img-container img { width: 100%; height: auto; object-fit: cover; display: block; }
+        .full-img-container { 
+            width: 100%; 
+            height: 120px; /* Equal height for both logo and event */
+            overflow: hidden; 
+            display: flex; 
+        }
+        .full-img-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
-        .logo-row { background: white; max-height: 80px; }
-        .event-row { max-height: 150px; border-bottom: 4px solid var(--emerald); }
+        .logo-row { background: white; border-bottom: 1px solid #eee; }
+        .event-row { border-bottom: 4px solid var(--emerald); }
 
         .event-info-bar { 
             background: var(--emerald); color: white; 
-            padding: 15px; text-align: center; position: relative;
+            padding: 10px; text-align: center; position: relative;
         }
         .major-event { background: linear-gradient(135deg, #4b0082, #2e004f) !important; }
-        .major-tag { background: #ffd700; color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 900; margin-left: 10px; }
 
-        /* HORIZONTAL LAYOUT */
-        .main-content { display: flex; flex-direction: row; gap: 20px; padding: 20px; flex: 1; overflow: hidden; }
-        .scroll-card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: flex; flex-direction: column; height: 100%; }
+        /* 3. INDEPENDENT SCROLLING COLUMNS */
+        .main-content { 
+            display: flex; 
+            flex-direction: row; 
+            gap: 15px; 
+            padding: 15px; 
+            flex: 1; /* Takes up all remaining vertical space */
+            overflow: hidden; /* Important: keeps the containers from growing */
+        }
+
+        .scroll-card { 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; /* Fills the flex container */
+        }
         
-        #leaderboard-card { flex: 2; } 
+        #leaderboard-card { flex: 2.2; } /* Leaderboard gets more width */
         #standings-card { flex: 1; }
 
-        .scroll-body { overflow-y: auto; flex: 1; padding: 0 20px 20px 20px; }
-        h2 { position: sticky; top: 0; background: white; margin: 0; padding: 15px 20px; z-index: 10; border-bottom: 1px solid #eee; }
+        .scroll-body { 
+            overflow-y: auto; /* This enables independent scrolling */
+            flex: 1; 
+            padding: 0 15px 15px 15px; 
+            -webkit-overflow-scrolling: touch; /* Smooth scroll for iPhone Safari */
+        }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 0.75em; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
-        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.9em; }
-
-        .playoff-zone { background-color: rgba(34, 139, 34, 0.08) !important; border-left: 5px solid var(--emerald); }
-        .standings-player { display: flex; align-items: center; white-space: nowrap; min-width: 180px; }
-        .q-marker { color: var(--emerald); font-weight: bold; margin-left: 8px; }
+        /* Sticky Table Headers inside the scroll area */
+        h2 { position: sticky; top: 0; background: white; margin: 0; padding: 15px; z-index: 10; border-bottom: 1px solid #eee; font-size: 1.1em; }
+        th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 0.7em; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
         
+        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.85em; }
+
+        /* Style tweaks */
+        .playoff-zone { background-color: rgba(34, 139, 34, 0.08) !important; border-left: 5px solid var(--emerald); }
+        .standings-player { display: flex; align-items: center; white-space: nowrap; }
+        .q-marker { color: var(--emerald); font-weight: bold; margin-left: 6px; }
+
         @media (max-width: 1000px) {
             .main-content { flex-direction: column; overflow-y: auto; }
             body { overflow: auto; }
+            .scroll-card { height: auto; min-height: 400px; }
         }
     </style>
 </head>
@@ -62,9 +94,9 @@
     <div class="full-img-container logo-row"><img src="logo.png" alt="Tour Logo"></div>
     <div class="full-img-container event-row"><img src="event.png" alt="Event Image"></div>
     <div class="event-info-bar" id="branding-bar">
-        <h1 id="display-week" style="margin:0; font-size: 1.4em;">SEASON 1 | WEEK 1</h1>
-        <div id="display-date" style="opacity: 0.9; font-size: 0.9em;">Loading...</div>
-        <div style="margin-top:5px; font-size: 0.8em; font-weight: bold;">PAR: <span id="course-par">72</span></div>
+        <h1 id="display-week" style="margin:0; font-size: 1.3em;">SEASON 1 | WEEK 1</h1>
+        <div id="display-date" style="opacity: 0.9; font-size: 0.85em;">Loading...</div>
+        <div style="margin-top:3px; font-size: 0.75em; font-weight: bold;">PAR: <span id="course-par">72</span></div>
     </div>
 </header>
 
@@ -82,9 +114,8 @@
                         <th>R2</th>
                         <th class="col-r3">R3</th>
                         <th class="col-r4">R4</th>
-                        <th style="text-align:center">Total</th>
+                        <th style="text-align:center">Tot</th>
                         <th style="text-align:center">Pts</th>
-                        <th style="text-align:center">Prize</th>
                         <th>FiR</th>
                         <th>GiR</th>
                         <th>Scram</th>
@@ -126,15 +157,13 @@
         .then(data => {
             const brandingBar = document.getElementById('branding-bar');
             const titleEl = document.getElementById('display-week');
-            
             if (data.isSignature) {
                 brandingBar.classList.add('major-event');
-                titleEl.innerHTML = `${data.venue} <span class="major-tag">MAJOR</span>`;
+                titleEl.innerHTML = `${data.venue} <span style="background:#ffd700; color:black; padding:2px 5px; border-radius:3px; font-size:0.7em; margin-left:8px;">MAJOR</span>`;
             } else {
                 brandingBar.classList.remove('major-event');
                 titleEl.textContent = data.venue;
             }
-
             document.getElementById('display-date').textContent = data.date;
             document.getElementById('course-par').textContent = data.coursePar;
 
@@ -151,44 +180,35 @@
         const tbody = document.getElementById('tournament-body');
         const sorted = [...players].sort((a,b) => getScore(a) - getScore(b));
 
-        let html = "";
-        sorted.forEach((p, i) => {
+        tbody.innerHTML = sorted.map((p, i) => {
             const total = getScore(p);
-            const displayTotal = total === 999 ? '-' : total;
-            
-            // TIED LOGIC
-            let displayPos = i + 1;
-            const isTied = sorted.filter(player => getScore(player) === total).length > 1;
-            if (isTied && total !== 999) {
-                const firstIndex = sorted.findIndex(player => getScore(player) === total);
-                displayPos = "T" + (firstIndex + 1);
-            }
+            const isTied = sorted.filter(pl => getScore(pl) === total).length > 1;
+            const firstIdx = sorted.findIndex(pl => getScore(pl) === total);
+            const displayPos = (isTied && total !== 999) ? "T" + (firstIdx + 1) : (i + 1);
 
             const rdCount = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s !== "").length;
             const diff = total === 999 ? '-' : total - (par * rdCount);
             const toPar = diff === 0 ? 'E' : (diff > 0 ? `+${diff}` : diff);
             const fStat = (v, u) => (v && v !== '-') ? `${v}${u}` : '-';
 
-            html += `
+            return `
                 <tr>
                     <td>${displayPos}</td>
-                    <td><div style="display:flex;align-items:center;gap:8px;"><i class="fa-brands ${p.console}"></i><span class="fi fi-${p.country}"></span><strong>${p.name}</strong></div></td>
+                    <td><div class="standings-player"><i class="fa-brands ${p.console}"></i><span class="fi fi-${p.country}" style="margin:0 5px;"></span><strong>${p.name}</strong></div></td>
                     <td style="font-weight:bold; color:${toPar.toString().includes('-')?'red':'inherit'}">${toPar}</td>
                     <td>${p.r1 || '-'}</td>
                     <td>${p.r2 || '-'}</td>
                     <td style="display:${r3?'table-cell':'none'}">${p.r3 || '-'}</td>
                     <td style="display:${r4?'table-cell':'none'}">${p.r4 || '-'}</td>
-                    <td style="background:#f9f9f9; font-weight:bold; text-align:center;">${displayTotal}</td>
+                    <td style="background:#f9f9f9; font-weight:bold; text-align:center;">${total === 999 ? '-' : total}</td>
                     <td style="color:var(--emerald); font-weight:bold; text-align:center;">${p.points || '-'}</td>
-                    <td>${p.prize || '$0'}</td>
-                    <td style="font-size:0.85em;">${fStat(p.fir, '%')}</td>
-                    <td style="font-size:0.85em;">${fStat(p.gir, '%')}</td>
-                    <td style="font-size:0.85em;">${fStat(p.scrambling, '%')}</td>
-                    <td style="font-size:0.85em;">${fStat(p.ntp, 'ft')}</td>
+                    <td style="font-size:0.75em;">${fStat(p.fir, '%')}</td>
+                    <td style="font-size:0.75em;">${fStat(p.gir, '%')}</td>
+                    <td style="font-size:0.75em;">${fStat(p.scrambling, '%')}</td>
+                    <td style="font-size:0.75em;">${fStat(p.ntp, 'ft')}</td>
                 </tr>
             `;
-        });
-        tbody.innerHTML = html;
+        }).join('');
     }
 
     function renderSeason(pts, earn, evs) {
