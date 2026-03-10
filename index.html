@@ -22,40 +22,54 @@
             overflow: hidden; 
         }
         
-        /* 2. STICKY HEADER WITH IMAGES */
+        /* 2. FULL-WIDTH HERO HEADER (GRID LAYOUT) */
         .event-info-bar { 
-            background: var(--emerald); 
-            color: white; 
-            padding: 15px 20px; 
-            text-align: center; 
-            position: relative; /* Crucial for absolute images */
-            min-height: 100px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr; /* Image-Text-Image */
+            align-items: stretch; /* Stretch images to full height */
+            position: relative;
+            min-height: 120px;
+            background: #eee; /* Fallback */
+            flex-shrink: 0;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            overflow: hidden; /* Keep images contained */
+        }
+
+        .major-event .major-tag { background: #ffd700; color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 900; margin-left: 10px; }
+
+        /* HERO IMAGE PLACEMENT */
+        .logo-container { overflow: hidden; }
+        .logo-container img { width: 100%; height: 100%; object-fit: cover; } /* Cover fills container */
+        
+        .event-img-container { overflow: hidden; }
+        .event-img-container img { width: 100%; height: 100%; object-fit: cover; } /* Cover fills container */
+
+        /* CENTER TEXT BOX */
+        .header-text {
+            background: rgba(34, 139, 34, 0.95); /* Semi-transparent Green */
+            color: white;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            z-index: 100;
+            align-items: center;
+            text-align: center;
+            padding: 10px;
+            z-index: 5;
+            transition: all 0.5s ease;
         }
 
-        .major-event { background: linear-gradient(135deg, #4b0082, #2e004f) !important; }
-        .major-tag { background: #ffd700; color: black; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 900; margin-left: 10px; }
-
-        /* IMAGE PLACEMENT */
-        .logo-container { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); }
-        .logo-container img { height: 70px; display: block; }
-        
-        .event-img-container { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
-        .event-img-container img { height: 70px; border-radius: 6px; display: block; border: 1px solid rgba(255,255,255,0.3); }
+        /* Update background for Majors */
+        .major-event .header-text { background: linear-gradient(135deg, rgba(75,0,130,0.95), rgba(46,0,79,0.95)) !important; }
 
         /* 3. SIDE-BY-SIDE SCROLLING (HORIZONTAL) */
         .main-content { 
             display: flex; 
-            flex-direction: row; /* Force side-by-side */
+            flex-direction: row; /* Horizontal split */
             gap: 20px; 
             padding: 20px; 
             flex: 1; 
-            overflow: hidden; /* Prevent page scroll */
+            overflow: hidden; 
         }
 
         .scroll-card { 
@@ -67,7 +81,7 @@
             height: 100%; 
         }
 
-        /* Leaderboard gets more space */
+        /* Leaderboard wider than Standings */
         #leaderboard-card { flex: 2; } 
         #standings-card { flex: 1; }
 
@@ -77,35 +91,49 @@
             padding: 0 20px 20px 20px; 
         }
         
-        h2 { position: sticky; top: 0; background: white; margin: 0; padding: 20px; z-index: 10; border-bottom: 1px solid #eee; }
+        h2 { position: sticky; top: 0; background: white; margin: 0; padding: 15px 20px; z-index: 10; border-bottom: 1px solid #eee; }
 
         /* Table Styling */
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 12px; text-align: left; font-size: 0.75em; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.9em; }
+        th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 0.75em; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
+        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.9em; }
 
+        .total-cell { background:#f9f9f9; font-weight:bold; text-align:center; }
         .playoff-zone { background-color: rgba(34, 139, 34, 0.08) !important; border-left: 5px solid var(--emerald); }
-        .q-marker { color: var(--emerald); font-weight: bold; margin-left: 5px; }
-        .player-cell { display: flex; align-items: center; gap: 8px; }
         
-        /* Mobile fallback: Switch to vertical if screen is too narrow */
+        /* 4. FORCE SINGLE LINE (Q) TAG */
+        .standings-player {
+            display: flex;
+            align-items: center;
+            white-space: nowrap; /* Prevents text from ever wrapping */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Adds ... if name is incredibly long */
+            min-width: 200px; /* Crucial: Ensures enough space for name+(Q) */
+        }
+        .q-marker { color: var(--emerald); font-weight: bold; margin-left: 8px; flex-shrink: 0; } /* Won't shrink */
+
+        .player-cell { display: flex; align-items: center; gap: 8px; }
+        .fa-playstation { color: #003791; } .fa-xbox { color: #107C10; } .fa-steam { color: #171a21; }
+        
+        /* Mobile fallback */
         @media (max-width: 1000px) {
             .main-content { flex-direction: column; overflow-y: auto; }
             body { overflow: auto; }
-            .logo-container, .event-img-container { position: static; transform: none; margin: 10px auto; }
-            .event-info-bar { height: auto; }
+            .event-info-bar { grid-template-columns: 1fr; grid-template-rows: 100px auto; height: auto; }
+            .logo-container, .event-img-container { display: none; }
         }
     </style>
 </head>
 <body>
 
 <div class="event-info-bar">
-    <div class="logo-container"><img src="logo.png" alt="Logo"></div>
-    <div class="event-img-container"><img src="event.png" alt="Event"></div>
-    
-    <h1 id="display-week" style="margin:0; font-size: 1.6em;">SEASON 1 | WEEK 1</h1>
-    <div id="display-date" style="opacity: 0.9; font-size: 1em;">Loading details...</div>
-    <div style="margin-top:5px; font-size: 0.8em; font-weight: bold;">COURSE PAR: <span id="course-par">72</span></div>
+    <div class="logo-container"><img src="logo.png" alt="Tour Logo"></div>
+    <div class="header-text">
+        <h1 id="display-week" style="margin:0; font-size: 1.6em;">SEASON 1 | WEEK 1</h1>
+        <div id="display-date" style="opacity: 0.9; font-size: 1em;">Loading details...</div>
+        <div style="margin-top:5px; font-size: 0.8em; font-weight: bold;">COURSE PAR: <span id="course-par">72</span></div>
+    </div>
+    <div class="event-img-container"><img src="event.png" alt="Event Image"></div>
 </div>
 
 <div class="main-content">
@@ -127,7 +155,7 @@
                         <th style="text-align:center">Prize</th>
                         <th>FiR</th>
                         <th>GiR</th>
-                    </tr>
+                        <th>Scram</th> <th>NTP</th>   </tr>
                 </thead>
                 <tbody id="tournament-body"></tbody>
             </table>
@@ -218,11 +246,13 @@
                     <td>${p.r2 || '-'}</td>
                     <td style="display:${r3?'table-cell':'none'}">${p.r3 || '-'}</td>
                     <td style="display:${r4?'table-cell':'none'}">${p.r4 || '-'}</td>
-                    <td style="background:#f9f9f9; font-weight:bold; text-align:center;">${tot}</td>
+                    <td class="total-cell">${tot}</td>
                     <td style="color:var(--emerald); font-weight:bold; text-align:center;">${p.points || '-'}</td>
                     <td style="text-align:center;">${p.prize || '$0'}</td>
-                    <td style="font-size:0.8em;">${fStat(p.fir, '%')}</td>
-                    <td style="font-size:0.8em;">${fStat(p.gir, '%')}</td>
+                    <td style="font-size:0.85em; color:#666;">${fStat(p.fir, '%')}</td>
+                    <td style="font-size:0.85em; color:#666;">${fStat(p.gir, '%')}</td>
+                    <td style="font-size:0.85em; color:#666;">${fStat(p.scrambling, '%')}</td>
+                    <td style="font-size:0.85em; color:#666;">${fStat(p.ntp, 'ft')}</td>
                 </tr>
             `;
         }).join('');
@@ -238,7 +268,7 @@
             return `
                 <tr class="${isQ ? 'playoff-zone' : ''}">
                     <td>${i+1}</td>
-                    <td>${n} ${isQ ? '<span class="q-marker">(Q)</span>' : ''}</td>
+                    <td class="standings-player"><strong>${n}</strong> ${isQ ? '<span class="q-marker">(Q)</span>' : ''}</td>
                     <td>${evs[n] || 0}</td>
                     <td style="color:var(--emerald); font-weight:bold;">${pts[n].toLocaleString()}</td>
                     <td>$${earn[n].toLocaleString()}</td>
