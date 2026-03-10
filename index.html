@@ -96,6 +96,19 @@
             z-index: 10;
             text-transform: uppercase;
         }
+		.playoff-zone {
+			background-color: rgba(34, 139, 34, 0.1) !important; /* Light Emerald tint */
+			border-left: 4px solid var(--emerald);
+		}
+		.playoff-badge {
+			background: var(--emerald);
+			color: white;
+			font-size: 0.7em;
+			padding: 2px 5px;
+			border-radius: 4px;
+			margin-left: 8px;
+			vertical-align: middle;
+		}
 
         td { padding: 12px 10px; border-bottom: 1px solid #eee; background: white; }
 
@@ -239,28 +252,26 @@
 			`}).join('');
 		}
 
-		function renderSeason(points, earnings, events, players) {
+		function renderSeason(points, earnings, events) {
 			const tbody = document.getElementById('season-body');
-			const standings = Object.keys(points).map(name => {
-				const pInfo = players.find(p => p.name === name) || { console: 'fa-user', country: 'un' };
-				return { name, pts: points[name], cash: earnings[name], evs: events[name], console: pInfo.console, country: pInfo.country };
-			}).sort((a, b) => b.pts - a.pts);
+			const names = Object.keys(points).sort((a, b) => points[b] - points[a]);
+			
+			// Calculate the 50% cutoff
+			const totalPlayers = names.length;
+			const cutoff = Math.ceil(totalPlayers / 2);
 
-			tbody.innerHTML = standings.map((player, index) => {
-				let medal = index === 0 ? " 🥇" : index === 1 ? " 🥈" : index === 2 ? " 🥉" : "";
+			tbody.innerHTML = names.map((name, i) => {
+				const isPlayoffQualified = (i < cutoff && totalPlayers > 1);
+				const rowClass = isPlayoffQualified ? 'playoff-zone' : '';
+				const badge = isPlayoffQualified ? '<span class="playoff-badge">CLINCHED</span>' : '';
+
 				return `
-					<tr>
-						<td>${index + 1}</td>
-						<td>
-							<div class="player-cell">
-								<i class="fa-brands ${player.console}"></i>
-								<span class="fi fi-${player.country}"></span>
-								<strong>${player.name}${medal}</strong>
-							</div>
-						</td>
-						<td>${player.evs || 0}</td>
-						<td>${(player.pts || 0).toLocaleString()}</td>
-						<td>$${(player.cash || 0).toLocaleString()}</td>
+					<tr class="${rowClass}">
+						<td>${i + 1}</td>
+						<td style="font-weight:bold;">${name}${badge}</td>
+						<td>${events[name] || 0}</td>
+						<td style="color:var(--emerald); font-weight:bold;">${points[name].toLocaleString()}</td>
+						<td>$${earnings[name].toLocaleString()}</td>
 					</tr>
 				`;
 			}).join('');
