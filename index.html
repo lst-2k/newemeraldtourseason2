@@ -100,15 +100,36 @@
 			background-color: rgba(34, 139, 34, 0.1) !important; /* Light Emerald tint */
 			border-left: 4px solid var(--emerald);
 		}
-		.playoff-badge {
-			background: var(--emerald);
-			color: white;
-			font-size: 0.7em;
-			padding: 2px 5px;
-			border-radius: 4px;
-			margin-left: 8px;
-			vertical-align: middle;
+		.q-marker {
+			color: var(--emerald);
+			font-weight: 800;
+			margin-left: 6px;
+			font-size: 0.9em;
 		}
+		/* Special Major Styling */
+			.major-event {
+				background: linear-gradient(135deg, #4b0082 0%, #2e004f 100%) !important; /* Deep Purple */
+				color: white !important;
+				border-radius: 8px;
+				padding: 15px;
+				position: relative;
+			}
+
+			.major-event .week-title { color: #ffd700 !important; } /* Gold Title */
+			.major-event .date-subtitle { color: #e0e0e0 !important; }
+
+			.major-tag {
+				background: #ffd700;
+				color: #000;
+				font-weight: 900;
+				padding: 2px 10px;
+				border-radius: 4px;
+				font-size: 0.7em;
+				vertical-align: middle;
+				margin-left: 10px;
+				box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+				text-transform: uppercase;
+			}
 
         td { padding: 12px 10px; border-bottom: 1px solid #eee; background: white; }
 
@@ -198,22 +219,46 @@
 </div>
 
 <script>
-    fetch('data.json')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('display-week').textContent = data.venue || "SEASON 1 | WEEK 1";
-            document.getElementById('display-date').textContent = data.date || "DATE TBD";
-            
-            const coursePar = parseInt(data.coursePar) || 72;
-            const hasR3 = data.players.some(p => p.r3 && p.r3 !== "");
-            const hasR4 = data.players.some(p => p.r4 && p.r4 !== "");
-            
-            if(!hasR3) document.querySelectorAll('.col-r3').forEach(el => el.classList.add('hidden-col'));
-            if(!hasR4) document.querySelectorAll('.col-r4').forEach(el => el.classList.add('hidden-col'));
+fetch('data.json')
+    .then(response => response.json())
+    .then(data => {
+        // 1. Update Header & Branding
+        const infoBar = document.querySelector('.event-info-bar'); // The container for venue/date
+        const titleEl = document.getElementById('display-week');
+        const dateEl = document.getElementById('display-date');
+        
+        // Apply Special Major/Signature Styling
+        if (data.isSignature) {
+            infoBar.classList.add('major-event');
+            titleEl.innerHTML = `${data.venue} <span class="major-tag">MAJOR</span>`;
+        } else {
+            infoBar.classList.remove('major-event');
+            titleEl.textContent = data.venue || "SEASON 1 | WEEK 1";
+        }
+        
+        dateEl.textContent = data.date || "Course Name - Date";
+        document.getElementById('course-par').textContent = data.coursePar || "72";
 
-            renderTournament(data.players, coursePar, hasR3, hasR4);
-            renderSeason(data.seasonPoints, data.seasonEarnings, data.seasonEvents, data.players);
-        });
+        // 2. Logic for Round Visibility
+        // Checks if any player has a score in R3 or R4 to decide if columns should show
+        const hasR3 = data.players.some(p => p.r3 && p.r3 !== "");
+        const hasR4 = data.players.some(p => p.r4 && p.r4 !== "");
+
+        // Update Table Headers visibility
+        document.querySelectorAll('.col-r3').forEach(el => el.style.display = hasR3 ? 'table-cell' : 'none');
+        document.querySelectorAll('.col-r4').forEach(el => el.style.display = hasR4 ? 'table-cell' : 'none');
+
+        // 3. Render the Tournament Leaderboard
+        renderTournament(data.players, parseInt(data.coursePar), hasR3, hasR4);
+
+        // 4. Render the Season Standings
+        // Pass the objects directly from the JSON
+        renderSeason(data.seasonPoints, data.seasonEarnings, data.seasonEvents);
+    })
+    .catch(error => {
+        console.error('Error loading tournament data:', error);
+        document.getElementById('tournament-body').innerHTML = '<tr><td colspan="14" style="text-align:center;">Error loading data. Please check back later.</td></tr>';
+    });
 
 		function renderTournament(players, coursePar, showR3, showR4) {
 			const tbody = document.getElementById('tournament-body');
@@ -263,7 +308,7 @@
 			tbody.innerHTML = names.map((name, i) => {
 				const isPlayoffQualified = (i < cutoff && totalPlayers > 1);
 				const rowClass = isPlayoffQualified ? 'playoff-zone' : '';
-				const badge = isPlayoffQualified ? '<span class="playoff-badge">CLINCHED</span>' : '';
+				const badge = isPlayoffQualified ? '<span class="q-marker">(Q)</span>' : '';
 
 				return `
 					<tr class="${rowClass}">
