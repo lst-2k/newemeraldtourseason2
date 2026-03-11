@@ -1,7 +1,6 @@
 {
-  "header": "EMERALD TOUR",
   "venue": "Antalya PGA",
-  "date": "19-16 March 2026",
+  "date": "19-26 March 2026",
   "coursePar": "72",
   "isSignature": true,
   "players": [
@@ -9,13 +8,13 @@
       "name": "Tyrell",
       "console": "fa-steam",
       "country": "gb",
-      "r1": "66",
+      "r1": "65",
       "r2": "65",
       "r3": "69",
       "r4": "",
-      "prize": "$1,080,000",
+      "prize": "$540,000",
       "eventPoints": "1,000",
-      "fir": "",
+      "fir": "50",
       "gir": "",
       "scrambling": "",
       "ntp": ""
@@ -28,12 +27,12 @@
       "r2": "68",
       "r3": "68",
       "r4": "",
-      "prize": "$654,000",
+      "prize": "$327,000",
       "eventPoints": "600",
       "fir": "",
-      "gir": "",
+      "gir": "60",
       "scrambling": "",
-      "ntp": "21"
+      "ntp": ""
     },
     {
       "name": "Brooks",
@@ -43,11 +42,11 @@
       "r2": "67",
       "r3": "71",
       "r4": "",
-      "prize": "$414,000",
+      "prize": "$207,000",
       "eventPoints": "380",
       "fir": "",
       "gir": "",
-      "scrambling": "66",
+      "scrambling": "77",
       "ntp": ""
     },
     {
@@ -58,9 +57,9 @@
       "r2": "68",
       "r3": "71",
       "r4": "",
-      "prize": "$294,000",
+      "prize": "$147,000",
       "eventPoints": "270",
-      "fir": "88",
+      "fir": "",
       "gir": "",
       "scrambling": "",
       "ntp": ""
@@ -73,12 +72,12 @@
       "r2": "68",
       "r3": "68",
       "r4": "",
-      "prize": "$246,000",
+      "prize": "$123,000",
       "eventPoints": "220",
       "fir": "",
-      "gir": "77",
+      "gir": "",
       "scrambling": "",
-      "ntp": ""
+      "ntp": "11"
     },
     {
       "name": "Shane",
@@ -88,7 +87,7 @@
       "r2": "68",
       "r3": "72",
       "r4": "",
-      "prize": "$222,000",
+      "prize": "$111,000",
       "eventPoints": "200",
       "fir": "",
       "gir": "",
@@ -105,12 +104,12 @@
     "Justin": 410
   },
   "seasonEarnings": {
-    "Tyrell": 1180000,
-    "Rory": 982500,
-    "Scottie": 492000,
-    "Brooks": 547000,
-    "Shane": 416000,
-    "Justin": 305500
+    "Tyrell": 660000,
+    "Rory": 655500,
+    "Scottie": 325000,
+    "Brooks": 340000,
+    "Shane": 305000,
+    "Justin": 182500
   },
   "seasonEvents": {
     "Tyrell": 2,
