@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emerald Tour Leaderboard</title>
+    <title>Leaderboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -11,7 +11,6 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f4f4f4; color: var(--dark); min-height: 100vh; }
 
-        /* HEADER & IMAGES */
         .full-img-container { width: 100%; background: white; display: flex; justify-content: center; }
         .full-img-container img { width: 100%; height: auto; display: block; }
         
@@ -21,12 +20,10 @@
         }
         .major-event { background: linear-gradient(135deg, #4b0082, #2e004f) !important; }
 
-        /* ICON COLORS */
         .fa-playstation { color: #003791; }
         .fa-xbox { color: #107c10; }
         .fa-steam { color: #171a21; }
 
-        /* LAYOUT & SCROLLING */
         .main-content { display: flex; flex-direction: row; gap: 15px; padding: 15px; width: 100%; }
         .scroll-card { background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); flex: 1; min-width: 0; }
         #leaderboard-card { flex: 2.5; } 
@@ -36,11 +33,10 @@
         th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 0.7em; position: sticky; top: 0; z-index: 5; white-space: nowrap; }
         h2 { padding: 15px; margin: 0; border-bottom: 1px solid #eee; font-size: 1.1em; }
 
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         #standings-card table { min-width: 450px; }
         td { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.85em; white-space: nowrap; }
         
-        /* ALIGNMENT & HELPERS */
         .txt-right { text-align: right; }
         .txt-center { text-align: center; }
         .txt-small { font-size: 0.8em; color: #666; }
@@ -60,7 +56,7 @@
 <div class="full-img-container" style="border-bottom: 4px solid var(--emerald);"><img src="event.png"></div>
 
 <div class="event-info-bar" id="branding-bar">
-    <h1 id="display-week" style="margin:0; font-size: 1.3em;">WEEK LOADING...</h1>
+    <h1 id="display-venue" style="margin:0; font-size: 1.3em;">LOADING...</h1>
     <div id="display-date" style="opacity: 0.9; font-size: 0.85em;">...</div>
 </div>
 
@@ -71,18 +67,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Pos</th>
-                        <th>Player</th>
-                        <th>+/-</th>
-                        <th>R1</th><th>R2</th><th>R3</th><th>R4</th>
-                        <th class="txt-center">Tot</th>
-                        <th class="txt-center">Pts</th>
-                        <th class="txt-center">Prize</th>
-                        <th class="txt-center">FiR</th>
-                        <th class="txt-center">GiR</th>
-                        <th class="txt-center">Scr</th>
-                        <th class="txt-center">NTP</th>
-                        <th class="txt-right">Bonus</th>
+                        <th>Pos</th><th>Player</th><th>+/-</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th>
+                        <th class="txt-center">Tot</th><th class="txt-center">Pts</th><th class="txt-right">Prize</th>
+                        <th class="txt-center">FiR</th><th class="txt-center">GiR</th><th class="txt-center">Scr</th><th class="txt-center">NTP</th><th class="txt-right">Bonus</th>
                     </tr>
                 </thead>
                 <tbody id="tournament-body"></tbody>
@@ -91,16 +78,12 @@
     </div>
 
     <div class="scroll-card" id="standings-card">
-        <h2>Season Standings Top 50% Qualify</h2>
+        <h2>Season Standings</h2>
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th>Pos</th>
-                        <th>Player</th>
-                        <th class="txt-center">Ev</th>
-                        <th class="txt-center">Pts</th>
-                        <th class="txt-right">Earnings</th>
+                        <th>Pos</th><th>Player</th><th class="txt-center">Ev</th><th class="txt-center">Pts</th><th class="txt-right">Earnings</th>
                     </tr>
                 </thead>
                 <tbody id="season-body"></tbody>
@@ -109,9 +92,7 @@
     </div>
 </div>
 
-<footer>
-    <img src="2k25-logo.png" alt="2K25 Logo">
-</footer>
+<footer><img src="2k25-logo.png"></footer>
 
 <script>
     const getScore = (p) => {
@@ -126,7 +107,6 @@
         document.getElementById('display-venue').textContent = data.venue || "Tournament Leaderboard";
         document.getElementById('display-date').textContent = data.date;
 
-        // 1. RENDER TOURNAMENT
         const lbBody = document.getElementById('tournament-body');
         const sortedLB = [...data.players].sort((a, b) => getScore(a) - getScore(b));
 
@@ -140,7 +120,6 @@
             const firstIdx = sortedLB.findIndex(pl => getScore(pl) === total);
             const displayPos = (isTied && total !== 999) ? "T" + (firstIdx + 1) : (i + 1);
 
-            // Calculate Bonus Display
             let bonusCount = 0;
             if(p.fir) bonusCount++; if(p.gir) bonusCount++; if(p.scrambling) bonusCount++; if(p.ntp) bonusCount++;
             const multiplier = data.isSignature ? 2 : 1;
@@ -164,7 +143,6 @@
             `;
         }).join('');
 
-        // 2. RENDER STANDINGS
         const sBody = document.getElementById('season-body');
         const sNames = Object.keys(data.seasonPoints).sort((a, b) => data.seasonPoints[b] - data.seasonPoints[a]);
         const cutoff = Math.ceil(sNames.length / 2);
@@ -174,19 +152,13 @@
             const isTied = sNames.filter(name => data.seasonPoints[name] === currentPts).length > 1;
             const firstIdx = sNames.findIndex(name => data.seasonPoints[name] === currentPts);
             const displayPos = isTied ? "T" + (firstIdx + 1) : (i + 1);
-            
             const isQualified = (i < cutoff);
             const rowStyle = isQualified ? 'style="background-color: rgba(34, 139, 34, 0.08);"' : '';
 
             return `
                 <tr ${rowStyle}>
                     <td>${displayPos}</td>
-                    <td>
-                        <div class="player-cell">
-                            <strong>${n}</strong>
-                            ${isQualified ? '<span class="q-badge">Q</span>' : ''}
-                        </div>
-                    </td>
+                    <td><div class="player-cell"><strong>${n}</strong>${isQualified ? '<span class="q-badge">Q</span>' : ''}</div></td>
                     <td class="txt-center">${data.seasonEvents[n] || 0}</td>
                     <td class="txt-center" style="color:var(--emerald); font-weight:bold;">${currentPts.toLocaleString()}</td>
                     <td class="txt-right" style="font-weight:bold;">$${data.seasonEarnings[n].toLocaleString()}</td>
