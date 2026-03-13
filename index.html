@@ -30,9 +30,23 @@
         #leaderboard-card { flex: 2.5; } 
         #standings-card { flex: 1.2; }
         
-        /* SPONSOR CARD STYLE */
-        .sponsor-card { flex: 0.4; background: white; border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .sponsor-card img { max-width: 100%; height: auto; border-radius: 4px; }
+        /* ADJUSTED SPONSOR LOGO SCALE */
+        .sponsor-card { 
+            flex: 0.4; 
+            background: white; 
+            border-radius: 8px; 
+            padding: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .sponsor-card img { 
+            max-width: 100%; 
+            height: auto; 
+            max-height: 120px; /* Scaling down by height */
+            object-fit: contain;
+        }
 
         .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         th { background: #f8f9fa; padding: 10px; text-align: left; font-size: 0.7em; position: sticky; top: 0; z-index: 5; white-space: nowrap; }
@@ -54,7 +68,7 @@
 
         @media (max-width: 1200px) { 
             .main-content { flex-direction: column; }
-            .sponsor-card { width: 100%; flex: none; order: 2; } /* Moves between tables on small screens */
+            .sponsor-card { width: 100%; flex: none; order: 2; margin-bottom: 15px; }
             #leaderboard-card { order: 1; width: 100%; }
             #standings-card { order: 3; width: 100%; }
         }
