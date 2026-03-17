@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emerald Tour - Member Portal</title>
-    <link rel="stylesheet" href="https://cdn.gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root { --emerald: #124d12; --gold: #FFD700; --dark: #1a1a1a; }
@@ -17,7 +17,21 @@
         
         .event-banner { width: 100%; height: auto; border-bottom: 4px solid var(--gold); display: block; }
 
-        .venue-bar { background: #333; color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 16px; letter-spacing: 1px; }
+        /* Venue Bar Styling */
+        .venue-bar { 
+            background: #333; 
+            color: white; 
+            padding: 12px; 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 14px; 
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .venue-bar span { color: var(--gold); margin-right: 5px; text-transform: uppercase; font-size: 11px; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
         
@@ -42,18 +56,15 @@
         .col-money { font-weight: bold; color: #2c3e50; }
         .col-bonus-payout { background-color: #fffdf0; font-weight: bold; color: #856404; border-left: 1px solid #eee; }
 
-        /* Middle Sponsor Divider - Reduced height by 50% */
         .middle-logo-divider { text-align: center; padding: 20px 20px; background: #fff; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         .middle-logo-divider img { max-width: 80%; max-height: 60px; height: auto; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
         .sponsor-img { max-height: 50px !important; }
 
-        /* Bottom 2K Logo */
         .bottom-logo-divider { text-align: center; padding: 20px 0; width: 100%; background: #fff; }
         .bottom-logo-divider img { width: 100%; max-width: 600px; height: auto; max-height: 60px; object-fit: contain; filter: grayscale(0.3); }
 
         .top-tier { background: linear-gradient(to right, #f2f9f2, #ffffff) !important; }
 
-        /* 3D HOF Cards */
         .hof-container { padding: 40px 10px; background: var(--dark); color: white; text-align: center; }
         .hof-cards { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; perspective: 1000px; }
         .hof-card { 
@@ -73,7 +84,12 @@
     <div class="header"><img src="logo.png" alt="Tour Logo"></div>
     <img src="event.png" alt="Event Banner" class="event-banner">
     
-    <div id="venue-display" class="venue-bar">Tournament Loading...</div>
+    <div id="venue-display" class="venue-bar">
+        <div><span>Venue:</span> --</div>
+        <div><span>Date:</span> --</div>
+        <div><span>Par:</span> --</div>
+        <div><span>Purse:</span> --</div>
+    </div>
 
     <div class="section-title">Current Leaderboard</div>
     <div class="table-responsive">
@@ -142,7 +158,15 @@
     }
 
     function renderAll(data) {
-        document.getElementById('venue-display').innerText = data.venue || "Weekly Event";
+        // Update Venue Bar with new fields
+        const venueHTML = `
+            <div><span>Venue:</span> ${data.venue || '--'}</div>
+            <div><span>Date:</span> ${data.date || '--'}</div>
+            <div><span>Par:</span> ${data.coursePar || '--'}</div>
+            <div><span>Purse:</span> ${data.prizePool || '--'}</div>
+        `;
+        document.getElementById('venue-display').innerHTML = venueHTML;
+
         const cPar = parseInt(data.coursePar) || 72;
         const multiplier = data.isSignature ? 2 : 1;
 
