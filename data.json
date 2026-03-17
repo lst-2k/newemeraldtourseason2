@@ -1,7 +1,8 @@
 {
-  "venue": "California Golf Club",
-  "date": "11-18 March 2026",
+  "venue": "The Royal Golf Club",
+  "date": "Feb 2026",
   "coursePar": "72",
+  "prizePool": "$600,000",
   "isSignature": false,
   "players": [
     {
@@ -12,7 +13,7 @@
       "r2": "69",
       "r3": "",
       "r4": "",
-      "prize": "$108,000",
+      "prize": "$90,000",
       "eventPoints": "500",
       "fir": "",
       "gir": "",
@@ -27,7 +28,7 @@
       "r2": "70",
       "r3": "",
       "r4": "",
-      "prize": "$65,400",
+      "prize": "$54,500",
       "eventPoints": "300",
       "fir": "",
       "gir": "",
@@ -42,7 +43,7 @@
       "r2": "71",
       "r3": "",
       "r4": "",
-      "prize": "$41,400",
+      "prize": "$34,500",
       "eventPoints": "190",
       "fir": "",
       "gir": "",
@@ -57,7 +58,7 @@
       "r2": "72",
       "r3": "",
       "r4": "",
-      "prize": "$29,400",
+      "prize": "$24,500",
       "eventPoints": "135",
       "fir": "",
       "gir": "",
@@ -72,7 +73,7 @@
       "r2": "73",
       "r3": "",
       "r4": "",
-      "prize": "$24,600",
+      "prize": "$20,500",
       "eventPoints": "110",
       "fir": "",
       "gir": "",
@@ -87,7 +88,7 @@
       "r2": "75",
       "r3": "",
       "r4": "",
-      "prize": "$22,200",
+      "prize": "$18,500",
       "eventPoints": "100",
       "fir": "",
       "gir": "",
@@ -104,12 +105,12 @@
     "Scottie": 210
   },
   "seasonEarnings": {
-    "Justin": 119400,
-    "Tyrell": 142500,
-    "Rory": 95900,
-    "Brooks": 69100,
-    "Shane": 93900,
-    "Scottie": 52700
+    "Justin": 114500,
+    "Tyrell": 124500,
+    "Rory": 89000,
+    "Brooks": 65000,
+    "Shane": 83000,
+    "Scottie": 49000
   },
   "seasonEvents": {
     "Justin": 2,
