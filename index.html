@@ -21,6 +21,8 @@
         .venue-bar { background: #333; color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 16px; letter-spacing: 1px; }
 
         .table-responsive { width: 100%; overflow-x: auto; }
+        
+        /* Fixed Table Border Logic */
         table { width: 100%; border-collapse: collapse; }
         th { background-color: #f8f8f8; padding: 12px; font-size: 11px; border-bottom: 2px solid #eee; text-transform: uppercase; color: #666; text-align: center; }
         td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 14px; white-space: nowrap; text-align: center; }
@@ -43,12 +45,18 @@
         .col-money { font-weight: bold; color: #2c3e50; }
         .col-bonus-payout { background-color: #fffdf0; font-weight: bold; color: #856404; border-left: 1px solid #eee; }
 
-        /* Middle Divider with Sponsor */
+        /* Middle Sponsor Divider */
         .middle-logo-divider { text-align: center; padding: 40px 20px; background: #fff; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         .middle-logo-divider img { max-width: 80%; max-height: 120px; height: auto; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
         .sponsor-img { max-height: 100px !important; }
 
+        /* Bottom 2K Logo - Reduced height by 50% */
+        .bottom-logo-divider { text-align: center; padding: 20px 0; width: 100%; background: #fff; }
+        .bottom-logo-divider img { width: 100%; max-width: 600px; height: auto; max-height: 60px; object-fit: contain; filter: grayscale(0.3); }
+
         .top-tier { background: linear-gradient(to right, #f2f9f2, #ffffff) !important; }
+        
+        /* Fixed Solid Cutoff Line */
         .cutoff-row td { border-bottom: 4px solid var(--emerald) !important; }
 
         /* 3D HOF Cards */
@@ -99,7 +107,7 @@
     </div>
 
     <div class="middle-logo-divider">
-		<img src="sponsor.png" alt="Sponsor" class="sponsor-img">
+        <img src="sponsor.png" alt="Sponsor" class="sponsor-img">
     </div>
 
     <div class="section-title">Season Standings</div>
@@ -117,9 +125,9 @@
             <tbody id="standings-body"></tbody>
         </table>
     </div>
-	
-	<div class="bottom-logo-divider">
-        <img src="2k25-logo.png" alt="2K25 Logo">
+    
+    <div class="bottom-logo-divider">
+        <img src="2k25 logo.png" alt="2K25 Logo">
     </div>
 
     <div class="hof-container">
@@ -144,7 +152,6 @@
         const cPar = parseInt(data.coursePar) || 72;
         const multiplier = data.isSignature ? 2 : 1;
 
-        // Round Detection
         const hasR3 = data.players.some(p => p.r3 > 0);
         const hasR4 = data.players.some(p => p.r4 > 0);
         const showExtended = data.showR3R4 || hasR3 || hasR4;
@@ -154,7 +161,6 @@
             document.getElementById('th-r4').classList.remove('hidden');
         }
 
-        // 1. Leaderboard Rendering
         const lbBody = document.getElementById('leaderboard-body');
         lbBody.innerHTML = '';
         
@@ -167,7 +173,6 @@
             const toParDisplay = diff === 0 ? 'E' : (diff > 0 ? `+${diff}` : diff);
             const toParClass = diff < 0 ? 'under' : (diff === 0 ? 'even' : '');
 
-            // Calculate Bonus Column ($10k per achievement)
             let bCount = 0;
             if(p.fir) bCount++; if(p.gir) bCount++; if(p.scrambling) bCount++; if(p.ntp) bCount++;
             const bonusSum = bCount * 10000 * multiplier;
@@ -192,7 +197,6 @@
             lbBody.appendChild(tr);
         });
 
-        // 2. Standings Rendering with "Q" Status
         const stBody = document.getElementById('standings-body');
         stBody.innerHTML = '';
         const standings = Object.keys(data.seasonPoints || {}).map(name => ({
@@ -217,7 +221,6 @@
             stBody.appendChild(tr);
         });
 
-        // 3. HOF Rendering
         const hof = document.getElementById('hof-display');
         hof.innerHTML = '';
         const top3 = [...standings].sort((a,b) => b.earn - a.earn).slice(0,3);
