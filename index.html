@@ -78,46 +78,120 @@
 
 <script>
     async function fetchData() {
-        const response = await fetch('data.json');
-        const data = await response.json();
-        render(data);
+        try {
+            const response = await fetch('data.json');
+            const data = await response.json();
+            render(data);
+        } catch (e) { console.error("Fetch Error:", e); }
     }
 
     function render(data) {
-        document.getElementById('venue-display').innerHTML = `<div><span>Venue:</span>${data.venue}</div><div><span>Date:</span>${data.date}</div><div><span>Par:</span>${data.coursePar}</div><div><span>Purse:</span>${data.prizePool}</div>`;
+        // 1. Update Venue Bar
+        document.getElementById('venue-display').innerHTML = `
+            <div><span>Venue:</span> ${data.venue || '--'}</div>
+            <div><span>Date:</span> ${data.date || '--'}</div>
+            <div><span>Par:</span> ${data.coursePar || '--'}</div>
+            <div><span>Purse:</span> ${data.prizePool || '--'}</div>
+        `;
         
         const hasExtra = data.players.some(p => p.r3 || p.r4);
-        if(hasExtra) { document.getElementById('th-r3').classList.remove('hidden'); document.getElementById('th-r4').classList.remove('hidden'); }
+        if(hasExtra) { 
+            document.getElementById('th-r3').classList.remove('hidden'); 
+            document.getElementById('th-r4').classList.remove('hidden'); 
+        }
 
+        // 2. Leaderboard Rendering
         const lb = document.getElementById('leaderboard-body');
+        lb.innerHTML = '';
         data.players.forEach((p, i) => {
-            const scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s);
+            const scores = [p.r1, p.r2, p.r3, p.r4].filter(s => s && s !== "");
             const tot = scores.reduce((a, b) => parseInt(a) + parseInt(b), 0);
             const parDiff = tot - (parseInt(data.coursePar) * scores.length);
             const toPar = parDiff === 0 ? 'E' : (parDiff > 0 ? '+'+parDiff : parDiff);
             
-            lb.innerHTML += `<tr><td>${i+1}</td><td class="player-cell"><i class="fa-brands ${p.console}"></i> <span class="fi fi-${p.country}"></span> ${p.name}</td><td class="to-par ${parDiff<0?'under':parDiff===0?'even':''}">${toPar}</td><td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td class="${hasExtra?'':'hidden'}">${p.r3||'-'}</td><td class="${hasExtra?'':'hidden'}">${p.r4||'-'}</td><td><b>${tot}</b></td><td>${p.prize}</td><td style="background:#fffdf0">✔</td></tr>`;
+            // Calculate Bonus Total for display
+            let bCount = 0;
+            if(p.fir) bCount++; if(p.gir) bCount++; if(p.scrambling) bCount++; if(p.ntp) bCount++;
+            const bonusVal = bCount * 10000 * (data.isSignature ? 2 : 1);
+
+            lb.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td class="player-cell">
+                        <i class="fa-brands ${p.console}"></i> 
+                        <span class="fi fi-${p.country}"></span> ${p.name}
+                    </td>
+                    <td class="to-par ${parDiff<0?'under':parDiff===0?'even':''}">${toPar}</td>
+                    <td>${p.r1||'-'}</td><td>${p.r2||'-'}</td>
+                    <td class="${hasExtra?'':'hidden'}">${p.r3||'-'}</td>
+                    <td class="${hasExtra?'':'hidden'}">${p.r4||'-'}</td>
+                    <td><b>${tot}</b></td>
+                    <td class="col-money">${p.prize || '$0'}</td>
+                    <td class="col-bonus-payout">$${bonusVal.toLocaleString()}</td>
+                </tr>
+            `;
         });
 
+        // 3. Season Standings Rendering (Including Events)
         const st = document.getElementById('standings-body');
-        const sortedStandings = Object.keys(data.seasonPoints).map(n => ({ name: n, pts: data.seasonPoints[n], earn: data.seasonEarnings[n] })).sort((a,b) => b.pts - a.pts);
+        st.innerHTML = '';
+        const sortedStandings = Object.keys(data.seasonPoints || {}).map(name => ({
+            name, 
+            pts: data.seasonPoints[name], 
+            earn: data.seasonEarnings[name],
+            evs: data.seasonEvents ? data.seasonEvents[name] : 0 // Pulls the seasonEvents value
+        })).sort((a,b) => b.pts - a.pts);
+
         sortedStandings.forEach((s, i) => {
-            st.innerHTML += `<tr><td>${i+1}</td><td class="player-cell">${s.name}</td><td class="txt-right">${s.pts.toLocaleString()}</td><td class="txt-right"><b>$${s.earn.toLocaleString()}</b></td></tr>`;
+            st.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td class="player-cell">${s.name}</td>
+                    <td style="text-align:right; padding-right:30px;">${s.pts.toLocaleString()}</td>
+                    <td style="text-align:right; padding-right:30px;"><b>$${s.earn.toLocaleString()}</b></td>
+                    <td style="text-align:right; padding-right:30px;">${s.evs}</td> 
+                </tr>
+            `;
         });
 
+        // 4. History Rendering
         const hist = document.getElementById('history-container');
-        if(data.history) data.history.reverse().forEach((h, i) => {
-            hist.innerHTML += `<div class="history-item" onclick="this.classList.toggle('active')"><div class="history-header">Week ${data.history.length-i}: ${h.venue} <i class="fas fa-chevron-down"></i></div><div class="history-content">Winner: <b>${h.winner}</b> | Score: ${h.score} | Prize: ${h.prize}</div></div>`;
-        });
+        hist.innerHTML = '';
+        if(data.history) {
+            [...data.history].reverse().forEach((h, i) => {
+                hist.innerHTML += `
+                    <div class="history-item" onclick="this.classList.toggle('active')">
+                        <div class="history-header">
+                            Week ${data.history.length-i}: ${h.venue} <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="history-content">
+                            Winner: <b>${h.winner}</b> | Score: ${h.score} | Prize: ${h.prize}
+                        </div>
+                    </div>`;
+            });
+        }
 
+        // 5. Hall of Fame Rendering
         const hof = document.getElementById('hof-display');
-        const top3 = Object.keys(data.seasonEarnings).map(n => ({ name: n, earn: data.seasonEarnings[n], wins: data.seasonWins[n]||0 })).sort((a,b) => b.earn - a.earn).slice(0,3);
+        hof.innerHTML = '';
+        const top3 = Object.keys(data.seasonEarnings || {}).map(n => ({ 
+            name: n, 
+            earn: data.seasonEarnings[n], 
+            wins: data.seasonWins ? data.seasonWins[n] : 0 
+        })).sort((a,b) => b.earn - a.earn).slice(0,3);
+
         const medals = ['🥇','🥈','🥉'];
         top3.forEach((p, i) => {
-            hof.innerHTML += `<div class="hof-card"><span class="hof-medal">${medals[i]}</span><b>${p.name}</b><br>Earnings: $${p.earn.toLocaleString()}<span class="hof-wins">🏆 ${p.wins} Wins</span></div>`;
+            hof.innerHTML += `
+                <div class="hof-card">
+                    <span class="hof-medal">${medals[i]}</span>
+                    <b>${p.name}</b><br>
+                    Earnings: $${p.earn.toLocaleString()}<br>
+                    <span class="hof-wins">🏆 ${p.wins} Wins</span>
+                </div>`;
         });
     }
-    fetchData();
+    window.onload = fetchData;
 </script>
 </body>
 </html>
