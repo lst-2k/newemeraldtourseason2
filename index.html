@@ -5,64 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emerald Tour Leaderboard</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; scroll-behavior: smooth; }
+        
+        /* --- HEADER & LOGO --- */
         .sticky-top-wrap { position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .main-header { background-color: #1b5e20; color: white; text-align: center; padding: 15px; font-weight: bold; font-size: 24px; border-bottom: 4px solid #fbc02d; text-transform: uppercase; }
-        .info-bar { background-color: #333; color: #ffeb3b; padding: 10px; display: flex; justify-content: center; gap: 40px; font-size: 14px; font-weight: bold; }
-        .venue-section { text-align: center; padding: 15px; background: white; border-bottom: 1px solid #ddd; }
-        .venue-section h2 { color: #1b5e20; margin: 0; text-transform: uppercase; }
-        .content-padding { padding: 20px; }
-        .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin: 30px 0 15px; }
+        .logo-container { background-color: #1b5e20; text-align: center; padding: 10px 0; border-bottom: 4px solid #fbc02d; }
+        .logo-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+        .venue-section { text-align: center; padding: 15px; background: white; }
+        .venue-section h2 { color: #1b5e20; margin: 0; text-transform: uppercase; font-size: 24px; }
+        .venue-section p { font-weight: bold; margin: 5px 0 0 0; color: #333; }
+
+        .info-bar-below { 
+            background-color: #333; color: #ffeb3b; padding: 8px; 
+            display: flex; justify-content: center; gap: 30px; 
+            font-size: 13px; font-weight: bold; border-bottom: 1px solid #ddd;
+        }
+
+        /* --- CONTENT AREA --- */
+        .content-padding { padding: 15px; }
+        .section-title { text-align:center; color:#1b5e20; text-transform: uppercase; margin: 25px 0 10px; font-size: 1.2em; }
+
+        /* --- TABLES GENERAL --- */
         .table-container { width: 100%; overflow-x: auto; background: white; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th { background-color: #1b5e20; color: white; padding: 12px; text-transform: uppercase; font-size: 11px; }
-        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background-color: #1b5e20; color: white; padding: 10px; text-transform: uppercase; font-size: 11px; }
+        td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; }
+        
         .net-cell { background-color: #f1f8e9; font-weight: bold; color: #1b5e20; }
         .hcap-cell { background-color: #fffde7; font-style: italic; }
-        .bonus-cell { color: #666; font-size: 12px; }
-        .platform-icon { width: 18px; vertical-align: middle; margin-right: 8px; }
+        .platform-icon { width: 16px; vertical-align: middle; margin-right: 6px; }
+
+        /* --- SEASON STANDINGS (Compact) --- */
+        .season-table { width: auto; margin: 0 auto; }
+        .col-rank { text-align: left !important; width: 35px; }
+        .col-player { text-align: left !important; width: 1%; white-space: nowrap; font-weight: bold; padding-right: 20px; }
+        .col-stat { width: 1%; white-space: nowrap; padding: 10px 15px; }
+        .col-earn { width: 1%; white-space: nowrap; text-align: right; padding-right: 15px; }
+
+        /* --- HISTORY ACCORDION --- */
+        .history-item { background: white; border: 1px solid #ddd; margin-bottom: 5px; border-radius: 4px; overflow: hidden; }
+        .history-header { 
+            display: grid; 
+            grid-template-columns: 60px 1fr 1fr 100px 120px 40px;
+            align-items: center; padding: 12px; cursor: pointer; background: #fff; transition: background 0.2s;
+        }
+        .history-header:hover { background: #f9f9f9; }
+        .history-header div { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
+        .hist-winner { text-align: left; font-weight: bold; color: #1b5e20; }
+        .hist-venue { text-align: left; }
+        .history-content { display: none; padding: 10px; background: #fdfdfd; border-top: 1px solid #eee; }
+        .history-item.active .history-content { display: block; }
+        .history-item.active .arrow-icon { transform: rotate(180deg); }
+
+        /* --- BACK TO TOP BUTTON --- */
+        #backToTop {
+            position: fixed; bottom: 30px; right: 30px; z-index: 2000;
+            display: none; width: 50px; height: 50px; background: #1b5e20;
+            color: white; border: none; border-radius: 50%; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 20px; line-height: 50px; text-align: center;
+        }
+        #backToTop:hover { background: #2e7d32; }
+
     </style>
 </head>
 <body>
 
+    <button id="backToTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">↑</button>
+
     <div class="sticky-top-wrap">
-        <div class="main-header">EMERALD TOUR LEADERBOARD</div>
-        <div class="info-bar">
-            <div>DATE: <span id="event-date" style="color:white">--</span></div>
-            <div>COURSE PAR: <span id="course-par" style="color:white">--</span></div>
+        <div class="logo-container">
+            <img src="logo.png" alt="Emerald Tour Logo">
         </div>
         <div class="venue-section">
             <h2 id="current-venue">Loading...</h2>
             <p id="total-prize-pool">Total Prize Pool: --</p>
         </div>
+        <div class="info-bar-below">
+            <div>DATE: <span id="event-date" style="color:white">--</span></div>
+            <div>COURSE PAR: <span id="course-par" style="color:white">--</span></div>
+        </div>
     </div>
 
     <div class="content-padding">
-        <h3 class="section-title">Current Tournament</h3>
+        
+        <h3 class="section-title">Current Tournament Leaderboard</h3>
         <div class="table-container">
-            <table>
+            <table id="main-lb">
                 <thead>
-                    <tr><th>POS</th><th style="text-align:left">PLAYER</th><th>HCP</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>GROSS</th><th>NET</th><th>TO PAR</th><th>FiR%</th><th>GiR%</th><th>SCRAM</th><th>NTP</th><th>PRIZES</th></tr>
+                    <tr>
+                        <th>POS</th><th style="text-align:left">PLAYER</th><th>HCP</th>
+                        <th>R1</th><th>R2</th><th>R3</th><th>R4</th>
+                        <th>GROSS</th><th>NET</th><th>TO PAR</th>
+                        <th>FiR%</th><th>GiR%</th><th>SCRAM</th><th>NTP</th><th>PRIZES</th>
+                    </tr>
                 </thead>
                 <tbody id="leaderboard-body"></tbody>
             </table>
         </div>
 
         <h3 class="section-title">Season Standings</h3>
-        <div class="table-container">
-            <table>
-                <thead><tr><th>Rank</th><th style="text-align:left">Player</th><th>Events</th><th>Points</th><th>Earnings</th></tr></thead>
+        <div class="table-container" style="display: flex; justify-content: center;">
+            <table class="season-table">
+                <thead>
+                    <tr>
+                        <th class="col-rank">RK</th><th style="text-align:left">PLAYER</th>
+                        <th class="col-stat">EV</th><th class="col-stat">PTS</th><th class="col-earn">EARNINGS</th>
+                    </tr>
+                </thead>
                 <tbody id="season-body"></tbody>
             </table>
         </div>
 
-        <h3 class="section-title">Season 1 Event History</h3>
-        <div class="table-container">
-            <table>
-                <thead><tr><th>Event</th><th style="text-align:left">Venue</th><th>Winner</th><th>Score</th><th>Purse</th></tr></thead>
-                <tbody id="history-body"></tbody>
-            </table>
-        </div>
+        <h3 class="section-title">Season 2 Event History</h3>
+        <div id="history-accordion-container"></div>
     </div>
 
     <script>
@@ -70,6 +126,16 @@
             'fa-playstation': 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg',
             'fa-xbox': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg',
             'fa-steam': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg'
+        };
+
+        // Back to Top Logic
+        window.onscroll = function() {
+            const btn = document.getElementById("backToTop");
+            if (document.body.scrollTop > 400 || document.documentElement.scrollTop > 400) {
+                btn.style.display = "block";
+            } else {
+                btn.style.display = "none";
+            }
         };
 
         async function loadData() {
@@ -82,11 +148,12 @@
 
         function render(data) {
             const par = parseInt(data.coursePar) || 72;
-            document.getElementById('current-venue').innerText = data.venue;
+            document.getElementById('current-venue').innerText = data.venue || "TOURNAMENT";
             document.getElementById('course-par').innerText = par;
-            document.getElementById('event-date').innerText = data.date;
-            document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${data.prizePool}`;
+            document.getElementById('event-date').innerText = data.date || "--";
+            document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${data.prizePool || '--'}`;
 
+            // --- 1. LEADERBOARD ---
             const players = data.players.map(p => {
                 const rounds = [p.r1, p.r2, p.r3, p.r4].map(r => parseInt(r) || 0);
                 const active = rounds.filter(r => r > 0).length;
@@ -100,26 +167,48 @@
                 <tr>
                     <td>${p.active > 0 ? i+1 : '-'}</td>
                     <td style="text-align:left; font-weight:bold;"><img src="${platformIcons[p.console]||''}" class="platform-icon">${p.name}</td>
-                    <td class="hcap-cell">${p.hcap}</td>
+                    <td class="hcap-cell">${(p.hcap == 0) ? "—" : p.hcap}</td>
                     <td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td>
                     <td>${p.active > 0 ? p.gross : '-'}</td>
                     <td class="net-cell">${p.active > 0 ? p.net : '-'}</td>
                     <td style="font-weight:bold">${p.active > 0 ? (p.toParVal === 0 ? 'E' : (p.toParVal > 0 ? '+'+p.toParVal : p.toParVal)) : '-'}</td>
                     <td class="bonus-cell">${p.fir||'-'}</td><td class="bonus-cell">${p.gir||'-'}</td><td class="bonus-cell">${p.scram||'-'}</td><td class="bonus-cell">${p.ntp||'-'}</td>
                     <td style="font-weight:bold; color:#1b5e20;">${p.prize||'$0'}</td>
-                </tr>
-            `).join('');
+                </tr>`).join('');
 
+            // --- 2. SEASON STANDINGS ---
             if(data.seasonPoints) {
-                const sorted = Object.keys(data.seasonPoints).sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
-                document.getElementById('season-body').innerHTML = sorted.map((n, i) => `
-                    <tr><td>${i+1}</td><td style="text-align:left; font-weight:bold">${n}</td><td>${data.seasonEvents[n]||0}</td><td style="color:#1b5e20; font-weight:bold">${data.seasonPoints[n].toLocaleString()}</td><td>$${data.seasonEarnings[n].toLocaleString()}</td></tr>
-                `).join('');
+                const sortedNames = Object.keys(data.seasonPoints).sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
+                document.getElementById('season-body').innerHTML = sortedNames.map((name, i) => {
+                    const pInfo = data.players.find(pl => pl.name === name);
+                    const icon = pInfo ? `<img src="${platformIcons[pInfo.console]||''}" class="platform-icon">` : '';
+                    return `<tr>
+                        <td class="col-rank">${i+1}</td>
+                        <td class="col-player">${icon}${name}</td>
+                        <td class="col-stat">${data.seasonEvents[name] || 0}</td>
+                        <td class="col-stat" style="color:#1b5e20; font-weight:bold">${data.seasonPoints[name].toLocaleString()}</td>
+                        <td class="col-earn"><b>$${data.seasonEarnings[name].toLocaleString()}</b></td>
+                    </tr>`;
+                }).join('');
             }
 
+            // --- 3. EVENT HISTORY ACCORDION ---
+            const histContainer = document.getElementById('history-accordion-container');
             if(data.eventHistory) {
-                document.getElementById('history-body').innerHTML = data.eventHistory.map(h => `
-                    <tr><td>${h.event}</td><td style="text-align:left; font-weight:bold">${h.venue}</td><td>${h.winner}</td><td>${h.score}</td><td>${h.purse}</td></tr>
+                histContainer.innerHTML = data.eventHistory.map((h, idx) => `
+                    <div class="history-item" onclick="this.classList.toggle('active')">
+                        <div class="history-header">
+                            <div style="font-weight:bold; color:#666;">${h.event}</div>
+                            <div class="hist-venue">${h.venue}</div>
+                            <div class="hist-winner">${h.winner}</div>
+                            <div style="text-align:center">${h.score}</div>
+                            <div style="font-weight:bold; color:#1b5e20; text-align:right">${h.purse}</div>
+                            <div class="arrow-icon">▼</div>
+                        </div>
+                        <div class="history-content">
+                            <p style="font-size:12px; color:#666; margin-bottom:5px;">Leaderboard for this event would appear here if data is archived.</p>
+                            </div>
+                    </div>
                 `).join('');
             }
         }
