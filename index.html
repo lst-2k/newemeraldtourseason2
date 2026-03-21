@@ -46,14 +46,19 @@
         /* --- HISTORY ACCORDION --- */
         .history-item { background: white; border: 1px solid #ddd; margin-bottom: 5px; border-radius: 4px; overflow: hidden; }
         .history-header { 
-            display: grid; 
-            grid-template-columns: 60px 1fr 1fr 100px 120px 40px;
-            align-items: center; padding: 12px; cursor: pointer; background: #fff; transition: background 0.2s;
-        }
+			display: grid; 
+			/* Col 1: Wk, Col 2: Date, Col 3: Venue, Col 4: Winner, Col 5: Score/Prize, Col 6: Arrow */
+			grid-template-columns: 45px 90px 1.2fr 1fr 100px 20px;
+			align-items: center; 
+			padding: 15px 10px; 
+			cursor: pointer; 
+			transition: background 0.2s;
+		}
         .history-header:hover { background: #f9f9f9; }
         .history-header div { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
-        .hist-winner { text-align: left; font-weight: bold; color: #1b5e20; }
-        .hist-venue { text-align: left; }
+        .hist-date { font-size: 11px !important; color: #666; white-space: nowrap; }
+		.hist-venue { text-align: left; font-weight: 600; color: #333; }
+		.hist-winner { text-align: left; font-weight: bold; color: #1b5e20; white-space: nowrap; }
         .history-content { display: none; padding: 10px; background: #fdfdfd; border-top: 1px solid #eee; }
         .history-item.active .history-content { display: block; }
         .history-item.active .arrow-icon { transform: rotate(180deg); }
@@ -196,24 +201,22 @@
 
             // --- 3. EVENT HISTORY ACCORDION ---
             const histContainer = document.getElementById('history-accordion-container');
-            if(data.eventHistory) {
-                histContainer.innerHTML = data.eventHistory.map((h, idx) => `
-                    <div class="history-item" onclick="this.classList.toggle('active')">
-                        <div class="history-header">
-                            <div style="font-weight:bold; color:#666;">${h.event}</div>
-                            <div class="hist-venue">${h.venue}</div>
-                            <div class="hist-winner">${h.winner}</div>
-                            <div style="text-align:center">${h.score}</div>
-                            <div style="font-weight:bold; color:#1b5e20; text-align:right">${h.purse}</div>
-                            <div class="arrow-icon">▼</div>
-                        </div>
-                        <div class="history-content">
-                            <p style="font-size:12px; color:#666; margin-bottom:5px;">Leaderboard for this event would appear here if data is archived.</p>
-                            </div>
-                    </div>
-                `).join('');
-            }
-        }
+		if(data.eventHistory) {
+			document.getElementById('history-accordion-container').innerHTML = data.eventHistory.map(h => `
+				<div class="history-item" onclick="this.classList.toggle('active')">
+					<div class="history-header">
+						<div style="font-weight:bold; color:#888;">${h.event}</div>
+						<div class="hist-date">${h.date || '--'}</div>
+						<div class="hist-venue">${h.venue}</div>
+						<div class="hist-winner">${h.winner}</div>
+						<div style="text-align:right; padding-right:5px;">
+							<div style="font-size:12px; font-weight:bold;">${h.score}</div>
+							<div style="font-size:11px; color:#1b5e20;">${h.purse}</div>
+						</div>
+						<div style="font-size:10px; color:#ccc;">▼</div>
+					</div>
+				</div>`).join('');
+		}
         loadData();
     </script>
 </body>
