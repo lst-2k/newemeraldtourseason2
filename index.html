@@ -57,16 +57,17 @@
             margin-bottom: 20px;
             border-radius: 4px;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         th { background-color: #1b5e20; color: white; padding: 12px; text-transform: uppercase; font-size: 11px; border-bottom: 2px solid #fbc02d; }
-        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
+        td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; }
         
         /* HIGHLIGHT COLUMNS */
         .net-cell { background-color: #f1f8e9; font-weight: bold; color: #1b5e20; }
         .hcap-cell { background-color: #fffde7; font-style: italic; }
+        .bonus-cell { color: #666; font-size: 12px; }
 
         /* ICONS */
-        .platform-icon { width: 20px; height: 20px; vertical-align: middle; margin-right: 8px; object-fit: contain; }
+        .platform-icon { width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; }
     </style>
 </head>
 <body>
@@ -85,7 +86,7 @@
 
     <div class="content-padding">
         
-        <h3 class="section-title">Tournament Leaderboard</h3>
+        <h3 class="section-title">Current Tournament</h3>
         <div class="table-container">
             <table>
                 <thead>
@@ -93,13 +94,14 @@
                         <th>POS</th>
                         <th style="text-align:left;">PLAYER</th>
                         <th>HCP</th>
-                        <th>R1</th>
-                        <th>R2</th>
-                        <th>R3</th>
-                        <th>R4</th>
+                        <th>R1</th><th>R2</th><th>R3</th><th>R4</th>
                         <th>GROSS</th>
                         <th>NET</th>
                         <th>TO PAR</th>
+                        <th>FiR%</th>
+                        <th>GiR%</th>
+                        <th>SCRAM</th>
+                        <th>NTP</th>
                         <th>PRIZES</th>
                     </tr>
                 </thead>
@@ -107,20 +109,41 @@
             </table>
         </div>
 
-        <h3 class="section-title">Season Stats & Standings</h3>
+        <h3 class="section-title">Season Standings</h3>
         <div class="table-container">
             <table>
                 <thead>
-                    <tr><th>Rank</th><th style="text-align:left;">Player</th><th>Points</th><th>Earnings</th><th>Events</th><th>FIR %</th><th>GIR %</th><th>Scram</th><th>NTP</th></tr>
+                    <tr>
+                        <th>Rank</th>
+                        <th style="text-align:left;">Player</th>
+                        <th>Events</th>
+                        <th>Points</th>
+                        <th>Earnings</th>
+                    </tr>
                 </thead>
-                <tbody id="stats-body"></tbody>
+                <tbody id="season-body"></tbody>
+            </table>
+        </div>
+
+        <h3 class="section-title">Season 1 Event History</h3>
+        <div class="table-container">
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th style="text-align:left;">Venue</th>
+                        <th>Winner</th>
+                        <th>Winning Score</th>
+                        <th>Purse</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    </tbody>
             </table>
         </div>
     </div>
 
     <script>
-const DATA_URL = 'data.json';
-
 const platformIcons = {
     'fa-playstation': 'https://upload.wikimedia.org/wikipedia/commons/0/00/PlayStation_logo.svg',
     'fa-xbox': 'https://upload.wikimedia.org/wikipedia/commons/f/f9/Xbox_one_logo.svg',
@@ -129,97 +152,65 @@ const platformIcons = {
 
 async function loadData() {
     try {
-        const response = await fetch(DATA_URL + '?t=' + Date.now());
-        if (!response.ok) throw new Error("File not found");
+        const response = await fetch('data.json?t=' + Date.now());
         const data = await response.json();
-        renderData(data);
+        render(data);
     } catch (err) { 
         console.error("Load Error:", err);
-        document.getElementById('current-venue').innerText = "Data Error: Make sure data.json exists.";
     }
 }
 
-function renderData(data) {
-    const parVal = parseInt(data.coursePar) || 72;
+function render(data) {
+    const par = parseInt(data.coursePar) || 72;
     document.getElementById('current-venue').innerText = data.venue || "Tournament";
-    document.getElementById('course-par').innerText = parVal;
+    document.getElementById('course-par').innerText = par;
     document.getElementById('event-date').innerText = data.date || "--";
     document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${data.prizePool || '--'}`;
 
+    // --- RENDER TOURNAMENT BOARD ---
     const lbBody = document.getElementById('leaderboard-body');
-    lbBody.innerHTML = "";
+    const players = data.players.map(p => {
+        const rounds = [p.r1, p.r2, p.r3, p.r4].map(r => parseInt(r) || 0);
+        const active = rounds.filter(r => r > 0).length;
+        const gross = rounds.reduce((a, b) => a + b, 0);
+        const net = active > 0 ? (gross - (parseInt(p.hcap) || 0)) : 0;
+        const toParVal = active > 0 ? (net - (par * active)) : 999;
+        return { ...p, gross, net, toParVal, active };
+    }).sort((a, b) => a.toParVal - b.toParVal);
 
-    if (data.players && Array.isArray(data.players)) {
-        let players = data.players.map(p => {
-            const hcap = parseInt(p.hcap) || 0;
-            const rounds = [p.r1, p.r2, p.r3, p.r4].map(r => parseInt(r) || 0);
-            const activeCount = rounds.filter(r => r > 0).length;
-            
-            const gross = rounds.reduce((a, b) => a + b, 0);
-            const net = activeCount > 0 ? (gross - hcap) : 0;
-            
-            let toParValue = 999;
-            let toParDisplay = "--";
-            
-            if (activeCount > 0) {
-                toParValue = net - (parVal * activeCount);
-                toParDisplay = toParValue > 0 ? `+${toParValue}` : (toParValue === 0 ? "E" : toParValue);
-            }
+    lbBody.innerHTML = players.map((p, i) => `
+        <tr>
+            <td>${p.active > 0 ? (i + 1) : '-'}</td>
+            <td style="text-align:left; font-weight:bold;">
+                <img src="${platformIcons[p.console] || ''}" class="platform-icon">${p.name}
+            </td>
+            <td class="hcap-cell">${p.hcap}</td>
+            <td>${p.r1 || '-'}</td><td>${p.r2 || '-'}</td>
+            <td>${p.r3 || '-'}</td><td>${p.r4 || '-'}</td>
+            <td>${p.active > 0 ? p.gross : '-'}</td>
+            <td class="net-cell">${p.active > 0 ? p.net : '-'}</td>
+            <td style="font-weight:bold;">${p.active > 0 ? (p.toParVal === 0 ? 'E' : (p.toParVal > 0 ? '+'+p.toParVal : p.toParVal)) : '-'}</td>
+            <td class="bonus-cell">${p.fir || '-'}</td>
+            <td class="bonus-cell">${p.gir || '-'}</td>
+            <td class="bonus-cell">${p.scram || '-'}</td>
+            <td class="bonus-cell">${p.ntp || '-'}</td>
+            <td style="font-weight:bold; color:#1b5e20;">${p.prize || '$0'}</td>
+        </tr>
+    `).join('');
 
-            const iconUrl = platformIcons[p.console] || "";
-            const iconHtml = iconUrl ? `<img src="${iconUrl}" class="platform-icon">` : "";
-            
-            return { ...p, hcap, rounds, gross, net, toParDisplay, toParValue, iconHtml, activeCount };
-        });
-
-        // SORT BY NET TO PAR
-        players.sort((a, b) => a.toParValue - b.toParValue);
-
-        players.forEach((p, i) => {
-            lbBody.innerHTML += `
-                <tr>
-                    <td>${p.activeCount > 0 ? (i + 1) : '-'}</td>
-                    <td style="text-align:left; font-weight:bold;">${p.iconHtml}${p.name}</td>
-                    <td class="hcap-cell">${p.hcap}</td>
-                    <td>${p.rounds[0]||'-'}</td>
-                    <td>${p.rounds[1]||'-'}</td>
-                    <td>${p.rounds[2]||'-'}</td>
-                    <td>${p.rounds[3]||'-'}</td>
-                    <td>${p.activeCount > 0 ? p.gross : '-'}</td>
-                    <td class="net-cell">${p.activeCount > 0 ? p.net : '-'}</td>
-                    <td style="font-weight:bold; color:${p.toParValue <= 0 ? 'red' : 'black'}">${p.toParDisplay}</td>
-                    <td style="color:#1b5e20; font-weight:bold;">${p.prize || '--'}</td>
-                </tr>`;
-        });
-    }
-
-    // SEASON STATS
-    const statsBody = document.getElementById('stats-body');
-    statsBody.innerHTML = "";
-    if (data.seasonPoints && data.seasonEarnings) {
-        const playerNames = Object.keys(data.seasonPoints).sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
-
-        playerNames.forEach((name, i) => {
-            const sPoints = data.seasonPoints[name] || 0;
-            const sEarn = data.seasonEarnings[name] || 0;
-            const sEvents = data.seasonEvents ? (data.seasonEvents[name] || 0) : 0;
-            
-            // Find player object for bonus stats
-            const pObj = data.players.find(p => p.name === name) || {};
-
-            statsBody.innerHTML += `
-                <tr>
-                    <td>${i + 1}</td>
-                    <td style="text-align:left; font-weight:bold;">${name}</td>
-                    <td><b>${sPoints.toLocaleString()}</b></td>
-                    <td style="color:#1b5e20; font-weight:bold;">$${sEarn.toLocaleString()}</td>
-                    <td>${sEvents}</td>
-                    <td>${pObj.fir || '--'}%</td>
-                    <td>${pObj.gir || '--'}%</td>
-                    <td>${pObj.scrambling || '--'}%</td>
-                    <td>${pObj.ntp ? pObj.ntp + 'ft' : '--'}</td>
-                </tr>`;
-        });
+    // --- RENDER SEASON STANDINGS ---
+    const seasonBody = document.getElementById('season-body');
+    if (data.seasonPoints) {
+        const sortedNames = Object.keys(data.seasonPoints).sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
+        seasonBody.innerHTML = sortedNames.map((name, i) => `
+            <tr>
+                <td>${i + 1}</td>
+                <td style="text-align:left; font-weight:bold;">${name}</td>
+                <td>${data.seasonEvents ? (data.seasonEvents[name] || 0) : 0}</td>
+                <td style="color:#1b5e20; font-weight:bold;">${data.seasonPoints[name].toLocaleString()}</td>
+                <td>$${data.seasonEarnings[name].toLocaleString()}</td>
+            </tr>
+        `).join('');
     }
 }
 

@@ -1,54 +1,108 @@
 {
+  "venue": "The Royal Golf Club",
+  "coursePar": "72",
+  "prizePool": "$500,000",
   "players": [
     {
       "name": "NoWorries",
       "hcap": "8",
+      "console": "fa-xbox",
+      "country": "gb",
       "r1": "68",
       "r2": "76",
       "r3": "",
-      "r4": ""
+      "r4": "",
+      "fir": "77.74",
+      "gir": "",
+      "scram": "",
+      "ntp": ""
     },
     {
       "name": "Mr Longpole",
       "hcap": "0",
+      "console": "fa-xbox",
+      "country": "gb",
       "r1": "69",
       "r2": "68",
       "r3": "",
-      "r4": ""
+      "r4": "",
+      "fir": "",
+      "gir": "",
+      "scram": "",
+      "ntp": ""
     },
     {
       "name": "Geordieboy85",
       "hcap": "0",
+      "console": "fa-playstation",
+      "country": "gb",
       "r1": "70",
       "r2": "70",
       "r3": "",
-      "r4": ""
+      "r4": "",
+      "fir": "",
+      "gir": "66.66",
+      "scram": "",
+      "ntp": ""
     },
     {
       "name": "Polekatt",
       "hcap": "6",
+      "console": "fa-steam",
+      "country": "us",
       "r1": "72",
       "r2": "75",
       "r3": "",
-      "r4": ""
+      "r4": "",
+      "fir": "",
+      "gir": "",
+      "scram": "",
+      "ntp": "22.50"
     },
     {
       "name": "x3offthetee",
       "hcap": "0",
+      "console": "fa-xbox",
+      "country": "gb",
       "r1": "72",
       "r2": "72",
       "r3": "",
-      "r4": ""
+      "r4": "",
+      "fir": "",
+      "gir": "",
+      "scram": "85.91",
+      "ntp": ""
+    },
+    {
+      "name": "Hammersman",
+      "hcap": "3",
+      "console": "fa-steam",
+      "country": "un",
+      "r1": "77",
+      "r2": "71",
+      "r3": "",
+      "r4": "",
+      "fir": "",
+      "gir": "",
+      "scram": "",
+      "ntp": ""
     },
     {
       "name": "Colly45x",
       "hcap": "0",
+      "console": "fa-xbox",
+      "country": "gb",
       "r1": "78",
       "r2": "74",
       "r3": "",
-      "r4": ""
+      "r4": "",
+      "fir": "",
+      "gir": "",
+      "scram": "",
+      "ntp": ""
     }
   ],
   "seasonPoints": {},
-  "seasonEarnings": {}
+  "seasonEarnings": {},
+  "seasonEvents": {}
 }
