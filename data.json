@@ -2,34 +2,54 @@
   "venue": "The Royal Golf Club",
   "coursePar": "72",
   "prizePool": "$500,000",
+  "date": "18 Mar - 25 Mar 2026",
+  "startDateRaw": "2026-03-18",
+  "endDateRaw": "2026-03-25",
   "players": [
     {
       "name": "NoWorries",
       "hcap": "8",
       "console": "fa-xbox",
       "country": "gb",
-      "r1": "68",
+      "r1": "65",
       "r2": "76",
       "r3": "",
       "r4": "",
       "fir": "77.74",
       "gir": "",
       "scram": "",
-      "ntp": ""
+      "ntp": "",
+      "prize": "$90,000"
     },
     {
       "name": "Mr Longpole",
       "hcap": "0",
       "console": "fa-xbox",
       "country": "gb",
-      "r1": "69",
+      "r1": "66",
       "r2": "68",
       "r3": "",
       "r4": "",
       "fir": "",
       "gir": "",
       "scram": "",
-      "ntp": ""
+      "ntp": "",
+      "prize": "$54,500"
+    },
+    {
+      "name": "HorusPhoenix",
+      "hcap": "0",
+      "console": "fa-xbox",
+      "country": "jp",
+      "r1": "70",
+      "r2": "71",
+      "r3": "",
+      "r4": "",
+      "fir": "",
+      "gir": "",
+      "scram": "",
+      "ntp": "",
+      "prize": "$34,500"
     },
     {
       "name": "Geordieboy85",
@@ -37,13 +57,29 @@
       "console": "fa-playstation",
       "country": "gb",
       "r1": "70",
-      "r2": "70",
+      "r2": "72",
       "r3": "",
       "r4": "",
       "fir": "",
       "gir": "66.66",
       "scram": "",
-      "ntp": ""
+      "ntp": "",
+      "prize": "$22,500"
+    },
+    {
+      "name": "x3offthetee",
+      "hcap": "0",
+      "console": "fa-xbox",
+      "country": "gb",
+      "r1": "70",
+      "r2": "72",
+      "r3": "",
+      "r4": "",
+      "fir": "",
+      "gir": "",
+      "scram": "85.91",
+      "ntp": "",
+      "prize": "$22,500"
     },
     {
       "name": "Polekatt",
@@ -51,58 +87,74 @@
       "console": "fa-steam",
       "country": "us",
       "r1": "72",
-      "r2": "75",
+      "r2": "77",
       "r3": "",
       "r4": "",
       "fir": "",
       "gir": "",
       "scram": "",
-      "ntp": "22.50"
-    },
-    {
-      "name": "x3offthetee",
-      "hcap": "0",
-      "console": "fa-xbox",
-      "country": "gb",
-      "r1": "72",
-      "r2": "72",
-      "r3": "",
-      "r4": "",
-      "fir": "",
-      "gir": "",
-      "scram": "85.91",
-      "ntp": ""
+      "ntp": "22.50",
+      "prize": "$18,500"
     },
     {
       "name": "Hammersman",
       "hcap": "3",
       "console": "fa-steam",
       "country": "un",
-      "r1": "77",
+      "r1": "78",
       "r2": "71",
       "r3": "",
       "r4": "",
       "fir": "",
       "gir": "",
       "scram": "",
-      "ntp": ""
+      "ntp": "",
+      "prize": "$16,250"
     },
     {
       "name": "Colly45x",
       "hcap": "0",
       "console": "fa-xbox",
       "country": "gb",
-      "r1": "78",
-      "r2": "74",
+      "r1": "75",
+      "r2": "71",
       "r3": "",
       "r4": "",
       "fir": "",
       "gir": "",
       "scram": "",
-      "ntp": ""
+      "ntp": "",
+      "prize": "$16,250"
     }
   ],
-  "seasonPoints": {},
-  "seasonEarnings": {},
-  "seasonEvents": {}
+  "seasonPoints": {
+    "NoWorries": 500,
+    "Mr Longpole": 300,
+    "HorusPhoenix": 190,
+    "Geordieboy85": 135,
+    "x3offthetee": 135,
+    "Polekatt": 100,
+    "Hammersman": 95,
+    "Colly45x": 95
+  },
+  "seasonEarnings": {
+    "NoWorries": 90000,
+    "Mr Longpole": 54500,
+    "HorusPhoenix": 34500,
+    "Geordieboy85": 22500,
+    "x3offthetee": 22500,
+    "Polekatt": 18500,
+    "Hammersman": 16250,
+    "Colly45x": 16250
+  },
+  "seasonEvents": {
+    "NoWorries": 1,
+    "Mr Longpole": 1,
+    "HorusPhoenix": 1,
+    "Geordieboy85": 1,
+    "x3offthetee": 1,
+    "Polekatt": 1,
+    "Hammersman": 1,
+    "Colly45x": 1
+  }
 }
