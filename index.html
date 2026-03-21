@@ -6,55 +6,53 @@
     <title>Emerald Tour Leaderboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --emerald: #1b5e20; --gold: #fbc02d; --dark: #333; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; scroll-behavior: smooth; }
+        :root { --emerald: #1b5e20; --gold: #fbc02d; --dark: #333; --light-bg: #f4f4f4; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); scroll-behavior: smooth; }
         
         /* --- HEADER --- */
         .header-wrap { width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .logo-container { background-color: var(--emerald); text-align: center; padding: 10px 0; border-bottom: 4px solid var(--gold); }
         .logo-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-
         .venue-section { text-align: center; padding: 15px; background: white; }
         .venue-section h2 { color: var(--emerald); margin: 0; text-transform: uppercase; font-size: 24px; }
         .venue-section p { font-weight: bold; margin: 5px 0 0 0; color: var(--dark); }
-
-        .info-bar-below { 
-            background-color: var(--dark); color: #ffeb3b; padding: 8px; 
-            display: flex; justify-content: center; gap: 30px; 
-            font-size: 13px; font-weight: bold;
-        }
+        .info-bar-below { background-color: var(--dark); color: #ffeb3b; padding: 8px; display: flex; justify-content: center; gap: 30px; font-size: 13px; font-weight: bold; }
 
         /* --- LAYOUT --- */
-        .content-padding { padding: 10px; }
+        .content-padding { padding: 10px; max-width: 1200px; margin: 0 auto; }
         .section-title { text-align:center; color: var(--emerald); text-transform: uppercase; margin: 25px 0 10px; font-size: 1.2em; }
 
         /* --- TABLES --- */
         .table-container { width: 100%; overflow-x: auto; background: white; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        th { background-color: var(--emerald); color: white; padding: 12px 8px; text-transform: uppercase; font-size: 11px; white-space: nowrap; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background-color: var(--emerald); color: white; padding: 12px 8px; text-transform: uppercase; font-size: 11px; }
         td { padding: 12px 8px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; }
-        
-        .player-cell { text-align: left !important; font-weight: bold; white-space: nowrap; min-width: 180px; }
-        .platform-icon { width: 16px; vertical-align: middle; margin-right: 8px; display: inline-block; }
+        .player-cell { text-align: left !important; font-weight: bold; white-space: nowrap; }
+        .platform-icon { width: 14px; vertical-align: middle; margin-right: 6px; opacity: 0.8; }
         .net-cell { background-color: #f1f8e9; font-weight: bold; color: var(--emerald); }
-        .hcap-cell { background-color: #fffde7; font-style: italic; }
 
-        /* --- FIXED ALIGNMENT HISTORY --- */
-        .history-item { background: white; border: 1px solid #ddd; margin-bottom: 8px; border-radius: 4px; overflow: hidden; }
-        .history-header { display: flex; align-items: center; padding: 12px 15px; cursor: pointer; gap: 15px; }
-        .history-header > div { flex-shrink: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .hist-wk { width: 35px; font-weight: bold; color: #888; }
-        .hist-date { width: 100px; color: #666; font-size: 11px !important; }
-        .hist-venue { flex-grow: 1; text-align: left; font-weight: 600; color: var(--dark); min-width: 150px; }
-        .hist-winner { width: 140px; text-align: left; font-weight: bold; color: var(--emerald); }
-        .hist-stats { width: 90px; text-align: right; line-height: 1.2; }
+        /* --- HISTORY ACCORDION --- */
+        .history-item { background: white; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .history-header { display: flex; align-items: center; padding: 14px 15px; cursor: pointer; gap: 10px; transition: background 0.2s; }
+        .history-header:hover { background: #fcfcfc; }
+        .history-header > div { flex-shrink: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
-        #backToTop {
-            position: fixed; bottom: 50px; right: 20px; z-index: 2000;
-            display: none; width: 45px; height: 45px; background: var(--emerald);
-            color: white; border: none; border-radius: 50%; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 18px;
-        }
+        .hist-wk { width: 40px; font-weight: bold; color: #777; }
+        .hist-date { width: 100px; color: #666; font-size: 11px !important; }
+        .hist-venue { flex-grow: 1; text-align: left; font-weight: 600; color: var(--dark); min-width: 140px; }
+        .hist-winner { width: 150px; text-align: left; font-weight: bold; color: var(--emerald); }
+        .hist-stats { width: 80px; text-align: right; font-weight: bold; }
+        .hist-arrow { width: 20px; text-align: center; color: #ccc; transition: transform 0.3s; }
+
+        .history-content { display: none; border-top: 1px solid #eee; background: #fafafa; }
+        .history-item.active .history-content { display: block; }
+        .history-item.active .hist-arrow { transform: rotate(180deg); }
+
+        .hist-table { width: 100%; min-width: 100%; font-size: 12px; }
+        .hist-table th { background: #eee; color: #555; padding: 6px; font-size: 10px; }
+        .hist-table td { padding: 6px; border-bottom: 1px solid #ececec; }
+
+        #backToTop { position: fixed; bottom: 20px; right: 20px; display: none; width: 45px; height: 45px; background: var(--emerald); color: white; border: none; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 18px; z-index: 100; }
     </style>
 </head>
 <body>
@@ -64,8 +62,8 @@
     <div class="header-wrap">
         <div class="logo-container"><img src="logo.png" alt="Emerald Tour Logo"></div>
         <div class="venue-section">
-            <h2 id="current-venue">Loading...</h2>
-            <p id="total-prize-pool">Total Prize Pool: --</p>
+            <h2 id="current-venue">Loading Tournament...</h2>
+            <p id="total-prize-pool">--</p>
         </div>
         <div class="info-bar-below">
             <div>DATE: <span id="event-date" style="color:white">--</span></div>
@@ -74,7 +72,7 @@
     </div>
 
     <div class="content-padding">
-        <h3 class="section-title">Tournament Leaderboard</h3>
+        <h3 class="section-title">Live Tournament Leaderboard</h3>
         <div class="table-container">
             <table>
                 <thead>
@@ -91,7 +89,7 @@
         </div>
 
         <div style="text-align: center; margin: 30px 0;">
-            <img src="sponsor.png" alt="Sponsor" style="max-width: 100%; height: auto;">
+            <img src="sponsor.png" alt="Sponsor" style="max-width: 100%; height: auto; border-radius: 8px;">
         </div>
 
         <h3 class="section-title">Season Standings</h3>
@@ -119,8 +117,7 @@
         };
 
         window.onscroll = () => {
-            const btn = document.getElementById("backToTop");
-            btn.style.display = (window.scrollY > 400) ? "block" : "none";
+            document.getElementById("backToTop").style.display = (window.scrollY > 400) ? "block" : "none";
         };
 
         async function loadData() {
@@ -141,7 +138,7 @@
                 try {
                     const res = await fetch('data.json?t=' + Date.now());
                     render(await res.json());
-                } catch (e) { console.log("Waiting for data..."); }
+                } catch (e) { console.log("Waiting for data source..."); }
             }
         }
 
@@ -149,12 +146,12 @@
             const par = parseInt(data.coursePar) || 72;
             const ptsTable = [500, 300, 190, 135, 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 57, 54, 51, 48, 45, 42];
             
-            document.getElementById('current-venue').innerText = data.venue || "TOURNAMENT";
+            document.getElementById('current-venue').innerText = data.venue || "ACTIVE TOURNAMENT";
             document.getElementById('course-par').innerText = par;
             document.getElementById('event-date').innerText = data.date || "--";
             document.getElementById('total-prize-pool').innerText = `Total Prize Pool: ${data.prizePool || '--'}`;
 
-            // 1. Calculate Scores & Ties
+            // 1. Calculate Live Leaderboard & Ties
             let players = data.players.map(p => {
                 const rounds = [p.r1, p.r2, p.r3, p.r4].map(r => parseInt(r) || 0);
                 const act = rounds.filter(r => r > 0).length;
@@ -169,11 +166,9 @@
                 if (players[i].act === 0) { i++; continue; }
                 let ties = 0;
                 while (i + ties < players.length && players[i + ties].tp === players[i].tp) ties++;
-                
                 let sumPts = 0;
                 for (let p = rank; p < rank + ties; p++) if (p <= 20) sumPts += ptsTable[p - 1];
                 const avgPts = Math.round(sumPts / ties);
-
                 for (let j = 0; j < ties; j++) {
                     players[i+j].displayPos = ties > 1 ? `T${rank}` : rank;
                     players[i+j].calcPoints = avgPts;
@@ -181,12 +176,11 @@
                 i += ties; rank += ties;
             }
 
-            // 2. Render Leaderboard
             document.getElementById('leaderboard-body').innerHTML = players.map(p => `
                 <tr>
-                    <td>${p.displayPos}</td>
+                    <td style="font-weight:bold">${p.displayPos}</td>
                     <td class="player-cell"><img src="${platformIcons[p.console]||''}" class="platform-icon">${p.name}</td>
-                    <td class="hcap-cell">${p.hcap||0}</td>
+                    <td style="background:#fffde7; font-style:italic;">${p.hcap||0}</td>
                     <td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td>
                     <td>${p.act > 0 ? p.gross : '-'}</td>
                     <td class="net-cell">${p.act > 0 ? p.net : '-'}</td>
@@ -196,7 +190,7 @@
                     <td style="font-weight:bold; color:var(--emerald)">${p.prize||'$0'}</td>
                 </tr>`).join('');
 
-            // 3. Render Projected Standings
+            // 2. Render Season Standings with Movement
             if (data.seasonPoints) {
                 const names = Object.keys(data.seasonPoints);
                 const before = [...names].sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
@@ -222,22 +216,43 @@
                 }).join('');
             }
 
-            // 4. Render History
+            // 3. Render Accordion History
             if (data.eventHistory) {
-                document.getElementById('history-accordion-container').innerHTML = data.eventHistory.map(h => `
+                document.getElementById('history-accordion-container').innerHTML = data.eventHistory.map(h => {
+                    const detailsRows = (h.details || []).map(r => `
+                        <tr>
+                            <td style="width:40px; font-weight:bold; text-align:center;">${r.pos}</td>
+                            <td style="text-align:left;">${r.name}</td>
+                            <td style="text-align:center;">${r.gross}</td>
+                            <td style="text-align:center;">${r.net}</td>
+                            <td style="text-align:center; font-weight:bold;">${r.tp}</td>
+                            <td style="text-align:center; color:var(--emerald);">${r.pts}</td>
+                            <td style="text-align:right; color:var(--emerald); padding-right:10px;">${r.prize}</td>
+                        </tr>
+                    `).join('');
+
+                    return `
                     <div class="history-item">
-                        <div class="history-header">
+                        <div class="history-header" onclick="this.parentElement.classList.toggle('active')">
                             <div class="hist-wk">${h.event}</div>
                             <div class="hist-date">${h.date || '--'}</div>
                             <div class="hist-venue">${h.venue}</div>
-                            <div class="hist-winner">${h.winner}</div>
-                            <div class="hist-stats">
-                                <div style="font-weight:bold;">${h.score}</div>
-                                <div style="font-size:11px; color:var(--emerald);">${h.purse}</div>
-                            </div>
-                            <div style="font-size:10px; color:#ccc;">▼</div>
+                            <div class="hist-winner"><i class="fa-solid fa-trophy" style="font-size:10px; color:var(--gold);"></i> ${h.winner}</div>
+                            <div class="hist-stats">${h.score}</div>
+                            <div class="hist-arrow">▼</div>
                         </div>
-                    </div>`).join('');
+                        <div class="history-content">
+                            <table class="hist-table">
+                                <thead>
+                                    <tr>
+                                        <th>POS</th><th style="text-align:left">PLAYER</th><th>G</th><th>N</th><th>TP</th><th>PTS</th><th style="text-align:right; padding-right:10px;">PRIZE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${detailsRows}</tbody>
+                            </table>
+                        </div>
+                    </div>`;
+                }).reverse().join('');
             }
         }
         loadData();
