@@ -24,6 +24,8 @@
         .admin-section { background: #333; color: white; border-color: var(--gold); display: none; }
         .submit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; }
         input, select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        label { display: block; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: #666; }
+        .admin-section label { color: var(--gold); }
         .btn { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
         .btn-primary { background: var(--emerald); color: white; }
         .btn-admin { background: var(--gold); color: #333; }
@@ -94,13 +96,16 @@
 
         <div class="submit-section">
             <h3 style="margin-top:0; color: var(--emerald);">⛳ Submit Round Scores</h3>
-            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
-                <input type="text" id="form-name" placeholder="Player Name">
-                <select id="form-platform">
-                    <option value="fa-playstation">PlayStation</option>
-                    <option value="fa-xbox">Xbox</option>
-                    <option value="fa-steam">Steam/PC</option>
-                </select>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <div><label>Player Name</label><input type="text" id="form-name" placeholder="Enter Full Name"></div>
+                <div><label>4-Digit PIN</label><input type="password" id="form-pin" placeholder="PIN" maxlength="4"></div>
+                <div><label>Platform</label>
+                    <select id="form-platform">
+                        <option value="fa-playstation">PlayStation</option>
+                        <option value="fa-xbox">Xbox</option>
+                        <option value="fa-steam">Steam/PC</option>
+                    </select>
+                </div>
             </div>
             <div class="submit-grid">
                 <div><label>HCP</label><input type="number" id="form-hcap" value="0"></div>
@@ -109,6 +114,7 @@
                 <div><label>R3</label><input type="number" id="form-r3"></div>
                 <div><label>R4</label><input type="number" id="form-r4"></div>
             </div>
+            <p style="font-size: 11px; color: #888; margin-top: 10px;">*The PIN you use the first time will be your permanent PIN for this name.</p>
             <button class="btn btn-primary" id="submitScoreBtn">UPDATE LEADERBOARD</button>
         </div>
 
@@ -167,25 +173,41 @@
             'fa-steam': 'https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg'
         };
 
-        // --- ADMIN LOGIN (5 CLICKS ON LOGO) ---
+        // --- ADMIN LOGIN ---
         let clicks = 0;
         document.getElementById('admin-trigger').onclick = () => {
             clicks++;
             if(clicks === 5) {
-                if(prompt("Admin Password:") === "emerald2024") {
+                if(prompt("Admin Password:") === "Emerald2024") {
                     document.getElementById('admin-panel').style.display = 'block';
                 }
                 clicks = 0;
             }
         };
 
-        // --- SUBMIT SCORE ---
+        // --- SUBMIT SCORE WITH PIN PROTECTION ---
         document.getElementById('submitScoreBtn').onclick = async () => {
             const name = document.getElementById('form-name').value.trim();
-            if(!name) return alert("Enter Name");
+            const pin = document.getElementById('form-pin').value.trim();
+            
+            if(!name || !pin) return alert("Please enter both Name and a 4-digit PIN.");
+            if(pin.length < 4) return alert("PIN must be 4 digits.");
+
             const id = name.toLowerCase().replace(/\s+/g, '-');
-            await setDoc(doc(db, "live_tournament", id), {
+            const playerRef = doc(db, "live_tournament", id);
+            
+            // Check for existing PIN
+            const existingSnap = await getDoc(playerRef);
+            if(existingSnap.exists()){
+                const data = existingSnap.data();
+                if(data.pin !== pin){
+                    return alert("Incorrect PIN for this player. Please contact Admin if you forgot it.");
+                }
+            }
+
+            await setDoc(playerRef, {
                 name,
+                pin, // PIN is saved for future verification
                 console: document.getElementById('form-platform').value,
                 hcap: parseInt(document.getElementById('form-hcap').value) || 0,
                 r1: parseInt(document.getElementById('form-r1').value) || 0,
@@ -194,7 +216,9 @@
                 r4: parseInt(document.getElementById('form-r4').value) || 0,
                 lastUpdated: new Date()
             }, { merge: true });
-            alert("Score Updated!");
+
+            alert("Score successfully updated!");
+            document.getElementById('form-pin').value = ""; // Clear PIN for safety
         };
 
         // --- ADMIN: SAVE SETTINGS ---
@@ -251,26 +275,29 @@
             await addDoc(collection(db, "event_history"), {
                 venue: sData.venue, date: sData.date, details: archivedDetails, timestamp: new Date()
             });
-            alert("Archive Complete!");
+            alert("Season totals updated and event archived!");
         };
 
         // --- ADMIN: WIPE BOARD ---
         document.getElementById('clearBoardBtn').onclick = async () => {
-            if(!confirm("WIPE LIVE BOARD?")) return;
+            if(!confirm("ARE YOU SURE? This wipes the current leaderboard for a new week!")) return;
             const snap = await getDocs(scoresCol);
-            snap.forEach(async d => await deleteDoc(doc(db, "live_tournament", d.id)));
+            for (const d of snap.docs) {
+                await deleteDoc(doc(db, "live_tournament", d.id));
+            }
             alert("Board Wiped");
         };
 
         // --- ADMIN: MANUAL ADJ ---
         document.getElementById('adjustCareerBtn').onclick = async () => {
             const name = document.getElementById('adj-name').value.trim();
+            if(!name) return alert("Enter Name");
             const pID = name.toLowerCase().replace(/\s+/g, '-');
             await setDoc(doc(db, "season_stats", pID), {
                 pts: increment(parseInt(document.getElementById('adj-pts').value)||0),
                 earnings: increment(parseInt(document.getElementById('adj-earn').value)||0)
             }, { merge: true });
-            alert("Adjusted");
+            alert("Career stats adjusted.");
         };
 
         // --- REAL-TIME SYNC: LIVE BOARD ---
