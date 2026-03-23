@@ -226,23 +226,40 @@
                     <td style="font-weight:bold; color:var(--emerald)">${p.prize||'$0'}</td>
                 </tr>`).join('');
 
-            // 2. Season Standings Logic
+		// 2. Season Standings Logic
             if (data.seasonPoints) {
                 const names = Object.keys(data.seasonPoints);
-                const before = [...names].sort((a,b) => data.seasonPoints[b] - data.seasonPoints[a]);
+                const before = [...names].sort((a,b) => (data.seasonPoints[b] || 0) - (data.seasonPoints[a] || 0));
+                
                 const projected = names.map(n => {
                     const pLive = players.find(lp => lp.name === n);
-                    return { n, pts: (data.seasonPoints[n] || 0) + (pLive ? pLive.calcPoints : 0), ev: data.seasonEvents[n]||0, earn: data.seasonEarnings[n]||0 };
+                    const livePts = pLive ? pLive.calcPoints : 0;
+                    return { 
+                        n, 
+                        pts: (data.seasonPoints[n] || 0) + livePts, 
+                        ev: data.seasonEvents[n]||0, 
+                        earn: data.seasonEarnings[n]||0,
+                        console: data.players.find(pl => pl.name === n)?.console
+                    };
                 }).sort((a,b) => b.pts - a.pts);
 
+                // Calculate the cutoff for the top 50% (rounding up for odd numbers)
+                const cutoff = Math.ceil(projected.length / 2);
+
                 document.getElementById('season-body').innerHTML = projected.map((p, idx) => {
-                    const oldIdx = before.indexOf(p.n), move = idx < oldIdx ? '▲' : (idx > oldIdx ? '▼' : '•');
+                    const isQualified = (idx < cutoff);
+                    const oldIdx = before.indexOf(p.n);
+                    const move = idx < oldIdx ? '▲' : (idx > oldIdx ? '▼' : '•');
                     const moveCol = idx < oldIdx ? '#2e7d32' : (idx > oldIdx ? '#c62828' : '#999');
-                    const pInfo = data.players.find(pl => pl.name === p.n);
-                    return `<tr>
+                    
+                    // Apply soft green background if in the top 50%
+                    const rowStyle = isQualified ? 'style="background-color: #e8f5e9;"' : '';
+                    const qLetter = isQualified ? '<span style="color: #2e7d32; margin-left: 5px; font-weight: 900;">Q</span>' : '';
+
+                    return `<tr ${rowStyle}>
                         <td style="padding-left:15px; text-align:left;">${idx+1}</td>
                         <td style="text-align:left; font-weight:bold;">
-                            <img src="${platformIcons[pInfo?.console]||''}" class="platform-icon">${p.n} 
+                            <img src="${platformIcons[p.console]||''}" class="platform-icon">${p.n}${qLetter}
                             <span style="color:${moveCol}; font-size:10px; margin-left:5px;">${move}</span>
                         </td>
                         <td>${p.ev}</td>
