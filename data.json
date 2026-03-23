@@ -16,6 +16,7 @@
       "gir": "",
       "scram": "",
       "ntp": "",
+      "pts": "500",
       "prize": "$100,000"
     },
     {
@@ -30,6 +31,7 @@
       "gir": "88%",
       "scram": "",
       "ntp": "",
+      "pts": "300",
       "prize": "$64,500"
     },
     {
@@ -44,6 +46,7 @@
       "gir": "",
       "scram": "66.66%",
       "ntp": "",
+      "pts": "190",
       "prize": "$44,500"
     },
     {
@@ -58,26 +61,27 @@
       "gir": "",
       "scram": "",
       "ntp": "21yds",
+      "pts": "135",
       "prize": "$34,500"
     }
   ],
   "seasonPoints": {
-    "x3offtehtee": 0,
-    "Geordieboy": 0,
-    "Colly45x": 0,
-    "Mr Longpole": 0
+    "x3offtehtee": 500,
+    "Geordieboy": 300,
+    "Colly45x": 190,
+    "Mr Longpole": 135
   },
   "seasonEarnings": {
-    "x3offtehtee": 100000,
-    "Geordieboy": 64500,
-    "Colly45x": 44500,
-    "Mr Longpole": 34500
+    "x3offtehtee": 200000,
+    "Geordieboy": 129000,
+    "Colly45x": 89000,
+    "Mr Longpole": 69000
   },
   "seasonEvents": {
-    "x3offtehtee": 1,
-    "Geordieboy": 1,
-    "Colly45x": 1,
-    "Mr Longpole": 1
+    "x3offtehtee": 2,
+    "Geordieboy": 2,
+    "Colly45x": 2,
+    "Mr Longpole": 2
   },
   "eventHistory": [
     {
@@ -122,6 +126,52 @@
           "net": "143",
           "tp": "-1",
           "pts": "",
+          "prize": "$34,500"
+        }
+      ]
+    },
+    {
+      "event": "W2",
+      "venue": "The Royal Golf Club",
+      "date": "2026-03-18 to 2026-03-24",
+      "winner": "x3offtehtee",
+      "score": "132 (-12)",
+      "purse": "$100,000",
+      "details": [
+        {
+          "pos": "1",
+          "name": "x3offtehtee",
+          "gross": "132",
+          "net": "132",
+          "tp": "-12",
+          "pts": "500",
+          "prize": "$100,000"
+        },
+        {
+          "pos": "2",
+          "name": "Geordieboy",
+          "gross": "137",
+          "net": "137",
+          "tp": "-7",
+          "pts": "300",
+          "prize": "$64,500"
+        },
+        {
+          "pos": "3",
+          "name": "Colly45x",
+          "gross": "140",
+          "net": "140",
+          "tp": "-4",
+          "pts": "190",
+          "prize": "$44,500"
+        },
+        {
+          "pos": "4",
+          "name": "Mr Longpole",
+          "gross": "143",
+          "net": "143",
+          "tp": "-1",
+          "pts": "135",
           "prize": "$34,500"
         }
       ]
