@@ -40,23 +40,19 @@
         td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; white-space: nowrap; }
         
         .player-cell { text-align: left !important; font-weight: bold; width: 1%; white-space: nowrap; padding-right: 40px; }
+        .platform-icon { margin-right: 8px; width: 18px; text-align: center; }
         .q-badge { color: var(--gold); font-weight: 900; margin-left: 8px; }
         .cut-line-row td { background-color: #ffebee; color: #b71c1c; font-weight: bold; font-size: 11px; padding: 8px; text-transform: uppercase; border-top: 2px dashed #b71c1c; }
         
         .q-legend { text-align: center; font-size: 11px; font-weight: bold; color: var(--emerald); margin-bottom: 10px; text-transform: uppercase; }
+        .mid-logo { text-align: center; padding: 30px 0; }
+        .mid-logo img { max-width: 220px; height: auto; opacity: 0.9; }
 
-        /* History Cards */
-        .history-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-bottom: 50px; }
-        .history-card { background: white; border-left: 5px solid var(--emerald); padding: 15px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .history-card h4 { margin: 0 0 5px 0; color: var(--emerald); font-size: 16px; }
-        .history-card p { margin: 0; font-size: 12px; color: #777; font-weight: bold; }
-        .winner-list { margin-top: 10px; font-size: 13px; line-height: 1.6; }
-		.history-card {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		min-height: 120px; /* Keeps them uniform */
-	}
+        /* Accordion Style History */
+        .history-accordion { border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; overflow: hidden; }
+        .history-header { background-color: var(--emerald); color: white; padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; text-transform: uppercase; font-size: 13px; }
+        .history-content { display: none; background: white; padding: 15px; border-top: 1px solid #eee; }
+        .history-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f2f2f2; font-size: 13px; }
 
         #backToTop { position: fixed; bottom: 30px; right: 30px; background: var(--emerald); color: white; border: 2px solid var(--gold); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 1000; }
     </style>
@@ -101,13 +97,11 @@
                 <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom: 10px;">
                     <div><label>Player Name</label><input type="text" id="form-name"></div>
                     <div><label>4-Digit PIN</label><input type="password" id="form-pin" maxlength="4"></div>
-                    <div><label>Platform</label>
-                        <select id="form-platform">
-                            <option value="ps-icon fa-brands fa-playstation">PlayStation 5</option>
-                            <option value="xb-icon fa-brands fa-xbox">Xbox Series X|S</option>
-                            <option value="st-icon fa-brands fa-steam">PC</option>
-                        </select>
-                    </div>
+                    <div><label>Platform</label><select id="form-platform">
+                        <option value="fa-brands fa-playstation ps-icon">PS5</option>
+                        <option value="fa-brands fa-xbox xb-icon">Xbox</option>
+                        <option value="fa-brands fa-steam st-icon">PC</option>
+                    </select></div>
                 </div>
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap:10px;">
                     <div><label>HCP</label><input type="number" id="form-hcap" value="0"></div>
@@ -125,25 +119,23 @@
         </div>
 
         <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">LIVE LEADERBOARD</h3>
-        <div class="table-container"><table><thead><tr>
-            <th>POS</th><th class="player-cell">PLAYER</th><th>HCP</th>
-            <th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>GROSS</th><th>NET</th><th>TP</th>
-            <th>FIR %</th><th>GIR %</th><th>SCR %</th><th>NTP</th><th>PTS</th><th>WEEK $</th>
-        </tr></thead><tbody id="leaderboard-body"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>POS</th><th class="player-cell">PLAYER</th><th>HCP</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>GROSS</th><th>NET</th><th>TP</th><th>FIR %</th><th>GIR %</th><th>SCR %</th><th>NTP</th><th>PTS</th><th>WEEK $</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div>
 
-        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px; margin-top:40px;">SEASON STANDINGS</h3>
+        <div class="mid-logo"><img src="2k25-logo.png" alt="PGA Tour 2K25"></div>
+
+        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px; margin-top:10px;">SEASON STANDINGS</h3>
         <div class="q-legend">Q - Qualifies for End of Season Playoff (Top 50%)</div>
-        <div class="table-container"><table><thead><tr><th>RANK</th><th class="player-cell">PLAYER</th><th>EV</th><th>POINTS</th><th style="text-align:right">CAREER EARNINGS</th></tr></thead><tbody id="season-body"></tbody></table></div>
+        <div class="table-container"><table><thead><tr><th>RANK</th><th class="player-cell">PLAYER</th><th>EV</th><th>POINTS</th><th style="text-align:right">EARNINGS</th></tr></thead><tbody id="season-body"></tbody></table></div>
 
         <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px; margin-top:40px;">TOURNAMENT HISTORY</h3>
-        <div class="history-grid" id="history-container"></div>
+        <div id="history-container"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, query, orderBy, limit, writeBatch, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-	const firebaseConfig = {
+        const firebaseConfig = {
           apiKey: "AIzaSyDXQU4I1XvkNi-XE4f5q7dixo3BrVkfuC8",
 		  authDomain: "emeraldtour2-f556d.firebaseapp.com",
 		  projectId: "emeraldtour2-f556d",
@@ -154,21 +146,27 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
-        const scoresCol = collection(db, "live_tournament");
-        const settingsDoc = doc(db, "settings", "current_event");
-        const seasonCol = collection(db, "season_stats");
-        const historyCol = collection(db, "history");
-
+        const scoresCol = collection(db, "live_tournament"), settingsDoc = doc(db, "settings", "current_event"), seasonCol = collection(db, "season_stats"), historyCol = collection(db, "history");
         const payoutTable = [0.18, 0.108, 0.068, 0.048, 0.04, 0.036, 0.0335, 0.031, 0.029, 0.027, 0.025, 0.023, 0.021, 0.019, 0.018, 0.017, 0.016, 0.015, 0.014, 0.013];
         const ptsTable = [500, 300, 190, 135, 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 57, 54, 51, 48, 45, 42];
 
-        // UI Toggles
-        document.getElementById('toggleFormBtn').onclick = function() {
-            const content = document.getElementById('submission-content');
-            content.style.display = (content.style.display === "none" || content.style.display === "") ? "block" : "none";
-        };
+        let qualifiedPlayers = new Set();
+        document.getElementById('toggleFormBtn').onclick = () => { const c = document.getElementById('submission-content'); c.style.display = (c.style.display === "none" || c.style.display === "") ? "block" : "none"; };
+        window.toggleAccordion = (el) => { const c = el.nextElementSibling; c.style.display = c.style.display === "block" ? "none" : "block"; };
 
-        // Snapshot: Settings
+        // HISTORY
+        onSnapshot(query(historyCol, orderBy("timestamp", "desc"), limit(6)), (snap) => {
+            let html = "";
+            snap.forEach(d => {
+                const h = d.data();
+                const dStr = h.date ? new Date(h.date).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'}) : "Past";
+                const rows = h.results ? h.results.slice(0, 10).map((r, i) => `<div class="history-item"><span><strong>${i+1}.</strong> ${r.name}</span><span>${r.pts} pts | <strong>$${r.earned.toLocaleString()}</strong></span></div>`).join('') : "";
+                html += `<div class="history-accordion"><div class="history-header" onclick="toggleAccordion(this)"><span>${h.venue} (${dStr})</span><i class="fa fa-chevron-down"></i></div><div class="history-content">${rows}</div></div>`;
+            });
+            document.getElementById('history-container').innerHTML = html;
+        });
+
+        // SETTINGS
         onSnapshot(settingsDoc, (sSnap) => {
             if (!sSnap.exists()) return;
             const s = sSnap.data();
@@ -177,27 +175,16 @@
             const rawDate = s.date || "";
             document.getElementById('event-date').innerText = rawDate ? new Date(rawDate).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'}) : "--";
             document.getElementById('total-prize-pool').innerText = `$${(parseInt(s.pool)||0).toLocaleString()}`;
-            if (s.closingTimestamp) {
+            if(s.closingTimestamp) {
                 const timer = setInterval(() => {
                     const dist = s.closingTimestamp - new Date().getTime();
-                    if (dist < 0) { document.getElementById("countdown").innerHTML = "CLOSED"; clearInterval(timer); }
-                    else { 
-                        const d = Math.floor(dist / 86400000), h = Math.floor((dist % 86400000) / 3600000), m = Math.floor((dist % 3600000) / 60000);
-                        document.getElementById("countdown").innerHTML = `${d}d ${h}h ${m}m Remaining`;
-                    }
+                    if(dist < 0) { document.getElementById("countdown").innerHTML = "CLOSED"; clearInterval(timer); }
+                    else { const d=Math.floor(dist/86400000), h=Math.floor((dist%86400000)/3600000), m=Math.floor((dist%3600000)/60000); document.getElementById("countdown").innerHTML = `${d}d ${h}h ${m}m Remaining`; }
                 }, 1000);
             }
         });
 
-        // Snapshot: Leaderboard
-        onSnapshot(scoresCol, (snapshot) => {
-            let players = []; snapshot.forEach(d => players.push({...d.data(), id: d.id}));
-            getDoc(settingsDoc).then(sSnap => {
-                const s = sSnap.data() || {par:72, pool:0};
-                renderBoard(players, parseInt(s.par), parseInt(s.pool));
-            });
-        });
-
+        // LEADERBOARD RENDER
         function renderBoard(playersData, par, pool) {
             let ps = playersData.map(p => {
                 const rs = [p.r1, p.r2, p.r3, p.r4].map(v => parseInt(v) || 0);
@@ -205,13 +192,12 @@
                 const net = act > 0 ? gross - (p.hcap || 0) : 0, tp = act > 0 ? net - (par * act) : 999;
                 return { ...p, gross, net, tp, act };
             }).sort((a, b) => a.tp - b.tp);
-
             const active = ps.filter(p => p.act > 0);
+            if(active.length === 0) { document.getElementById('leaderboard-body').innerHTML = ""; return; }
             const bF = Math.max(...active.map(p => p.fir || 0), -1), bG = Math.max(...active.map(p => p.gir || 0), -1);
             const bS = Math.max(...active.map(p => p.scram || 0), -1), vN = active.filter(p => p.ntp > 0).map(p => p.ntp);
             const bN = vN.length ? Math.min(...vN) : 999;
-            const cF = active.filter(p => p.fir === bF && bF > 0).length, cG = active.filter(p => p.gir === bG && bG > 0).length;
-            const cS = active.filter(p => p.scram === bS && bS > 0).length, cN = active.filter(p => p.ntp === bN && bN < 999).length;
+            const cF = active.filter(p => p.fir === bF && bF > 0).length, cG = active.filter(p => p.gir === bG && bG > 0).length, cS = active.filter(p => p.scram === bS && bS > 0).length, cN = active.filter(p => p.ntp === bN && bN < 999).length;
 
             let i = 0, rank = 1, html = "";
             while (i < ps.length) {
@@ -225,63 +211,78 @@
                     if(p.fir===bF && bF>0) bonus+=(10000/cF); if(p.gir===bG && bG>0) bonus+=(10000/cG);
                     if(p.scram===bS && bS>0) bonus+=(10000/cS); if(p.ntp===bN && bN<999) bonus+=(10000/cN);
                     const totalM = Math.round(avgBaseM + bonus), tScore = p.tp === 0 ? 'E' : (p.tp > 0 ? '+' + p.tp : p.tp);
-                    html += `<tr><td>${ties > 1 ? 'T' + rank : rank}</td><td class="player-cell">${p.name}${qualifiedPlayers.has(p.name) ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.hcap}</td><td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td><td>${p.gross}</td><td class="net-cell">${p.net}</td><td style="font-weight:bold; color:${p.tp<=0?'#2e7d32':'#333'}">${tScore}</td><td style="${p.fir===bF?'color:#d32f2f;font-weight:bold':''}">${p.fir.toFixed(2)}%</td><td style="${p.gir===bG?'color:#d32f2f;font-weight:bold':''}">${p.gir.toFixed(2)}%</td><td style="${p.scram===bS?'color:#d32f2f;font-weight:bold':''}">${p.scram.toFixed(2)}%</td><td style="${p.ntp===bN?'color:#d32f2f;font-weight:bold':''}">${p.ntp?p.ntp.toFixed(2)+'y':'-'}</td><td>${avgPts}</td><td style="color:var(--emerald);font-weight:bold">$${totalM.toLocaleString()}</td></tr>`;
+                    html += `<tr><td>${ties > 1 ? 'T' + rank : rank}</td><td class="player-cell"><i class="${p.console} platform-icon"></i>${p.name}${qualifiedPlayers.has(p.name) ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.hcap}</td><td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td><td>${p.gross}</td><td class="net-cell">${p.net}</td><td style="font-weight:bold; color:${p.tp<=0?'#2e7d32':'#333'}">${tScore}</td><td style="${p.fir===bF?'color:#d32f2f;font-weight:bold':''}">${p.fir.toFixed(2)}%</td><td style="${p.gir===bG?'color:#d32f2f;font-weight:bold':''}">${p.gir.toFixed(2)}%</td><td style="${p.scram===bS?'color:#d32f2f;font-weight:bold':''}">${p.scram.toFixed(2)}%</td><td style="${p.ntp===bN?'color:#d32f2f;font-weight:bold':''}">${p.ntp?p.ntp.toFixed(2)+'y':'-'}</td><td>${avgPts}</td><td style="color:var(--emerald);font-weight:bold">$${totalM.toLocaleString()}</td></tr>`;
                 }
                 i += ties; rank += ties;
             }
             document.getElementById('leaderboard-body').innerHTML = html;
         }
 
-        // Snapshot: Standings
-        onSnapshot(query(seasonCol, orderBy("pts", "desc")), (snap) => {
-            let html = "", r = 1, cutoff = Math.ceil(snap.size / 2);
-            qualifiedPlayers.clear();
-            snap.forEach(d => {
-                const p = d.data(); if(r <= cutoff) qualifiedPlayers.add(p.name);
-                html += `<tr><td>${r}</td><td class="player-cell">${p.name}${r <= cutoff ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.events}</td><td style="font-weight:bold; color:var(--emerald)">${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`;
-                if(r === cutoff && snap.size > 1) html += `<tr class="cut-line-row"><td colspan="5">--- PROJECTED PLAYOFF CUT LINE ---</td></tr>`;
-                r++;
-            });
-            document.getElementById('season-body').innerHTML = html;
-        });
+        // SNAPSHOTS
+        onSnapshot(scoresCol, (snapshot) => { let ps = []; snapshot.forEach(d => ps.push({...d.data(), id: d.id})); getDoc(settingsDoc).then(sSnap => { const s = sSnap.data() || {par:72, pool:0}; renderBoard(ps, parseInt(s.par), parseInt(s.pool)); }); });
+        onSnapshot(query(seasonCol, orderBy("pts", "desc")), (snap) => { let html = "", r = 1, cutoff = Math.ceil(snap.size / 2); qualifiedPlayers.clear(); snap.forEach(d => { const p = d.data(); if(r <= cutoff) qualifiedPlayers.add(p.name); html += `<tr><td>${r}</td><td class="player-cell">${p.name}${r <= cutoff ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.events}</td><td style="font-weight:bold; color:var(--emerald)">${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`; if(r === cutoff && snap.size > 1) html += `<tr class="cut-line-row"><td colspan="5">--- PROJECTED PLAYOFF CUT LINE ---</td></tr>`; r++; }); document.getElementById('season-body').innerHTML = html; });
 
-        // Snapshot: History
-        onSnapshot(query(historyCol, orderBy("timestamp", "desc"), limit(6)), (snap) => {
-            let html = "";
-            snap.forEach(d => {
-                const h = d.data();
-                const winners = h.results ? h.results.slice(0,3).map((r,idx) => `<div>${idx+1}. ${r.name} (${r.pts} pts)</div>`).join('') : "No data";
-                html += `<div class="history-card"><h4>${h.venue}</h4><p>${h.date || 'Past Event'}</p><div class="winner-list">${winners}</div></div>`;
-            });
-            document.getElementById('history-container').innerHTML = html;
-        });
-
-        // Admin Auth & Functions
+        // ADMIN LOGIC
         let cl = 0; document.getElementById('admin-trigger').onclick = () => { if(++cl === 5) { if(prompt("Pass:") === "emerald2024") document.getElementById('admin-panel').style.display='block'; cl=0; }};
         
         document.getElementById('saveSettingsBtn').onclick = async () => {
             const time = document.getElementById('admin-close-time').value;
             await setDoc(settingsDoc, { venue: document.getElementById('admin-venue').value, par: document.getElementById('admin-par').value, date: document.getElementById('admin-date-picker').value, pool: document.getElementById('admin-pool').value, closingTimestamp: time ? new Date(time).getTime() : null, lastUpdate: serverTimestamp() }, { merge: true });
-            alert("Updated!");
+            alert("Dashboard Updated!");
         };
+
+        document.getElementById('clearBoardBtn').onclick = async () => { if(!confirm("Clear ALL live scores?")) return; const snap = await getDocs(scoresCol); const batch = writeBatch(db); snap.forEach(d => batch.delete(d.ref)); await batch.commit(); await setDoc(settingsDoc, { lastUpdate: serverTimestamp() }, { merge: true }); alert("Board Cleared."); };
 
         document.getElementById('archiveEventBtn').onclick = async () => {
             const vName = document.getElementById('current-venue').innerText;
             if(!confirm(`Archive ${vName}?`)) return;
             const batch = writeBatch(db), sSnap = await getDoc(settingsDoc), s = sSnap.data();
+            const pool = parseInt(s.pool)||0, par = parseInt(s.par)||72;
             const qSnap = await getDocs(scoresCol);
-            let ps = []; qSnap.forEach(d => ps.push({...d.data(), id: d.id}));
-            // [Archive Logic here same as previous build...]
-            await batch.commit(); alert("Archived!");
+            let psRaw = []; qSnap.forEach(d => psRaw.push({...d.data(), id: d.id}));
+            let ps = psRaw.map(p => {
+                const rs = [p.r1, p.r2, p.r3, p.r4].map(v => parseInt(v) || 0);
+                const act = rs.filter(r => r > 0).length, gross = rs.reduce((a, b) => a + b, 0);
+                const net = act > 0 ? gross - (p.hcap || 0) : 0, tp = act > 0 ? net - (par * act) : 999;
+                return { ...p, gross, net, tp, act };
+            }).sort((a, b) => a.tp - b.tp);
+            const active = ps.filter(p => p.act > 0);
+            const bF = Math.max(...active.map(p => p.fir || 0), -1), bG = Math.max(...active.map(p => p.gir || 0), -1), bS = Math.max(...active.map(p => p.scram || 0), -1), vN = active.filter(p => p.ntp > 0).map(p => p.ntp), bN = vN.length ? Math.min(...vN) : 999;
+            const cF = active.filter(p => p.fir === bF && bF > 0).length, cG = active.filter(p => p.gir === bG && bG > 0).length, cS = active.filter(p => p.scram === bS && bS > 0).length, cN = active.filter(p => p.ntp === bN && bN < 999).length;
+            
+            let i = 0, rank = 1, historyData = [];
+            while(i < ps.length) {
+                if(ps[i].act === 0) { i++; continue; }
+                let ties = 0; while(i+ties < ps.length && ps[i+ties].tp === ps[i].tp) ties++;
+                let sP=0, sM=0; for(let pX=rank; pX<rank+ties; pX++) { if(pX<=20) { sP+=ptsTable[pX-1]; sM+=(payoutTable[pX-1]*pool); }}
+                const avgPts = Math.round(sP/ties), avgBaseM = sM/ties;
+                for(let j=0; j<ties; j++) {
+                    const p = ps[i+j];
+                    let bonus = 0;
+                    if(p.fir===bF && bF>0) bonus+=(10000/cF); if(p.gir===bG && bG>0) bonus+=(10000/cG);
+                    if(p.scram===bS && bS>0) bonus+=(10000/cS); if(p.ntp===bN && bN<999) bonus+=(10000/cN);
+                    const totalE = Math.round(avgBaseM + bonus);
+                    batch.set(doc(db, "season_stats", p.id), { name: p.name, pts: increment(avgPts), earnings: increment(totalE), events: increment(1) }, { merge: true });
+                    batch.delete(doc(db, "live_tournament", p.id));
+                    historyData.push({ name: p.name, pts: avgPts, earned: totalE });
+                }
+                i += ties; rank += ties;
+            }
+            batch.set(doc(collection(db, "history")), { venue: vName, date: s.date, timestamp: serverTimestamp(), results: historyData });
+            batch.update(settingsDoc, { venue: "Tournament Closed", pool: 0, closingTimestamp: null });
+            await batch.commit(); alert("Event Archived & Standings Updated!");
         };
 
+        // SCORE SUBMISSION
         document.getElementById('submitScoreBtn').onclick = async () => {
             const name = document.getElementById('form-name').value.trim(), pin = document.getElementById('form-pin').value;
             if(!name || pin.length < 4) return alert("Required: Name & 4-Digit PIN");
             const id = name.toLowerCase().replace(/\s+/g, '-');
+            const dSnap = await getDoc(doc(db, "live_tournament", id));
+            if(dSnap.exists() && dSnap.data().pin !== pin) return alert("Incorrect PIN for this Player.");
             await setDoc(doc(db, "live_tournament", id), { name, pin, console: document.getElementById('form-platform').value, hcap: parseInt(document.getElementById('form-hcap').value)||0, r1: parseInt(document.getElementById('form-r1').value)||0, r2: parseInt(document.getElementById('form-r2').value)||0, r3: parseInt(document.getElementById('form-r3').value)||0, r4: parseInt(document.getElementById('form-r4').value)||0, fir: parseFloat(document.getElementById('form-fir').value)||0, gir: parseFloat(document.getElementById('form-gir').value)||0, scram: parseFloat(document.getElementById('form-scram').value)||0, ntp: parseFloat(document.getElementById('form-ntp').value)||0 }, { merge: true });
             await setDoc(settingsDoc, { lastUpdate: serverTimestamp() }, { merge: true });
-            alert("Posted!");
+            alert("Scorecard Posted!");
         };
 
         window.onscroll = () => { document.getElementById('backToTop').style.display = window.scrollY > 400 ? 'flex' : 'none'; };
