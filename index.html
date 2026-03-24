@@ -12,6 +12,7 @@
         html, body { height: auto; overflow-y: auto; scroll-behavior: smooth; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: #333; }
         
+        /* Header & Navigation */
         .header-wrap { width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; position: sticky; top: 0; z-index: 999; }
         .logo-container { background-color: var(--emerald); text-align: center; padding: 20px 10px; border-bottom: 4px solid var(--gold); cursor: pointer; }
         .logo-container img { width: 100%; max-width: 500px; height: auto; display: block; margin: 0 auto; }
@@ -22,6 +23,7 @@
 
         .content-padding { padding: 10px; max-width: 1500px; margin: 0 auto; }
         
+        /* Interactive Sections */
         .submit-section, .admin-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid var(--emerald); }
         .admin-section { background: #222; color: white; border-color: var(--gold); display: none; }
         #submission-content { display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
@@ -34,6 +36,7 @@
         .btn-toggle { background: #eee; color: var(--emerald); border: 1px solid var(--emerald); }
         .btn-admin { background: var(--gold); color: #222; }
 
+        /* Tables */
         .table-container { width: 100%; overflow-x: auto; background: white; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 25px; }
         table { width: auto; min-width: 100%; border-collapse: collapse; }
         th { background-color: var(--emerald); color: white; padding: 12px 10px; font-size: 11px; text-transform: uppercase; }
@@ -41,6 +44,7 @@
         
         .player-cell { text-align: left !important; font-weight: bold; width: 1%; white-space: nowrap; padding-right: 40px; }
         .platform-icon { margin-right: 8px; width: 18px; text-align: center; }
+        .ps-icon { color: var(--ps-blue); } .xb-icon { color: var(--xb-green); } .st-icon { color: var(--st-grey); }
         .q-badge { color: var(--gold); font-weight: 900; margin-left: 8px; }
         .cut-line-row td { background-color: #ffebee; color: #b71c1c; font-weight: bold; font-size: 11px; padding: 8px; text-transform: uppercase; border-top: 2px dashed #b71c1c; }
         
@@ -48,11 +52,12 @@
         .mid-logo { text-align: center; padding: 30px 0; }
         .mid-logo img { max-width: 220px; height: auto; opacity: 0.9; }
 
-        /* Accordion Style History */
+        /* History Accordion */
         .history-accordion { border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; overflow: hidden; }
         .history-header { background-color: var(--emerald); color: white; padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; text-transform: uppercase; font-size: 13px; }
         .history-content { display: none; background: white; padding: 15px; border-top: 1px solid #eee; }
-        .history-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f2f2f2; font-size: 13px; }
+        .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f2f2f2; font-size: 13px; }
+        .hist-score { font-weight: bold; width: 40px; text-align: center; display: inline-block; }
 
         #backToTop { position: fixed; bottom: 30px; right: 30px; background: var(--emerald); color: white; border: 2px solid var(--gold); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 1000; }
     </style>
@@ -97,11 +102,13 @@
                 <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom: 10px;">
                     <div><label>Player Name</label><input type="text" id="form-name"></div>
                     <div><label>4-Digit PIN</label><input type="password" id="form-pin" maxlength="4"></div>
-                    <div><label>Platform</label><select id="form-platform">
-                        <option value="fa-brands fa-playstation ps-icon">PS5</option>
-                        <option value="fa-brands fa-xbox xb-icon">Xbox</option>
-                        <option value="fa-brands fa-steam st-icon">PC</option>
-                    </select></div>
+                    <div><label>Platform</label>
+                        <select id="form-platform">
+                            <option value="fa-brands fa-playstation ps-icon">PlayStation 5</option>
+                            <option value="fa-brands fa-xbox xb-icon">Xbox Series X|S</option>
+                            <option value="fa-brands fa-steam st-icon">PC / Steam</option>
+                        </select>
+                    </div>
                 </div>
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap:10px;">
                     <div><label>HCP</label><input type="number" id="form-hcap" value="0"></div>
@@ -119,7 +126,11 @@
         </div>
 
         <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">LIVE LEADERBOARD</h3>
-        <div class="table-container"><table><thead><tr><th>POS</th><th class="player-cell">PLAYER</th><th>HCP</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>GROSS</th><th>NET</th><th>TP</th><th>FIR %</th><th>GIR %</th><th>SCR %</th><th>NTP</th><th>PTS</th><th>WEEK $</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div>
+        <div class="table-container"><table><thead><tr>
+            <th>POS</th><th class="player-cell">PLAYER</th><th>HCP</th>
+            <th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>GROSS</th><th>NET</th><th>TP</th>
+            <th>FIR %</th><th>GIR %</th><th>SCR %</th><th>NTP</th><th>PTS</th><th>WEEK $</th>
+        </tr></thead><tbody id="leaderboard-body"></tbody></table></div>
 
         <div class="mid-logo"><img src="2k25-logo.png" alt="PGA Tour 2K25"></div>
 
@@ -154,19 +165,26 @@
         document.getElementById('toggleFormBtn').onclick = () => { const c = document.getElementById('submission-content'); c.style.display = (c.style.display === "none" || c.style.display === "") ? "block" : "none"; };
         window.toggleAccordion = (el) => { const c = el.nextElementSibling; c.style.display = c.style.display === "block" ? "none" : "block"; };
 
-        // HISTORY
+        // HISTORY ACCORDION RENDER
         onSnapshot(query(historyCol, orderBy("timestamp", "desc"), limit(6)), (snap) => {
             let html = "";
             snap.forEach(d => {
                 const h = d.data();
                 const dStr = h.date ? new Date(h.date).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'}) : "Past";
-                const rows = h.results ? h.results.slice(0, 10).map((r, i) => `<div class="history-item"><span><strong>${i+1}.</strong> ${r.name}</span><span>${r.pts} pts | <strong>$${r.earned.toLocaleString()}</strong></span></div>`).join('') : "";
+                const rows = h.results ? h.results.slice(0, 10).map((r, i) => {
+                    const toPar = r.toPar === 0 ? 'E' : (r.toPar > 0 ? '+' + r.toPar : r.toPar);
+                    const parColor = r.toPar < 0 ? "#b71c1c" : (r.toPar === 0 ? "#2e7d32" : "#333");
+                    return `<div class="history-item">
+                        <span><strong>${i+1}.</strong> ${r.name} <span class="hist-score" style="color:${parColor}">${toPar}</span></span>
+                        <span>${r.pts} pts | <strong>$${r.earned.toLocaleString()}</strong></span>
+                    </div>`
+                }).join('') : "";
                 html += `<div class="history-accordion"><div class="history-header" onclick="toggleAccordion(this)"><span>${h.venue} (${dStr})</span><i class="fa fa-chevron-down"></i></div><div class="history-content">${rows}</div></div>`;
             });
             document.getElementById('history-container').innerHTML = html;
         });
 
-        // SETTINGS
+        // SETTINGS & TIMER
         onSnapshot(settingsDoc, (sSnap) => {
             if (!sSnap.exists()) return;
             const s = sSnap.data();
@@ -194,9 +212,7 @@
             }).sort((a, b) => a.tp - b.tp);
             const active = ps.filter(p => p.act > 0);
             if(active.length === 0) { document.getElementById('leaderboard-body').innerHTML = ""; return; }
-            const bF = Math.max(...active.map(p => p.fir || 0), -1), bG = Math.max(...active.map(p => p.gir || 0), -1);
-            const bS = Math.max(...active.map(p => p.scram || 0), -1), vN = active.filter(p => p.ntp > 0).map(p => p.ntp);
-            const bN = vN.length ? Math.min(...vN) : 999;
+            const bF = Math.max(...active.map(p => p.fir || 0), -1), bG = Math.max(...active.map(p => p.gir || 0), -1), bS = Math.max(...active.map(p => p.scram || 0), -1), vN = active.filter(p => p.ntp > 0).map(p => p.ntp), bN = vN.length ? Math.min(...vN) : 999;
             const cF = active.filter(p => p.fir === bF && bF > 0).length, cG = active.filter(p => p.gir === bG && bG > 0).length, cS = active.filter(p => p.scram === bS && bS > 0).length, cN = active.filter(p => p.ntp === bN && bN < 999).length;
 
             let i = 0, rank = 1, html = "";
@@ -211,18 +227,19 @@
                     if(p.fir===bF && bF>0) bonus+=(10000/cF); if(p.gir===bG && bG>0) bonus+=(10000/cG);
                     if(p.scram===bS && bS>0) bonus+=(10000/cS); if(p.ntp===bN && bN<999) bonus+=(10000/cN);
                     const totalM = Math.round(avgBaseM + bonus), tScore = p.tp === 0 ? 'E' : (p.tp > 0 ? '+' + p.tp : p.tp);
-                    html += `<tr><td>${ties > 1 ? 'T' + rank : rank}</td><td class="player-cell"><i class="${p.console} platform-icon"></i>${p.name}${qualifiedPlayers.has(p.name) ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.hcap}</td><td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td><td>${p.gross}</td><td class="net-cell">${p.net}</td><td style="font-weight:bold; color:${p.tp<=0?'#2e7d32':'#333'}">${tScore}</td><td style="${p.fir===bF?'color:#d32f2f;font-weight:bold':''}">${p.fir.toFixed(2)}%</td><td style="${p.gir===bG?'color:#d32f2f;font-weight:bold':''}">${p.gir.toFixed(2)}%</td><td style="${p.scram===bS?'color:#d32f2f;font-weight:bold':''}">${p.scram.toFixed(2)}%</td><td style="${p.ntp===bN?'color:#d32f2f;font-weight:bold':''}">${p.ntp?p.ntp.toFixed(2)+'y':'-'}</td><td>${avgPts}</td><td style="color:var(--emerald);font-weight:bold">$${totalM.toLocaleString()}</td></tr>`;
+                    const scoreColor = p.tp < 0 ? "#b71c1c" : (p.tp === 0 ? "#2e7d32" : "#333");
+                    html += `<tr><td>${ties > 1 ? 'T' + rank : rank}</td><td class="player-cell"><i class="${p.console} platform-icon"></i>${p.name}${qualifiedPlayers.has(p.name) ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.hcap}</td><td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td><td>${p.gross}</td><td class="net-cell">${p.net}</td><td style="font-weight:bold; color:${scoreColor}">${tScore}</td><td style="${p.fir===bF?'color:#d32f2f;font-weight:bold':''}">${p.fir.toFixed(2)}%</td><td style="${p.gir===bG?'color:#d32f2f;font-weight:bold':''}">${p.gir.toFixed(2)}%</td><td style="${p.scram===bS?'color:#d32f2f;font-weight:bold':''}">${p.scram.toFixed(2)}%</td><td style="${p.ntp===bN?'color:#d32f2f;font-weight:bold':''}">${p.ntp?p.ntp.toFixed(2)+'y':'-'}</td><td>${avgPts}</td><td style="color:var(--emerald);font-weight:bold">$${totalM.toLocaleString()}</td></tr>`;
                 }
                 i += ties; rank += ties;
             }
             document.getElementById('leaderboard-body').innerHTML = html;
         }
 
-        // SNAPSHOTS
+        // STANDINGS
         onSnapshot(scoresCol, (snapshot) => { let ps = []; snapshot.forEach(d => ps.push({...d.data(), id: d.id})); getDoc(settingsDoc).then(sSnap => { const s = sSnap.data() || {par:72, pool:0}; renderBoard(ps, parseInt(s.par), parseInt(s.pool)); }); });
         onSnapshot(query(seasonCol, orderBy("pts", "desc")), (snap) => { let html = "", r = 1, cutoff = Math.ceil(snap.size / 2); qualifiedPlayers.clear(); snap.forEach(d => { const p = d.data(); if(r <= cutoff) qualifiedPlayers.add(p.name); html += `<tr><td>${r}</td><td class="player-cell">${p.name}${r <= cutoff ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.events}</td><td style="font-weight:bold; color:var(--emerald)">${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`; if(r === cutoff && snap.size > 1) html += `<tr class="cut-line-row"><td colspan="5">--- PROJECTED PLAYOFF CUT LINE ---</td></tr>`; r++; }); document.getElementById('season-body').innerHTML = html; });
 
-        // ADMIN LOGIC
+        // ADMIN ACCESS
         let cl = 0; document.getElementById('admin-trigger').onclick = () => { if(++cl === 5) { if(prompt("Pass:") === "emerald2024") document.getElementById('admin-panel').style.display='block'; cl=0; }};
         
         document.getElementById('saveSettingsBtn').onclick = async () => {
@@ -231,11 +248,10 @@
             alert("Dashboard Updated!");
         };
 
-        document.getElementById('clearBoardBtn').onclick = async () => { if(!confirm("Clear ALL live scores?")) return; const snap = await getDocs(scoresCol); const batch = writeBatch(db); snap.forEach(d => batch.delete(d.ref)); await batch.commit(); await setDoc(settingsDoc, { lastUpdate: serverTimestamp() }, { merge: true }); alert("Board Cleared."); };
-
+        // ARCHIVE & PAYOUT
         document.getElementById('archiveEventBtn').onclick = async () => {
             const vName = document.getElementById('current-venue').innerText;
-            if(!confirm(`Archive ${vName}?`)) return;
+            if(!confirm(`Archive ${vName} and Pay Out?`)) return;
             const batch = writeBatch(db), sSnap = await getDoc(settingsDoc), s = sSnap.data();
             const pool = parseInt(s.pool)||0, par = parseInt(s.par)||72;
             const qSnap = await getDocs(scoresCol);
@@ -264,13 +280,13 @@
                     const totalE = Math.round(avgBaseM + bonus);
                     batch.set(doc(db, "season_stats", p.id), { name: p.name, pts: increment(avgPts), earnings: increment(totalE), events: increment(1) }, { merge: true });
                     batch.delete(doc(db, "live_tournament", p.id));
-                    historyData.push({ name: p.name, pts: avgPts, earned: totalE });
+                    historyData.push({ name: p.name, pts: avgPts, earned: totalE, toPar: p.tp });
                 }
                 i += ties; rank += ties;
             }
             batch.set(doc(collection(db, "history")), { venue: vName, date: s.date, timestamp: serverTimestamp(), results: historyData });
             batch.update(settingsDoc, { venue: "Tournament Closed", pool: 0, closingTimestamp: null });
-            await batch.commit(); alert("Event Archived & Standings Updated!");
+            await batch.commit(); alert("Event Archived & Paid Out!");
         };
 
         // SCORE SUBMISSION
