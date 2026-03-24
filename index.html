@@ -12,7 +12,6 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); color: #333; }
         
-        /* Header */
         .header-wrap { width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; position: sticky; top: 0; z-index: 999; }
         .logo-container { background-color: var(--emerald); text-align: center; padding: 20px 10px; border-bottom: 4px solid var(--gold); cursor: pointer; }
         .logo-container img { width: 100%; max-width: 500px; height: auto; display: block; margin: 0 auto; }
@@ -24,7 +23,6 @@
 
         .content-padding { padding: 10px; max-width: 1500px; margin: 0 auto; }
         
-        /* Interactive Sections */
         .submit-section, .admin-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid var(--emerald); }
         .admin-section { background: #222; color: white; border-color: var(--gold); display: none; }
         #submission-content { display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
@@ -37,20 +35,18 @@
         .btn-toggle { background: #eee; color: var(--emerald); border: 1px solid var(--emerald); }
         .btn-admin { background: var(--gold); color: #222; }
 
-        /* Tables */
         .table-container { width: 100%; overflow-x: auto; background: white; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 25px; }
         table { width: auto; min-width: 100%; border-collapse: collapse; }
         th { background-color: var(--emerald); color: white; padding: 12px 10px; font-size: 11px; text-transform: uppercase; }
         td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; white-space: nowrap; }
         
         .player-cell { text-align: left !important; font-weight: bold; width: 1%; white-space: nowrap; padding-right: 40px; }
-        .q-badge { color: var(--gold); font-weight: 900; margin-left: 8px; }
+        .q-badge { color: var(--gold); font-weight: 900; margin-left: 8px; text-shadow: 1px 1px 0px rgba(0,0,0,0.1); }
         .platform-icon { margin-right: 10px; font-size: 16px; width: 20px; text-align: center; }
         .ps-icon { color: var(--ps-blue); } .xb-icon { color: var(--xb-green); } .st-icon { color: var(--st-grey); }
         .net-cell { background-color: #f9f9f9; font-weight: bold; }
 
-        /* Cut Line Styling */
-        .cut-line-row td { background-color: #ffebee; color: #b71c1c; font-weight: bold; font-size: 11px; padding: 6px; text-transform: uppercase; letter-spacing: 1px; border-top: 2px dashed #b71c1c; border-bottom: 2px dashed #b71c1c; }
+        .cut-line-row td { background-color: #ffebee; color: #b71c1c; font-weight: bold; font-size: 11px; padding: 8px; text-transform: uppercase; letter-spacing: 1px; border-top: 2px dashed #b71c1c; border-bottom: 2px dashed #b71c1c; }
         
         #backToTop { position: fixed; bottom: 30px; right: 30px; background: var(--emerald); color: white; border: 2px solid var(--gold); width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 1000; }
         .footer-logo-wrap { text-align: center; padding: 40px 0; } .footer-logo-wrap img { max-width: 180px; opacity: 0.6; }
@@ -87,13 +83,17 @@
             <button id="saveSettingsBtn" class="btn btn-admin">Update Dashboard</button>
             <hr style="border-color: #444; margin: 20px 0;">
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap:10px;">
-                <input type="text" id="admin-corr-name" placeholder="Exact Name">
+                <input type="text" id="admin-corr-name" placeholder="Player Name">
                 <div><label>FIR %</label><input type="number" id="admin-corr-fir" step="0.01"></div>
                 <div><label>GIR %</label><input type="number" id="admin-corr-gir" step="0.01"></div>
                 <div><label>SCR %</label><input type="number" id="admin-corr-scr" step="0.01"></div>
                 <div><label>NTP Yds</label><input type="number" id="admin-corr-ntp" step="0.01"></div>
             </div>
             <button id="adminUpdateStatsBtn" class="btn" style="background:#444; color:white;">Manual Override</button>
+            <div style="display:flex; gap:10px; margin-top: 15px;">
+                <button id="archiveEventBtn" class="btn" style="background:#0277bd; color:white">Archive & Pay Out</button>
+                <button id="clearBoardBtn" class="btn" style="background:#b71c1c; color:white">Clear Weekly Scores</button>
+            </div>
         </div>
 
         <div class="submit-section">
@@ -131,7 +131,7 @@
             <th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>GROSS</th><th>NET</th><th>TP</th>
             <th>FIR %</th><th>GIR %</th><th>SCR %</th><th>NTP</th><th>PTS</th><th>WEEK $</th>
         </tr></thead><tbody id="leaderboard-body"></tbody></table></div>
-        <div style="font-size:11px; font-weight:bold; color:var(--emerald); text-align:right;">Q - Qualifies for End of Season Playoff (Top 50% Standings)</div>
+        <div style="font-size:11px; font-weight:bold; color:var(--emerald); text-align:right; margin-bottom:20px;">Q - Qualifies for End of Season Playoff (Top 50% Standings)</div>
 
         <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px; margin-top:40px;">SEASON STANDINGS</h3>
         <div class="table-container"><table><thead><tr><th>RANK</th><th class="player-cell">PLAYER</th><th>EV</th><th>POINTS</th><th style="text-align:right">CAREER EARNINGS</th></tr></thead><tbody id="season-body"></tbody></table></div>
@@ -141,7 +141,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, query, orderBy, deleteDoc, writeBatch, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 		const firebaseConfig = {
           apiKey: "AIzaSyDXQU4I1XvkNi-XE4f5q7dixo3BrVkfuC8",
@@ -164,7 +164,6 @@
         let tournamentEndTime = null;
         let qualifiedPlayers = new Set();
 
-        // UI Helpers
         document.getElementById('toggleFormBtn').onclick = function() {
             const content = document.getElementById('submission-content');
             const isHidden = content.style.display === "none" || content.style.display === "";
@@ -172,14 +171,8 @@
             this.innerHTML = isHidden ? '<i class="fa fa-times"></i> Close Submission' : '<i class="fa fa-edit"></i> Open Scorecard Submission';
         };
 
-        function formatDisplayTime(ts) {
-            if(!ts) return "--";
-            const d = ts.toDate();
-            const pad = (n) => n.toString().padStart(2, '0');
-            return `${pad(d.getHours())}:${pad(d.getMinutes())} ${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
-        }
+        function formatTime(ts) { if(!ts) return "--"; const d = ts.toDate(); return d.toLocaleString('en-GB'); }
 
-        // Countdown Logic
         setInterval(() => {
             if (!tournamentEndTime) return;
             const now = new Date().getTime();
@@ -191,7 +184,6 @@
             document.getElementById("countdown").innerHTML = `${d}d ${h}h ${m}m Remaining`;
         }, 1000);
 
-        // Main Board Rendering
         function renderBoard(playersData, par, pool) {
             let ps = playersData.map(p => {
                 const rs = [p.r1, p.r2, p.r3, p.r4].map(v => parseInt(v) || 0);
@@ -225,20 +217,15 @@
 
                 for (let j = 0; j < ties; j++) {
                     const p = ps[i + j];
-                    let bonusTotal = 0;
-                    if (p.fir === bF && bF > 0) bonusTotal += (10000 / cF);
-                    if (p.gir === bG && bG > 0) bonusTotal += (10000 / cG);
-                    if (p.scram === bS && bS > 0) bonusTotal += (10000 / cS);
-                    if (p.ntp === bN && bN < 999) bonusTotal += (10000 / cN);
+                    let bonus = 0;
+                    if (p.fir === bF && bF > 0) bonus += (10000 / cF);
+                    if (p.gir === bG && bG > 0) bonus += (10000 / cG);
+                    if (p.scram === bS && bS > 0) bonus += (10000 / cS);
+                    if (p.ntp === bN && bN < 999) bonus += (10000 / cN);
                     
-                    const finalWeekMoney = Math.round(avgBaseMoney + bonusTotal);
+                    const totalMoney = Math.round(avgBaseMoney + bonus);
                     const tScore = p.tp === 0 ? 'E' : (p.tp > 0 ? '+' + p.tp : p.tp);
                     let tpColor = (p.tp < 0) ? "#d32f2f" : (p.tp === 0 ? "#2e7d32" : "#333");
-
-                    const fColor = (p.fir === bF && bF > 0) ? "color:#d32f2f; font-weight:bold" : "color:#333";
-                    const gColor = (p.gir === bG && bG > 0) ? "color:#d32f2f; font-weight:bold" : "color:#333";
-                    const sColor = (p.scram === bS && bS > 0) ? "color:#d32f2f; font-weight:bold" : "color:#333";
-                    const nColor = (p.ntp === bN && bN < 999) ? "color:#d32f2f; font-weight:bold" : "color:#333";
 
                     html += `<tr>
                         <td>${ties > 1 ? 'T' + rank : rank}</td>
@@ -247,10 +234,12 @@
                         <td>${p.r1 || '-'}</td><td>${p.r2 || '-'}</td><td>${p.r3 || '-'}</td><td>${p.r4 || '-'}</td>
                         <td>${p.gross}</td><td class="net-cell">${p.net}</td>
                         <td style="font-weight:bold; color:${tpColor}">${tScore}</td>
-                        <td style="${fColor}">${p.fir.toFixed(2)}%</td><td style="${gColor}">${p.gir.toFixed(2)}%</td>
-                        <td style="${sColor}">${p.scram.toFixed(2)}%</td><td style="${nColor}">${p.ntp ? p.ntp.toFixed(2) + 'y' : '-'}</td>
+                        <td style="${p.fir === bF && bF > 0 ? 'color:#d32f2f; font-weight:bold' : ''}">${p.fir.toFixed(2)}%</td>
+                        <td style="${p.gir === bG && bG > 0 ? 'color:#d32f2f; font-weight:bold' : ''}">${p.gir.toFixed(2)}%</td>
+                        <td style="${p.scram === bS && bS > 0 ? 'color:#d32f2f; font-weight:bold' : ''}">${p.scram.toFixed(2)}%</td>
+                        <td style="${p.ntp === bN && bN < 999 ? 'color:#d32f2f; font-weight:bold' : ''}">${p.ntp ? p.ntp.toFixed(2) + 'y' : '-'}</td>
                         <td style="font-weight:bold">${avgPts}</td>
-                        <td style="font-weight:bold; color:var(--emerald)">$${finalWeekMoney.toLocaleString()}</td>
+                        <td style="font-weight:bold; color:var(--emerald)">$${totalMoney.toLocaleString()}</td>
                     </tr>`;
                 }
                 i += ties; rank += ties;
@@ -258,15 +247,14 @@
             document.getElementById('leaderboard-body').innerHTML = html;
         }
 
-        // Listeners
         onSnapshot(settingsDoc, (sSnap) => {
             if (!sSnap.exists()) return;
             const s = sSnap.data();
             document.getElementById('current-venue').innerText = s.venue || "Emerald Tour";
-            document.getElementById('course-par').innerText = s.par || "--";
+            document.getElementById('course-par').innerText = s.par || "72";
             document.getElementById('event-date').innerText = s.date || "--";
             document.getElementById('total-prize-pool').innerText = `$${(parseInt(s.pool)||0).toLocaleString()}`;
-            document.getElementById('last-update-time').innerText = formatDisplayTime(s.lastUpdate);
+            document.getElementById('last-update-time').innerText = formatTime(s.lastUpdate);
             tournamentEndTime = s.closingTimestamp;
         });
 
@@ -284,23 +272,18 @@
             const total = snap.size;
             const cutoff = Math.ceil(total / 2);
             qualifiedPlayers.clear();
-
             snap.forEach(d => {
                 const p = d.data();
                 if (r <= cutoff) qualifiedPlayers.add(p.name);
                 html += `<tr><td>${r}</td><td class="player-cell">${p.name}${r <= cutoff ? '<span class="q-badge">Q</span>' : ''}</td><td>${p.events}</td><td style="font-weight:bold; color:var(--emerald)">${p.pts}</td><td style="text-align:right; font-weight:bold">$${(p.earnings||0).toLocaleString()}</td></tr>`;
-                
-                if (r === cutoff && total > 1) {
-                    html += `<tr class="cut-line-row"><td colspan="5">--- PROJECTED PLAYOFF CUT LINE (TOP 50%) ---</td></tr>`;
-                }
+                if (r === cutoff && total > 1) html += `<tr class="cut-line-row"><td colspan="5">--- PROJECTED PLAYOFF CUT LINE (TOP 50%) ---</td></tr>`;
                 r++;
             });
             document.getElementById('season-body').innerHTML = html;
         });
 
-        // Admin Auth & Functions
         let cl = 0; document.getElementById('admin-trigger').onclick = () => { if(++cl === 5) { if(prompt("Pass:") === "emerald2024") document.getElementById('admin-panel').style.display='block'; cl=0; }};
-        
+
         document.getElementById('saveSettingsBtn').onclick = async () => {
             const time = document.getElementById('admin-close-time').value;
             await setDoc(settingsDoc, {
@@ -311,13 +294,82 @@
                 closingTimestamp: time ? new Date(time).getTime() : null,
                 lastUpdate: serverTimestamp()
             }, { merge: true });
-            alert("Updated!");
+            alert("Dashboard Updated!");
+        };
+
+        document.getElementById('clearBoardBtn').onclick = async () => {
+            if(!confirm("Clear ALL live scores?")) return;
+            const snap = await getDocs(scoresCol);
+            const batch = writeBatch(db);
+            snap.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            await setDoc(settingsDoc, { lastUpdate: serverTimestamp() }, { merge: true });
+            alert("Board Cleared.");
+        };
+
+        document.getElementById('archiveEventBtn').onclick = async () => {
+            const vName = document.getElementById('current-venue').innerText;
+            if(!confirm(`Archive ${vName} and Update Season Standings?`)) return;
+
+            const batch = writeBatch(db);
+            const sSnap = await getDoc(settingsDoc);
+            const s = sSnap.data();
+            const pool = parseInt(s.pool)||0, par = parseInt(s.par)||72;
+
+            const qSnap = await getDocs(scoresCol);
+            let psRaw = []; qSnap.forEach(d => psRaw.push({...d.data(), id: d.id}));
+
+            let ps = psRaw.map(p => {
+                const rs = [p.r1, p.r2, p.r3, p.r4].map(v => parseInt(v) || 0);
+                const act = rs.filter(r => r > 0).length;
+                const gross = rs.reduce((a, b) => a + b, 0);
+                const net = act > 0 ? gross - (p.hcap || 0) : 0;
+                const tp = act > 0 ? net - (par * act) : 999;
+                return { ...p, gross, net, tp, act };
+            }).sort((a, b) => a.tp - b.tp);
+
+            const active = ps.filter(p => p.act > 0);
+            const bF = active.length ? Math.max(...active.map(p => p.fir || 0)) : -1;
+            const bG = active.length ? Math.max(...active.map(p => p.gir || 0)) : -1;
+            const bS = active.length ? Math.max(...active.map(p => p.scram || 0)) : -1;
+            const vN = active.filter(p => p.ntp > 0).map(p => p.ntp);
+            const bN = vN.length > 0 ? Math.min(...vN) : 999;
+
+            const cF = active.filter(p => p.fir === bF && bF > 0).length;
+            const cG = active.filter(p => p.gir === bG && bG > 0).length;
+            const cS = active.filter(p => p.scram === bS && bS > 0).length;
+            const cN = active.filter(p => p.ntp === bN && bN < 999).length;
+
+            let i = 0, rank = 1, historyData = [];
+            while(i < ps.length) {
+                if(ps[i].act === 0) { i++; continue; }
+                let ties = 0; while(i+ties < ps.length && ps[i+ties].tp === ps[i].tp) ties++;
+                let sP=0, sM=0; for(let pX=rank; pX<rank+ties; pX++) { if(pX<=20) { sP+=ptsTable[pX-1]; sM+=(payoutTable[pX-1]*pool); }}
+                const avgPts = Math.round(sP/ties), avgBaseM = sM/ties;
+
+                for(let j=0; j<ties; j++) {
+                    const p = ps[i+j];
+                    let bonus = 0;
+                    if(p.fir===bF && bF>0) bonus+=(10000/cF); if(p.gir===bG && bG>0) bonus+=(10000/cG);
+                    if(p.scram===bS && bS>0) bonus+=(10000/cS); if(p.ntp===bN && bN<999) bonus+=(10000/cN);
+                    const totalE = Math.round(avgBaseM + bonus);
+
+                    batch.set(doc(db, "season_stats", p.id), { name: p.name, pts: increment(avgPts), earnings: increment(totalE), events: increment(1) }, { merge: true });
+                    batch.delete(doc(db, "live_tournament", p.id));
+                    historyData.push({ name: p.name, pts: avgPts, earned: totalE });
+                }
+                i += ties; rank += ties;
+            }
+            batch.set(doc(collection(db, "history")), { venue: vName, date: s.date, timestamp: serverTimestamp(), results: historyData });
+            batch.update(settingsDoc, { venue: "Tournament Closed", pool: 0, closingTimestamp: null });
+            await batch.commit();
+            alert("Archive Complete!");
         };
 
         document.getElementById('submitScoreBtn').onclick = async () => {
             const name = document.getElementById('form-name').value.trim();
             const pin = document.getElementById('form-pin').value.trim();
-            if(!name || pin.length < 4) return alert("Error: Name/PIN required");
+            if(!name || pin.length < 4) return alert("Required: Name & 4-Digit PIN");
             const id = name.toLowerCase().replace(/\s+/g, '-');
             await setDoc(doc(db, "live_tournament", id), {
                 name, pin, console: document.getElementById('form-platform').value,
