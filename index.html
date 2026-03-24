@@ -6,43 +6,62 @@
     <title>Emerald Tour | Professional Series</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --emerald: #1b5e20; --gold: #fbc02d; --dark: #333; --light-bg: #f4f4f4; }
+        :root { --emerald: #1b5e20; --gold: #fbc02d; --dark: #333; --light-bg: #f4f4f4; 
+                --ps-blue: #003791; --xb-green: #107c10; --st-grey: #171a21; }
+        
+        html { scroll-behavior: smooth; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; background-color: var(--light-bg); }
         
+        /* Header & Logo */
         .header-wrap { width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .logo-container { background-color: var(--emerald); text-align: center; padding: 25px 10px; border-bottom: 4px solid var(--gold); cursor: pointer; }
         .logo-container img { width: 100%; max-width: 800px; height: auto; display: block; margin: 0 auto; }
         
         .venue-section { text-align: center; padding: 15px; background: white; }
         .venue-section h2 { color: var(--emerald); margin: 0; text-transform: uppercase; font-size: 28px; }
-        .update-tag { font-size: 12px; color: #888; margin-top: 5px; font-style: italic; }
+        .update-tag { font-size: 11px; color: #888; margin-top: 5px; }
 
         .info-bar-below { background-color: var(--dark); color: #ffeb3b; padding: 10px; display: flex; justify-content: center; gap: 40px; font-size: 14px; font-weight: bold; }
-        .content-padding { padding: 10px; max-width: 1600px; margin: 0 auto; }
+        .content-padding { padding: 10px; max-width: 1500px; margin: 0 auto; position: relative; }
         
+        /* Forms */
         .submit-section, .admin-section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px solid var(--emerald); }
         .admin-section { background: #222; color: white; border-color: var(--gold); display: none; }
         .submit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px; margin-top: 10px; }
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; font-size: 14px; box-sizing: border-box; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; font-size: 14px; }
         label { display: block; font-size: 10px; font-weight: bold; margin-bottom: 4px; color: #666; text-transform: uppercase; }
         .btn { padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; text-transform: uppercase; }
         .btn-primary { background: var(--emerald); color: white; }
         .btn-admin { background: var(--gold); color: #222; }
-        
-        /* --- TABLE LAYOUT FIXES --- */
+
+        /* Tables */
         .table-container { width: 100%; overflow-x: auto; background: white; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 25px; }
         table { width: auto; min-width: 100%; border-collapse: collapse; }
         th { background-color: var(--emerald); color: white; padding: 12px 10px; font-size: 11px; text-transform: uppercase; white-space: nowrap; }
         td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: center; font-size: 14px; white-space: nowrap; }
         
-        /* Player name column expands, others stay tight */
-        .player-cell { text-align: left !important; font-weight: bold; width: 1%; white-space: nowrap; padding-right: 30px; }
-        .hcap-cell { width: 50px; text-align: center; }
+        .player-cell { text-align: left !important; font-weight: bold; width: 1%; white-space: nowrap; padding-right: 40px; }
+        .hcap-cell { width: 40px; color: #777; font-weight: normal; }
         
-        .platform-icon { margin-right: 8px; color: var(--emerald); width: 18px; text-align: center; }
+        /* Console Colors */
+        .ps-icon { color: var(--ps-blue); }
+        .xb-icon { color: var(--xb-green); }
+        .st-icon { color: var(--st-grey); }
+        .platform-icon { margin-right: 10px; font-size: 16px; width: 20px; text-align: center; }
+
         .net-cell { background-color: #e8f5e9; font-weight: bold; color: var(--emerald); }
         .winner-highlight { background-color: #fff9c4; font-weight: bold; outline: 2px solid var(--gold); }
         
+        /* 2K25 Logo Section */
+        .footer-logo-wrap { text-align: center; padding: 40px 0; opacity: 0.8; }
+        .footer-logo-wrap img { max-width: 250px; height: auto; }
+
+        /* Back to Top Button */
+        #backToTop { position: fixed; bottom: 30px; right: 30px; background: var(--emerald); color: white; border: 2px solid var(--gold); 
+                      width: 50px; height: 50px; border-radius: 50%; cursor: pointer; display: none; align-items: center; justify-content: center; 
+                      box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; transition: transform 0.2s; }
+        #backToTop:hover { transform: scale(1.1); }
+
         .history-item { background: white; border: 1px solid var(--emerald); margin-bottom: 10px; border-radius: 5px; }
         .history-header { display: flex; padding: 15px; cursor: pointer; background: var(--emerald); color: white; font-weight: bold; justify-content: space-between; }
         .history-content { display: none; padding: 10px; overflow-x: auto; }
@@ -51,12 +70,14 @@
 </head>
 <body>
 
+    <button id="backToTop" onclick="window.scrollTo(0,0)"><i class="fa fa-chevron-up"></i></button>
+
     <div class="header-wrap">
         <div class="logo-container" id="admin-trigger"><img src="logo.png" alt="Emerald Tour Logo"></div>
         <div class="venue-section">
-            <h2 id="current-venue">Loading Emerald Tour...</h2>
+            <h2 id="current-venue">Emerald Tour</h2>
             <p id="total-prize-pool" style="font-size: 18px; margin: 5px 0; font-weight: bold;">Main Pool: --</p>
-            <div class="update-tag">Last Updated: <span id="last-update-time">Never</span></div>
+            <div class="update-tag">LIVE SYNC: <span id="last-update-time">--</span></div>
         </div>
         <div class="info-bar-below">
             <div>EVENT DATE: <span id="event-date">--</span></div>
@@ -66,7 +87,7 @@
 
     <div class="content-padding">
         <div id="admin-panel" class="admin-section">
-            <h3 style="color:var(--gold); margin-top:0;">Tournament Director Tools</h3>
+            <h3 style="color:var(--gold); margin-top:0;">Tournament Director</h3>
             <div class="submit-grid">
                 <div><label>Venue</label><input type="text" id="admin-venue"></div>
                 <div><label>Par</label><input type="number" id="admin-par"></div>
@@ -74,9 +95,7 @@
                 <div><label>Main Pool $</label><input type="number" id="admin-pool"></div>
             </div>
             <button id="saveSettingsBtn" class="btn btn-admin">Update Tournament Info</button>
-            
             <hr style="border-color: #444; margin: 20px 0;">
-            <h4 style="color: var(--gold); margin-top:0;">🔧 Manual Stat Correction</h4>
             <div class="submit-grid">
                 <input type="text" id="admin-corr-name" placeholder="Exact Player Name">
                 <div><label>FIR %</label><input type="number" id="admin-corr-fir" step="0.01"></div>
@@ -85,23 +104,22 @@
                 <div><label>NTP Yds</label><input type="number" id="admin-corr-ntp" step="0.01"></div>
             </div>
             <button id="adminUpdateStatsBtn" class="btn" style="background:#444; color:white;">Force Update Stats</button>
-
             <div style="display:flex; gap:10px; margin-top: 15px;">
-                <button id="archiveEventBtn" class="btn" style="background:#0277bd; color:white">Archive & Pay Out Season</button>
-                <button id="clearBoardBtn" class="btn" style="background:#b71c1c; color:white">Reset Scores for New Week</button>
+                <button id="archiveEventBtn" class="btn" style="background:#0277bd; color:white">Archive & Update Season</button>
+                <button id="clearBoardBtn" class="btn" style="background:#b71c1c; color:white">Reset Weekly Scores</button>
             </div>
         </div>
 
         <div class="submit-section">
-            <h3 style="color:var(--emerald); margin-top:0">⛳ Submit Round Card</h3>
+            <h3 style="color:var(--emerald); margin-top:0">⛳ Submit Card</h3>
             <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; margin-bottom: 10px;">
-                <div><label>Your Name</label><input type="text" id="form-name" placeholder="Full Name"></div>
-                <div><label>4-Digit PIN</label><input type="password" id="form-pin" maxlength="4" placeholder="****"></div>
+                <div><label>Name</label><input type="text" id="form-name"></div>
+                <div><label>PIN</label><input type="password" id="form-pin" maxlength="4"></div>
                 <div><label>Platform</label>
                     <select id="form-platform">
-                        <option value="fa-brands fa-playstation">PlayStation 5</option>
-                        <option value="fa-brands fa-xbox">Xbox Series X|S</option>
-                        <option value="fa-brands fa-steam">PC / Steam</option>
+                        <option value="ps-icon fa-brands fa-playstation">PlayStation 5</option>
+                        <option value="xb-icon fa-brands fa-xbox">Xbox</option>
+                        <option value="st-icon fa-brands fa-steam">PC</option>
                     </select>
                 </div>
             </div>
@@ -116,33 +134,36 @@
                 <div><label>SCR %</label><input type="number" id="form-scram" step="0.01"></div>
                 <div><label>NTP Yds</label><input type="number" id="form-ntp" step="0.01"></div>
             </div>
-            <button class="btn btn-primary" id="submitScoreBtn">Post to Leaderboard</button>
+            <button class="btn btn-primary" id="submitScoreBtn">Post Scorecard</button>
         </div>
 
-        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">LIVE TOURNAMENT STANDINGS</h3>
+        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">LIVE LEADERBOARD</h3>
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
                         <th>POS</th><th class="player-cell">PLAYER</th><th class="hcap-cell">HCP</th>
-                        <th>R1</th><th>R2</th><th>R3</th><th>R4</th>
-                        <th>GROSS</th><th>NET</th><th>TP</th>
-                        <th>FIR %</th><th>GIR %</th><th>SCR %</th><th>NTP</th><th>PTS</th><th>TOTAL $</th>
+                        <th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>GROSS</th><th>NET</th><th>TP</th>
+                        <th>FIR %</th><th>GIR %</th><th>SCR %</th><th>NTP</th><th>PTS</th><th>WEEK $</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body"></tbody>
             </table>
         </div>
 
-        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">SEASON POINTS RACE</h3>
+        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">SEASON STANDINGS</h3>
         <div class="table-container">
             <table>
-                <thead><tr><th>RANK</th><th class="player-cell">PLAYER</th><th>EVENTS</th><th>POINTS</th><th style="text-align:right">CAREER EARNINGS</th></tr></thead>
+                <thead><tr><th>RANK</th><th class="player-cell">PLAYER</th><th>EV</th><th>POINTS</th><th style="text-align:right">CAREER EARNINGS</th></tr></thead>
                 <tbody id="season-body"></tbody>
             </table>
         </div>
 
-        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">TOURNAMENT ARCHIVE</h3>
+        <div class="footer-logo-wrap">
+            <img src="2k25-logo.png" alt="PGA Tour 2K25">
+        </div>
+
+        <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">EVENT ARCHIVE</h3>
         <div id="history-container"></div>
     </div>
 
@@ -150,7 +171,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, query, orderBy, addDoc, deleteDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIG: Replace with your actual Firebase details
         const firebaseConfig = {
           apiKey: "AIzaSyDXQU4I1XvkNi-XE4f5q7dixo3BrVkfuC8",
 		  authDomain: "emeraldtour2-f556d.firebaseapp.com",
@@ -168,14 +188,12 @@
         const payoutTable = [0.18, 0.108, 0.068, 0.048, 0.04, 0.036, 0.0335, 0.031, 0.029, 0.027, 0.025, 0.023, 0.021, 0.019, 0.018, 0.017, 0.016, 0.015, 0.014, 0.013];
         const ptsTable = [500, 300, 190, 135, 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 57, 54, 51, 48, 45, 42];
 
-        function updateTimeTag() {
-            const now = new Date();
-            document.getElementById('last-update-time').innerText = now.toLocaleTimeString() + " " + now.toLocaleDateString();
-        }
+        // Back to Top Logic
+        window.onscroll = () => { document.getElementById('backToTop').style.display = window.scrollY > 400 ? 'flex' : 'none'; };
 
-        // Admin Auth
+        // Admin Trigger
         let clicks = 0;
-        document.getElementById('admin-trigger').onclick = () => { if(++clicks === 5) { if(prompt("Admin Password:") === "emerald2024") document.getElementById('admin-panel').style.display='block'; clicks=0; }};
+        document.getElementById('admin-trigger').onclick = () => { if(++clicks === 5) { if(prompt("Admin Pass:") === "emerald2024") document.getElementById('admin-panel').style.display='block'; clicks=0; }};
 
         // Submit Score
         document.getElementById('submitScoreBtn').onclick = async () => {
@@ -185,7 +203,7 @@
             const id = name.toLowerCase().replace(/\s+/g, '-');
             const ref = doc(db, "live_tournament", id);
             const snap = await getDoc(ref);
-            if(snap.exists() && snap.data().pin !== pin) return alert("Incorrect PIN.");
+            if(snap.exists() && snap.data().pin !== pin) return alert("Wrong PIN.");
 
             await setDoc(ref, {
                 name, pin, console: document.getElementById('form-platform').value,
@@ -199,10 +217,10 @@
                 scram: parseFloat(document.getElementById('form-scram').value)||0,
                 ntp: parseFloat(document.getElementById('form-ntp').value)||0
             }, { merge: true });
-            alert("Scorecard Posted!");
+            alert("Updated!");
         };
 
-        // Manual Admin Correction
+        // Admin Manual Update
         document.getElementById('adminUpdateStatsBtn').onclick = async () => {
             const name = document.getElementById('admin-corr-name').value.trim();
             const id = name.toLowerCase().replace(/\s+/g, '-');
@@ -212,33 +230,22 @@
                 scram: parseFloat(document.getElementById('admin-corr-scr').value)||0,
                 ntp: parseFloat(document.getElementById('admin-corr-ntp').value)||0
             }, { merge: true });
-            alert("Stats Forced!");
+            alert("Stats Overridden!");
         };
 
-        // Save Tournament Info
-        document.getElementById('saveSettingsBtn').onclick = async () => {
-            await setDoc(settingsDoc, {
-                venue: document.getElementById('admin-venue').value,
-                par: document.getElementById('admin-par').value,
-                date: document.getElementById('admin-date').value,
-                pool: document.getElementById('admin-pool').value
-            });
-            alert("Tournament Updated!");
-        };
-
-        // Score Wipe
+        // Admin Reset
         document.getElementById('clearBoardBtn').onclick = async () => {
-            if(confirm("Wipe Scores? Players and PINs will remain.")){
+            if(confirm("Reset scores for new week?")){
                 const snap = await getDocs(scoresCol);
                 const batch = snap.docs.map(d => setDoc(doc(db, "live_tournament", d.id), {
                     r1:0, r2:0, r3:0, r4:0, fir:0, gir:0, scram:0, ntp:0
                 }, { merge: true }));
                 await Promise.all(batch);
-                alert("Scores Reset!");
+                alert("Scores Wiped.");
             }
         };
 
-        // Main Live Sync
+        // Sync Data
         onSnapshot(scoresCol, async (snapshot) => {
             const sSnap = await getDoc(settingsDoc);
             const s = sSnap.exists() ? sSnap.data() : {venue:"TBD", par:72, pool:0};
@@ -246,11 +253,11 @@
             document.getElementById('course-par').innerText = s.par;
             document.getElementById('event-date').innerText = s.date || "--";
             document.getElementById('total-prize-pool').innerText = `Main Pool: $${(parseInt(s.pool)||0).toLocaleString()}`;
+            document.getElementById('last-update-time').innerText = new Date().toLocaleTimeString();
             
             let players = [];
             snapshot.forEach(d => players.push({...d.data(), id: d.id}));
             renderBoard(players, parseInt(s.par), parseInt(s.pool));
-            updateTimeTag();
         });
 
         function renderBoard(playersData, par, pool) {
@@ -296,11 +303,10 @@
 
                     const total = avgMoney + bonus;
                     const tScore = p.tp === 0 ? 'E' : (p.tp > 0 ? '+'+p.tp : p.tp);
-                    const consoleClass = p.console || "fa-solid fa-golf-ball";
                     
                     html += `<tr>
                         <td>${ties>1?'T'+rank:rank}</td>
-                        <td class="player-cell"><i class="${consoleClass} platform-icon"></i>${p.name}</td>
+                        <td class="player-cell"><i class="${p.console || 'fa-solid fa-golf-ball'} platform-icon"></i>${p.name}</td>
                         <td class="hcap-cell">${p.hcap}</td>
                         <td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td>
                         <td>${p.gross}</td><td class="net-cell">${p.net}</td><td style="font-weight:bold">${tScore}</td>
@@ -319,9 +325,9 @@
             window.currentCalculatedPlayers = ps; 
         }
 
-        // Archive Event
+        // Archive
         document.getElementById('archiveEventBtn').onclick = async () => {
-            if(!confirm("Finalize Season Points and Payouts?")) return;
+            if(!confirm("Push results to Season Standings?")) return;
             const sSnap = await getDoc(settingsDoc);
             const s = sSnap.data();
             const players = window.currentCalculatedPlayers || [];
@@ -334,7 +340,7 @@
                 archived.push({name:p.name, gross:p.gross, net:p.net, tp:p.tp, pts:p.tempPts, prize:p.tempMoney});
             }
             await addDoc(collection(db, "event_history"), { venue:s.venue, date:s.date, details:archived, timestamp:new Date() });
-            alert("Tour Standings Updated!");
+            alert("Season Totals Updated!");
         };
 
         // Season Stats Sync
@@ -342,8 +348,7 @@
             let html = "", r=1;
             snap.forEach(d => {
                 const p = d.data();
-                const icon = p.console || "fa-solid fa-golf-ball";
-                html += `<tr><td>${r++}</td><td class="player-cell"><i class="${icon} platform-icon"></i>${p.name}</td><td>${p.events}</td><td style="font-weight:bold; color:var(--emerald)">${p.pts}</td><td style="text-align:right; font-weight:bold">$${(p.earnings||0).toLocaleString()}</td></tr>`;
+                html += `<tr><td>${r++}</td><td class="player-cell"><i class="${p.console || ''} platform-icon"></i>${p.name}</td><td>${p.events}</td><td style="font-weight:bold; color:var(--emerald)">${p.pts}</td><td style="text-align:right; font-weight:bold">$${(p.earnings||0).toLocaleString()}</td></tr>`;
             });
             document.getElementById('season-body').innerHTML = html;
         });
