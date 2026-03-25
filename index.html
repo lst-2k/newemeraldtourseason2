@@ -81,7 +81,10 @@
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
                 <div><label>Venue</label><input type="text" id="admin-venue"></div>
                 <div><label>Par</label><input type="number" id="admin-par"></div>
-                <div><label>Event Date</label><input type="date" id="admin-date-picker"></div>
+                <div>
+					<label>Event Date</label>
+					<input type="date" id="admin-date-picker" min="2024-01-01" max="2030-12-31">
+				</div>
                 <div><label>Prize Pool $</label><input type="number" id="admin-pool"></div>
                 <div style="grid-column: span 2;"><label>Closing Date/Time</label><input type="datetime-local" id="admin-close-time"></div>
             </div>
@@ -157,7 +160,22 @@
         const payoutTable = [0.18, 0.108, 0.068, 0.048, 0.04, 0.036, 0.0335, 0.031, 0.029, 0.027, 0.025, 0.023, 0.021, 0.019, 0.018, 0.017, 0.016, 0.015, 0.014, 0.013];
         const ptsTable = [500, 300, 190, 135, 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 57, 54, 51, 48, 45, 42];
 
-        document.getElementById('toggleFormBtn').onclick = () => { const c = document.getElementById('submission-content'); c.style.display = (c.style.display === "none" || c.style.display === "") ? "block" : "none"; };
+		document.getElementById('toggleFormBtn').onclick = () => {
+			const content = document.getElementById('submission-content');
+			const btn = document.getElementById('toggleFormBtn');
+			
+			if (content.style.display === "none" || content.style.display === "") {
+				content.style.display = "block";
+				btn.innerHTML = `<i class="fa fa-times"></i> Close Scorecard Submission`;
+				btn.style.background = "#ffebee"; // Optional: slight red tint when opening to "close"
+				btn.style.color = "#b71c1c";
+			} else {
+				content.style.display = "none";
+				btn.innerHTML = `<i class="fa fa-edit"></i> Open Scorecard Submission`;
+				btn.style.background = "#eee"; // Back to original
+				btn.style.color = "var(--emerald)";
+			}
+		};
         window.toggleAccordion = (el) => { const c = el.nextElementSibling; c.style.display = c.style.display === "block" ? "none" : "block"; };
 
         // HISTORY
@@ -165,7 +183,11 @@
             let html = "";
             snap.forEach(d => {
                 const h = d.data();
-                const dStr = h.date ? new Date(h.date).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'}) : "Past";
+                const dateStr = h.date ? new Date(h.date).toLocaleDateString('en-GB', {
+					day: '2-digit', 
+					month: '2-digit', 
+					year: 'numeric' // This forces 2026 instead of 26
+				}) : "Past Event";
                 const rows = h.results ? h.results.slice(0, 10).map((r, i) => {
                     const toPar = r.toPar === 0 ? 'E' : (r.toPar > 0 ? '+' + r.toPar : r.toPar);
                     const parColor = r.toPar < 0 ? "#b71c1c" : (r.toPar === 0 ? "#2e7d32" : "#333");
