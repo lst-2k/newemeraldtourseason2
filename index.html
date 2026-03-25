@@ -81,21 +81,37 @@
 
     <div class="content-padding">
         <div id="admin-panel" class="admin-section">
-            <h3 style="color:var(--gold); margin-top:0;">Tournament Manager</h3>
-            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:10px;">
-                <div><label>Venue</label><input type="text" id="admin-venue"></div>
-				<label>Event Date</label><input type="date" id="admin-date-picker" min="2024-01-01" max="2030-12-31">
-                <div><label>Par</label><input type="number" id="admin-par"></div>
-                <div><label>Event Date</label><input type="date" id="admin-date-picker"></div>
-                <div><label>Prize Pool $</label><input type="number" id="admin-pool"></div>
-                <div style="grid-column: span 2;"><label>Closing Date/Time</label><input type="datetime-local" id="admin-close-time"></div>
-            </div>
-            <button id="saveSettingsBtn" class="btn btn-admin">Update Dashboard</button>
-            <div style="display:flex; gap:10px; margin-top: 15px;">
-                <button id="archiveEventBtn" class="btn" style="background:#0277bd; color:white">Archive & Pay Out</button>
-                <button id="clearBoardBtn" class="btn" style="background:#b71c1c; color:white">Clear Weekly Scores</button>
-            </div>
+    <h3 style="color:var(--gold); margin-top:0; border-bottom: 1px solid #444; padding-bottom: 10px;">Tournament Manager</h3>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:15px;">
+        <div>
+            <label>Venue Name</label>
+            <input type="text" id="admin-venue" placeholder="e.g. Royal Portrush">
         </div>
+        <div>
+            <label>Course Par</label>
+            <input type="number" id="admin-par" placeholder="72">
+        </div>
+        <div>
+            <label>Tournament Date</label>
+            <input type="date" id="admin-date-picker" min="2024-01-01" max="2030-12-31">
+        </div>
+        <div>
+            <label>Total Prize Pool ($)</label>
+            <input type="number" id="admin-pool" placeholder="50000">
+        </div>
+        <div style="grid-column: span 2;">
+            <label>Submissions Close (Date & Time)</label>
+            <input type="datetime-local" id="admin-close-time">
+        </div>
+    </div>
+    
+    <button id="saveSettingsBtn" class="btn btn-admin" style="margin-top: 20px;">Update Dashboard</button>
+    
+    <div style="display:flex; gap:10px; margin-top: 15px; border-top: 1px solid #444; padding-top: 15px;">
+        <button id="archiveEventBtn" class="btn" style="background:#0277bd; color:white; margin-top:0;">Archive & Pay Out</button>
+        <button id="clearBoardBtn" class="btn" style="background:#b71c1c; color:white; margin-top:0;">Clear Weekly Scores</button>
+    </div>
+</div>
 
         <div class="submit-section">
             <button class="btn btn-toggle" id="toggleFormBtn"><i class="fa fa-edit"></i> Open Scorecard Submission</button>
@@ -171,13 +187,15 @@
 			if (content.style.display === "none" || content.style.display === "") {
 				content.style.display = "block";
 				btn.innerHTML = `<i class="fa fa-times"></i> Close Scorecard Submission`;
-				btn.style.background = "#ffebee"; // Optional: slight red tint when opening to "close"
+				btn.style.background = "#ffebee"; 
 				btn.style.color = "#b71c1c";
+				btn.style.borderColor = "#b71c1c";
 			} else {
 				content.style.display = "none";
 				btn.innerHTML = `<i class="fa fa-edit"></i> Open Scorecard Submission`;
-				btn.style.background = "#eee"; // Back to original
+				btn.style.background = "#eee"; 
 				btn.style.color = "var(--emerald)";
+				btn.style.borderColor = "var(--emerald)";
 			}
 		};
         window.toggleAccordion = (el) => { const c = el.nextElementSibling; c.style.display = c.style.display === "block" ? "none" : "block"; };
@@ -187,8 +205,12 @@
             let html = "";
             snap.forEach(d => {
                 const h = d.data();
-                const dStr = h.date ? new Date(h.date).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric'}) : "Past";
-                const rows = h.results ? h.results.slice(0, 10).map((r, i) => {
+			const dateStr = h.date ? new Date(h.date).toLocaleDateString('en-GB', {
+				day: '2-digit', 
+				month: '2-digit', 
+				year: 'numeric' 
+			}) : "--/--/----";
+					const rows = h.results ? h.results.slice(0, 10).map((r, i) => {
                     const toPar = r.toPar === 0 ? 'E' : (r.toPar > 0 ? '+' + r.toPar : r.toPar);
                     const parColor = r.toPar < 0 ? "#b71c1c" : (r.toPar === 0 ? "#2e7d32" : "#333");
                     return `<div class="history-item">
