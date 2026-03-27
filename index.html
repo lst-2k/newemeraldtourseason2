@@ -50,6 +50,21 @@
         .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f2f2f2; font-size: 13px; }
 
         #backToTop { position: fixed; bottom: 20px; right: 20px; background: var(--emerald); color: white; border-radius: 50%; width: 50px; height: 50px; display: none; align-items: center; justify-content: center; border: 2px solid var(--gold); cursor: pointer; z-index: 1000; }
+		```css
+        .btn-season-link { 
+            display: inline-block;
+            background: #444; 
+            color: white; 
+            text-decoration: none; 
+            width: auto; 
+            padding: 12px 30px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .btn-season-link:hover {
+            background: var(--emerald);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -132,6 +147,17 @@
         <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px; margin-top:40px;">TOURNAMENT HISTORY</h3>
         <div id="history-container"></div>
     </div>
+	
+	<h3 style="text-align:center; color:var(--emerald); letter-spacing:1px; margin-top:40px;">TOURNAMENT HISTORY</h3>
+        <div id="history-container"></div>
+
+        <div style="margin-top: 50px; padding: 20px; border-top: 2px solid #ddd; text-align: center;">
+            <p style="font-size: 12px; color: #666; text-transform: uppercase; font-weight: bold;">Past Records</p>
+            <a href="https://lst-2k.github.io/new-emerald-tour/" class="btn btn-season-link">
+                <i class="fa fa-archive"></i> View Season 1 Standings
+            </a>
+        </div>
+    </div> ```
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
