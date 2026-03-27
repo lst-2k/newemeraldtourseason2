@@ -14,7 +14,13 @@
         /* Header */
         .header-wrap { width: 100%; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; position: sticky; top: 0; z-index: 999; }
         .logo-container { background-color: var(--emerald); text-align: center; padding: 20px 10px; border-bottom: 4px solid var(--gold); cursor: pointer; }
-        .logo-container img { width: 100%; max-width: 450px; height: auto; display: block; margin: 0 auto; }
+        .logo-container img { width: 100%; max-width: 450px; height: auto; display: block; margin: 0 auto; }.logo-container img { 
+            width: 100%; 
+            max-width: 100%; /* Changed from 450px to allow full stretch */
+            height: auto; 
+            display: block; 
+            margin: 0 auto; 
+        }
         .venue-section { text-align: center; padding: 15px; }
         .venue-section h2 { margin: 0; text-transform: uppercase; font-size: 24px; letter-spacing: 1px; }
         .info-bar-below { background-color: var(--dark); color: #ffeb3b; padding: 10px; display: flex; justify-content: center; gap: 30px; font-size: 13px; font-weight: bold; }
@@ -169,7 +175,6 @@
 			<div id="history-container"></div>
 				<div style="margin-top: 50px; text-align: center; border-top: 1px solid #ddd; padding-top: 30px;">
 					<div class="season-btn-container">
-						<p style="font-size: 10px; color: #888; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">Previous Rankings</p>
 						<a href="https://lst-2k.github.io/new-emerald-tour/" class="btn-archive">
 							<i class="fa-solid fa-clock-rotate-left" style="margin-right: 10px;"></i> Season 1 Archives
 						</a>
