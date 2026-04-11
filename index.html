@@ -23,7 +23,14 @@
         
         .venue-section { text-align: center; padding: 15px; }
         .venue-section h2 { margin: 0; text-transform: uppercase; font-size: 24px; letter-spacing: 1px; }
+        
         .info-bar-below { background-color: var(--dark); color: #ffeb3b; padding: 10px; display: flex; justify-content: center; gap: 30px; font-size: 13px; font-weight: bold; }
+
+        /* SCROLLING TICKER */
+        .ticker-wrap { background: #222; color: #fff; overflow: hidden; white-space: nowrap; padding: 8px 0; border-bottom: 2px solid var(--emerald); }
+        .ticker-content { display: inline-block; padding-left: 100%; animation: ticker 30s linear infinite; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .ticker-content span { margin-right: 50px; color: var(--gold); }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
         .content-padding { padding: 15px; max-width: 1400px; margin: 0 auto; }
         
@@ -79,6 +86,12 @@
             <div>DATE: <span id="event-date">--/--/----</span></div>
             <div>PAR: <span id="course-par">--</span></div>
         </div>
+        <div class="ticker-wrap">
+            <div class="ticker-content" id="ticker-text">
+                <span>Welcome to the 2026 Emerald Tour Season</span>
+                <span>Update the ticker in the Admin Panel</span>
+            </div>
+        </div>
     </div>
 
     <div class="content-padding">
@@ -94,6 +107,10 @@
                     <input type="checkbox" id="admin-signature" style="width: 20px; height: 20px;">
                     <label style="margin: 0; color: var(--gold); font-size: 13px;">Signature Event (2x Pts)</label>
                 </div>
+            </div>
+            <div style="margin-top:15px;">
+                <label>Scrolling Ticker Text (Separate events with | )</label>
+                <input type="text" id="admin-ticker" placeholder="Next Week: Augusta | Major Championship Next Month">
             </div>
             <button id="saveSettingsBtn" class="btn" style="background:var(--gold); color:#222; margin-top:20px;">Update Dashboard</button>
             <div style="display:flex; gap:10px; margin-top:15px; border-top:1px solid #444; padding-top:15px;">
@@ -196,6 +213,7 @@
                 par: document.getElementById('admin-par').value,
                 date: document.getElementById('admin-date-picker').value,
                 pool: document.getElementById('admin-pool').value,
+                tickerText: document.getElementById('admin-ticker').value, // Save ticker text
                 isSignature: document.getElementById('admin-signature').checked,
                 closingTimestamp: new Date(document.getElementById('admin-close-time').value).getTime(),
                 lastUpdate: serverTimestamp()
@@ -215,6 +233,13 @@
                 venueEl.innerText = data.venue || "Emerald Tour";
                 venueEl.style.color = "var(--emerald)";
             }
+
+            // Ticker Update
+            if(data.tickerText) {
+                const items = data.tickerText.split('|');
+                document.getElementById('ticker-text').innerHTML = items.map(i => `<span>${i.trim()}</span>`).join('');
+            }
+
             document.getElementById('course-par').innerText = data.par || "--";
             document.getElementById('total-prize-pool').innerText = `$${(parseInt(data.pool) || 0).toLocaleString()}`;
             if (data.date) {
@@ -383,7 +408,7 @@
 						const pRef = doc(db, "season_stats", p.id);
 						batch.set(pRef, { 
 							name: p.name, 
-                            console: p.console || "", // Preserving console icon in season stats
+                            console: p.console || "",
 							pts: increment(avgPts), 
 							earnings: increment(avgMoney), 
 							events: increment(1) 
