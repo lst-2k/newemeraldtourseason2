@@ -266,7 +266,7 @@
 
 			const bestFir = Math.max(...ps.map(p => p.fir || 0));
 			const bestGir = Math.max(...ps.map(p => p.gir || 0));
-			const bestScr = Math.max(...ps.map(p => p.scr || 0)); // Corrected variable name
+			const bestScr = Math.max(...ps.map(p => p.scram || 0)); // Corrected variable name
 			const validNtp = ps.filter(p => p.ntp > 0).map(p => p.ntp);
 			const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
 
@@ -325,29 +325,29 @@
         };
 
         onSnapshot(query(seasonCol, orderBy("pts", "desc")), (snap) => {
-			let players = [];
-			snap.forEach(d => players.push(d.data()));
+		let players = [];
+		snap.forEach(d => players.push(d.data()));
 
-			let html = "";
-			for (let i = 0; i < players.length; i++) {
-				const p = players[i];
-				
-				// Determine rank and tie status
-				let rank = i + 1;
-				let isTied = false;
-				if ((players[i-1] && players[i-1].pts === p.pts) || (players[i+1] && players[i+1].pts === p.pts)) {
-					isTied = true;
-				}
-
-				// Adjust rank display if tied (using a simplified "find actual rank" approach)
-				let actualRank = 1;
-				for(let j=0; j<i; j++) { if(players[j].pts > p.pts) actualRank++; }
-				const rankDisplay = isTied ? `T${actualRank}` : actualRank;
-
-				html += `<tr><td>${rankDisplay}</td><td class="player-cell">${p.console ? `<i class="${p.console}"></i>` : ""}${p.name}</td><td>${p.events}</td><td>${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`;
+		let html = "";
+		for (let i = 0; i < players.length; i++) {
+			const p = players[i];
+			
+			// Determine rank and tie status
+			let rank = i + 1;
+			let isTied = false;
+			if ((players[i-1] && players[i-1].pts === p.pts) || (players[i+1] && players[i+1].pts === p.pts)) {
+				isTied = true;
 			}
-			document.getElementById('season-body').innerHTML = html;
-		});
+
+			// Adjust rank display if tied (using a simplified "find actual rank" approach)
+			let actualRank = 1;
+			for(let j=0; j<i; j++) { if(players[j].pts > p.pts) actualRank++; }
+			const rankDisplay = isTied ? `T${actualRank}` : actualRank;
+
+			html += `<tr><td>${rankDisplay}</td><td class="player-cell">${p.console ? `<i class="${p.console}"></i>` : ""}${p.name}</td><td>${p.events}</td><td>${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`;
+		}
+		document.getElementById('season-body').innerHTML = html;
+	});
 
         // ADMIN ACCESS
         let count = 0; document.getElementById('admin-trigger').onclick = () => { if(++count === 5) { document.getElementById('admin-panel').style.display = 'block'; count = 0; }};
