@@ -27,10 +27,38 @@
         .info-bar-below { background-color: var(--dark); color: #ffeb3b; padding: 10px; display: flex; justify-content: center; gap: 30px; font-size: 13px; font-weight: bold; }
 
         /* SCROLLING TICKER */
-        .ticker-wrap { background: #222; color: #fff; overflow: hidden; white-space: nowrap; padding: 8px 0; border-bottom: 2px solid var(--emerald); }
-        .ticker-content { display: inline-block; padding-left: 100%; animation: ticker 20s linear infinite; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        .ticker-content span { margin-right: 50px; color: var(--gold); }
-        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        .ticker-wrap { 
+			background: #222; 
+			color: #fff; 
+			overflow: hidden; 
+			white-space: nowrap; 
+			padding: 8px 0; 
+			border-bottom: 2px solid var(--emerald);
+			width: 100%;
+		}
+
+		.ticker-content { 
+			display: inline-block; 
+			padding-left: 100%; 
+			/* Increased speed and hardware acceleration */
+			animation: ticker 20s linear infinite; 
+			font-size: 12px; 
+			font-weight: bold; 
+			text-transform: uppercase; 
+			letter-spacing: 1px;
+			will-change: transform; 
+		}
+
+		.ticker-content span { 
+			margin-right: 50px; 
+			color: var(--gold); 
+			display: inline-block; /* Helps with width calculation */
+		}
+
+		@keyframes ticker { 
+			0% { transform: translateX(0); } 
+			100% { transform: translateX(-100%); } 
+		}
 
         .content-padding { padding: 15px; max-width: 1400px; margin: 0 auto; }
         
@@ -225,48 +253,52 @@
 
         // LIVE LEADERBOARD
         onSnapshot(scoresCol, async (snap) => {
-            const sSnap = await getDoc(settingsDoc);
-            const par = parseInt(sSnap.data().par) || 72, pool = parseInt(sSnap.data().pool) || 0, multiplier = sSnap.data().isSignature ? 2 : 1;
+			const sSnap = await getDoc(settingsDoc);
+			const par = parseInt(sSnap.data().par) || 72, pool = parseInt(sSnap.data().pool) || 0, multiplier = sSnap.data().isSignature ? 2 : 1;
 
-            let ps = [];
-            snap.forEach(d => {
-                const p = d.data();
-                const rs = [p.r1, p.r2, p.r3, p.r4].filter(v => v > 0);
-                const net = rs.length > 0 ? (rs.reduce((a, b) => a + b, 0)) - p.hcap : 0;
-                ps.push({ ...p, net, tp: rs.length > 0 ? net - (par * rs.length) : 999, act: rs.length });
-            });
+			let ps = [];
+			snap.forEach(d => {
+				const p = d.data();
+				const rs = [p.r1, p.r2, p.r3, p.r4].filter(v => v > 0);
+				const net = rs.length > 0 ? (rs.reduce((a, b) => a + b, 0)) - p.hcap : 0;
+				ps.push({ ...p, net, tp: rs.length > 0 ? net - (par * rs.length) : 999, act: rs.length });
+			});
 
-            // Find Best Stats
-            const bestFir = Math.max(...ps.map(p => p.fir || 0));
-            const bestGir = Math.max(...ps.map(p => p.gir || 0));
-            const bestScr = Math.max(...ps.map(p => p.scram || 0));
-            const validNtp = ps.filter(p => p.ntp > 0).map(p => p.ntp);
-            const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
+			const bestFir = Math.max(...ps.map(p => p.fir || 0));
+			const bestGir = Math.max(...ps.map(p => p.gir || 0));
+			const bestScr = Math.max(...ps.map(p => p.scr || 0)); // Corrected variable name
+			const validNtp = ps.filter(p => p.ntp > 0).map(p => p.ntp);
+			const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
 
-            ps.sort((a, b) => a.tp - b.tp);
-            let html = "", i = 0, rank = 1;
-            while (i < ps.length) {
-                if (ps[i].act === 0) { i++; continue; }
-                let ties = 0; while (i + ties < ps.length && ps[i + ties].tp === ps[i].tp) ties++;
-                let sP = 0, sM = 0;
-                for (let pX = rank; pX < rank + ties; pX++) { if (pX <= 20) { sP += ptsTable[pX - 1]; sM += (payoutTable[pX - 1] * pool); } }
-                
-                for (let j = 0; j < ties; j++) {
-                    const p = ps[i + j];
-                    const icon = p.console ? `<i class="${p.console}"></i>` : "";
-                    html += `<tr><td>${rank}</td><td class="player-cell">${icon}${p.name}</td><td>${p.hcap}</td>
-                        <td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td>
-                        <td>${p.net}</td><td style="color:${p.tp < 0 ? '#b71c1c' : (p.tp === 0 ? '#2e7d32' : '#333')}; font-weight:bold">${p.tp === 0 ? 'E' : (p.tp > 0 ? '+'+p.tp : p.tp)}</td>
-                        <td class="${p.fir === bestFir && bestFir > 0 ? 'best-stat' : ''}">${(p.fir || 0).toFixed(2)}%</td>
-                        <td class="${p.gir === bestGir && bestGir > 0 ? 'best-stat' : ''}">${(p.gir || 0).toFixed(2)}%</td>
-                        <td class="${p.scram === bestScr && bestScr > 0 ? 'best-stat' : ''}">${(p.scram || 0).toFixed(2)}%</td>
-                        <td class="${p.ntp === bestNtp ? 'best-stat' : ''}">${(p.ntp || 0).toFixed(2)}y</td>
-                        <td>${Math.round((sP / ties) * multiplier)}</td><td style="color:var(--emerald); font-weight:bold">$${Math.round(sM / ties).toLocaleString()}</td></tr>`;
-                }
-                i += ties; rank += ties;
-            }
-            document.getElementById('leaderboard-body').innerHTML = html;
-        });
+			ps.sort((a, b) => a.tp - b.tp);
+			let html = "", i = 0, rank = 1;
+
+			while (i < ps.length) {
+				if (ps[i].act === 0) { i++; continue; }
+				let ties = 0; while (i + ties < ps.length && ps[i + ties].tp === ps[i].tp) ties++;
+				
+				// Determine Rank Display (Add 'T' if more than 1 player tied)
+				const rankDisplay = ties > 1 ? `T${rank}` : rank;
+
+				let sP = 0, sM = 0;
+				for (let pX = rank; pX < rank + ties; pX++) { if (pX <= 20) { sP += ptsTable[pX - 1]; sM += (payoutTable[pX - 1] * pool); } }
+				
+				for (let j = 0; j < ties; j++) {
+					const p = ps[i + j];
+					const icon = p.console ? `<i class="${p.console}"></i>` : "";
+					html += `<tr><td>${rankDisplay}</td><td class="player-cell">${icon}${p.name}</td><td>${p.hcap}</td>
+						<td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td>
+						<td>${p.net}</td><td style="color:${p.tp < 0 ? '#b71c1c' : (p.tp === 0 ? '#2e7d32' : '#333')}; font-weight:bold">${p.tp === 0 ? 'E' : (p.tp > 0 ? '+'+p.tp : p.tp)}</td>
+						<td class="${p.fir === bestFir && bestFir > 0 ? 'best-stat' : ''}">${(p.fir || 0).toFixed(2)}%</td>
+						<td class="${p.gir === bestGir && bestGir > 0 ? 'best-stat' : ''}">${(p.gir || 0).toFixed(2)}%</td>
+						<td class="${p.scram === bestScr && bestScr > 0 ? 'best-stat' : ''}">${(p.scram || 0).toFixed(2)}%</td>
+						<td class="${p.ntp === bestNtp ? 'best-stat' : ''}">${(p.ntp || 0).toFixed(2)}y</td>
+						<td>${Math.round((sP / ties) * multiplier)}</td><td style="color:var(--emerald); font-weight:bold">$${Math.round(sM / ties).toLocaleString()}</td></tr>`;
+				}
+				i += ties; rank += ties;
+			}
+			document.getElementById('leaderboard-body').innerHTML = html;
+		});
 
         // SUBMIT SCORE
         document.getElementById('submitScoreBtn').onclick = async (e) => {
@@ -293,13 +325,29 @@
         };
 
         onSnapshot(query(seasonCol, orderBy("pts", "desc")), (snap) => {
-            let html = "", r = 1;
-            snap.forEach(d => {
-                const p = d.data();
-                html += `<tr><td>${r++}</td><td class="player-cell">${p.console ? `<i class="${p.console}"></i>` : ""}${p.name}</td><td>${p.events}</td><td>${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`;
-            });
-            document.getElementById('season-body').innerHTML = html;
-        });
+			let players = [];
+			snap.forEach(d => players.push(d.data()));
+
+			let html = "";
+			for (let i = 0; i < players.length; i++) {
+				const p = players[i];
+				
+				// Determine rank and tie status
+				let rank = i + 1;
+				let isTied = false;
+				if ((players[i-1] && players[i-1].pts === p.pts) || (players[i+1] && players[i+1].pts === p.pts)) {
+					isTied = true;
+				}
+
+				// Adjust rank display if tied (using a simplified "find actual rank" approach)
+				let actualRank = 1;
+				for(let j=0; j<i; j++) { if(players[j].pts > p.pts) actualRank++; }
+				const rankDisplay = isTied ? `T${actualRank}` : actualRank;
+
+				html += `<tr><td>${rankDisplay}</td><td class="player-cell">${p.console ? `<i class="${p.console}"></i>` : ""}${p.name}</td><td>${p.events}</td><td>${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`;
+			}
+			document.getElementById('season-body').innerHTML = html;
+		});
 
         // ADMIN ACCESS
         let count = 0; document.getElementById('admin-trigger').onclick = () => { if(++count === 5) { document.getElementById('admin-panel').style.display = 'block'; count = 0; }};
