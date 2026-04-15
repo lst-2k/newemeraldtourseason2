@@ -250,6 +250,98 @@
                 }, 1000);
             }
         });
+		
+		// --- ADMIN: ARCHIVE & PAYOUT LOGIC ---
+        document.getElementById('archiveEventBtn').onclick = async () => {
+            const sSnap = await getDoc(settingsDoc);
+            if (!sSnap.exists()) return alert("Settings not found!");
+            
+            const s = sSnap.data();
+            const cleanVenueName = s.venue || "Unknown Venue";
+
+            if(!confirm(`Archive ${cleanVenueName} and Pay Out Season Points?`)) return;
+
+            try {
+                const batch = writeBatch(db);
+                const ptsMultiplier = s.isSignature === true ? 2 : 1;
+                const pool = parseInt(s.pool) || 0;
+                const par = parseInt(s.par) || 72;
+
+                const qSnap = await getDocs(scoresCol);
+                if (qSnap.empty) return alert("No scores found to archive!");
+
+                let psRaw = []; 
+                qSnap.forEach(d => psRaw.push({...d.data(), id: d.id}));
+
+                let ps = psRaw.map(p => {
+                    const rs = [p.r1, p.r2, p.r3, p.r4].filter(r => r > 0);
+                    const gross = rs.reduce((a, b) => a + b, 0);
+                    const net = rs.length > 0 ? gross - (parseInt(p.hcap) || 0) : 0;
+                    const tp = rs.length > 0 ? net - (par * rs.length) : 999;
+                    return { ...p, tp, act: rs.length };
+                }).sort((a, b) => a.tp - b.tp);
+
+                let i = 0, rank = 1, historyData = [];
+                while(i < ps.length) {
+                    if(ps[i].act === 0) { i++; continue; }
+                    let ties = 0; while(i+ties < ps.length && ps[i+ties].tp === ps[i].tp) ties++;
+                    
+                    let sP=0, sM=0; 
+                    for(let pX=rank; pX < rank+ties; pX++) { 
+                        if(pX <= 20) { 
+                            sP += ptsTable[pX-1]; 
+                            sM += (payoutTable[pX-1] * pool); 
+                        }
+                    }
+
+                    const avgPts = Math.round((sP / ties) * ptsMultiplier);
+                    const avgMoney = Math.round(sM / ties);
+
+                    for(let j=0; j < ties; j++) {
+                        const p = ps[i+j];
+                        const pRef = doc(db, "season_stats", p.id);
+                        batch.set(pRef, { 
+                            name: p.name, 
+                            pts: increment(avgPts), 
+                            earnings: increment(avgMoney), 
+                            events: increment(1),
+                            console: p.console || ""
+                        }, { merge: true });
+
+                        historyData.push({ name: p.name, pts: avgPts, earned: avgMoney, toPar: p.tp });
+                    }
+                    i += ties; rank += ties;
+                }
+
+                // Save to History
+                batch.set(doc(collection(db, "history")), { 
+                    venue: cleanVenueName, 
+                    date: s.date || "", 
+                    timestamp: serverTimestamp(), 
+                    results: historyData 
+                });
+
+                // Reset Tournament
+                batch.update(settingsDoc, { venue: "Tournament Closed", pool: 0, isSignature: false, closingTimestamp: null });
+                qSnap.forEach(d => batch.delete(d.ref));
+
+                await batch.commit(); 
+                alert("Archive Successful!");
+            } catch (err) {
+                console.error("Archive Error:", err);
+                alert("Archive Failed. Check console.");
+            }
+        };
+
+        // --- ADMIN: CLEAR LIVE BOARD ---
+        document.getElementById('clearBoardBtn').onclick = async () => {
+            if(!confirm("Wipe ALL live scores? This cannot be undone.")) return;
+            const qSnap = await getDocs(scoresCol);
+            const batch = writeBatch(db);
+            qSnap.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+            alert("Board Cleared.");
+        };
 
         // LIVE LEADERBOARD
         onSnapshot(scoresCol, async (snap) => {
