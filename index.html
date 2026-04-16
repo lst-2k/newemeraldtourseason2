@@ -228,7 +228,7 @@
 
         <h3 style="text-align:center; color:var(--emerald); letter-spacing:1px;">LIVE LEADERBOARD</h3>
         <div class="table-container"><table>
-            <thead><tr><th>POS</th><th class="player-cell">PLAYER</th><th>HCP</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th><th>NET</th><th>TO PAR</th><th>FIR%</th><th>GIR%</th><th>SCR%</th><th>NTP</th><th>PTS</th><th>WEEK $</th></tr></thead>
+            <thead><tr><th>POS</th><th class="player-cell">PLAYER</th><th>HCP</th><th>R1</th><th>R2</th><th id="th-r3">R3</th> <th id="th-r4">R4</th><th>NET</th><th>TO PAR</th><th>FIR%</th><th>GIR%</th><th>SCR%</th><th>NTP</th><th>PTS</th><th>WEEK $</th></tr></thead>
             <tbody id="leaderboard-body"></tbody>
         </table></div>
 
@@ -417,54 +417,69 @@
             alert("Board Cleared.");
         };
 
-        // LIVE LEADERBOARD
+        // LIVE LEADERBOARD (Dynamic Rounds)
         onSnapshot(scoresCol, async (snap) => {
-			const sSnap = await getDoc(settingsDoc);
-			const par = parseInt(sSnap.data().par) || 72, pool = parseInt(sSnap.data().pool) || 0, multiplier = sSnap.data().isSignature ? 2 : 1;
+            const sSnap = await getDoc(settingsDoc);
+            const par = parseInt(sSnap.data().par) || 72, pool = parseInt(sSnap.data().pool) || 0, multiplier = sSnap.data().isSignature ? 2 : 1;
 
-			let ps = [];
-			snap.forEach(d => {
-				const p = d.data();
-				const rs = [p.r1, p.r2, p.r3, p.r4].filter(v => v > 0);
-				const net = rs.length > 0 ? (rs.reduce((a, b) => a + b, 0)) - p.hcap : 0;
-				ps.push({ ...p, net, tp: rs.length > 0 ? net - (par * rs.length) : 999, act: rs.length });
-			});
+            let ps = [];
+            let hasR3 = false;
+            let hasR4 = false;
 
-			const bestFir = Math.max(...ps.map(p => p.fir || 0));
-			const bestGir = Math.max(...ps.map(p => p.gir || 0));
-			const bestScr = Math.max(...ps.map(p => p.scram || 0)); // Corrected variable name
-			const validNtp = ps.filter(p => p.ntp > 0).map(p => p.ntp);
-			const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
+            snap.forEach(d => {
+                const p = d.data();
+                const rs = [p.r1, p.r2, p.r3, p.r4].filter(v => v > 0);
+                
+                // Check if R3 or R4 actually have data
+                if (p.r3 > 0) hasR3 = true;
+                if (p.r4 > 0) hasR4 = true;
 
-			ps.sort((a, b) => a.tp - b.tp);
-			let html = "", i = 0, rank = 1;
+                const net = rs.length > 0 ? (rs.reduce((a, b) => a + b, 0)) - p.hcap : 0;
+                ps.push({ ...p, net, tp: rs.length > 0 ? net - (par * rs.length) : 999, act: rs.length });
+            });
 
-			while (i < ps.length) {
-				if (ps[i].act === 0) { i++; continue; }
-				let ties = 0; while (i + ties < ps.length && ps[i + ties].tp === ps[i].tp) ties++;
-				
-				// Determine Rank Display (Add 'T' if more than 1 player tied)
-				const rankDisplay = ties > 1 ? `T${rank}` : rank;
+            // Toggle Header Visibility
+            document.getElementById('th-r3').style.display = hasR3 ? '' : 'none';
+            document.getElementById('th-r4').style.display = hasR4 ? '' : 'none';
 
-				let sP = 0, sM = 0;
-				for (let pX = rank; pX < rank + ties; pX++) { if (pX <= 20) { sP += ptsTable[pX - 1]; sM += (payoutTable[pX - 1] * pool); } }
-				
-				for (let j = 0; j < ties; j++) {
-					const p = ps[i + j];
-					const icon = p.console ? `<i class="${p.console}"></i>` : "";
-					html += `<tr><td>${rankDisplay}</td><td class="player-cell">${icon}${p.name}</td><td>${p.hcap}</td>
-						<td>${p.r1||'-'}</td><td>${p.r2||'-'}</td><td>${p.r3||'-'}</td><td>${p.r4||'-'}</td>
-						<td>${p.net}</td><td style="color:${p.tp < 0 ? '#b71c1c' : (p.tp === 0 ? '#2e7d32' : '#333')}; font-weight:bold">${p.tp === 0 ? 'E' : (p.tp > 0 ? '+'+p.tp : p.tp)}</td>
-						<td class="${p.fir === bestFir && bestFir > 0 ? 'best-stat' : ''}">${(p.fir || 0).toFixed(2)}%</td>
-						<td class="${p.gir === bestGir && bestGir > 0 ? 'best-stat' : ''}">${(p.gir || 0).toFixed(2)}%</td>
-						<td class="${p.scram === bestScr && bestScr > 0 ? 'best-stat' : ''}">${(p.scram || 0).toFixed(2)}%</td>
-						<td class="${p.ntp === bestNtp ? 'best-stat' : ''}">${(p.ntp || 0).toFixed(2)}y</td>
-						<td>${Math.round((sP / ties) * multiplier)}</td><td style="color:var(--emerald); font-weight:bold">$${Math.round(sM / ties).toLocaleString()}</td></tr>`;
-				}
-				i += ties; rank += ties;
-			}
-			document.getElementById('leaderboard-body').innerHTML = html;
-		});
+            const bestFir = Math.max(...ps.map(p => p.fir || 0));
+            const bestGir = Math.max(...ps.map(p => p.gir || 0));
+            const bestScr = Math.max(...ps.map(p => p.scram || 0));
+            const validNtp = ps.filter(p => p.ntp > 0).map(p => p.ntp);
+            const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
+
+            ps.sort((a, b) => a.tp - b.tp);
+            let html = "", i = 0, rank = 1;
+
+            while (i < ps.length) {
+                if (ps[i].act === 0) { i++; continue; }
+                let ties = 0; while (i + ties < ps.length && ps[i + ties].tp === ps[i].tp) ties++;
+                const rankDisplay = ties > 1 ? `T${rank}` : rank;
+
+                let sP = 0, sM = 0;
+                for (let pX = rank; pX < rank + ties; pX++) { if (pX <= 20) { sP += ptsTable[pX - 1]; sM += (payoutTable[pX - 1] * pool); } }
+                
+                for (let j = 0; j < ties; j++) {
+                    const p = ps[i + j];
+                    const icon = p.console ? `<i class="${p.console}"></i>` : "";
+                    
+                    // Dynamic Round Cells
+                    const r3Cell = hasR3 ? `<td>${p.r3||'-'}</td>` : "";
+                    const r4Cell = hasR4 ? `<td>${p.r4||'-'}</td>` : "";
+
+                    html += `<tr><td>${rankDisplay}</td><td class="player-cell">${icon}${p.name}</td><td>${p.hcap}</td>
+                        <td>${p.r1||'-'}</td><td>${p.r2||'-'}</td>${r3Cell}${r4Cell}
+                        <td>${p.net}</td><td style="color:${p.tp < 0 ? '#b71c1c' : (p.tp === 0 ? '#2e7d32' : '#333')}; font-weight:bold">${p.tp === 0 ? 'E' : (p.tp > 0 ? '+'+p.tp : p.tp)}</td>
+                        <td class="${p.fir === bestFir && bestFir > 0 ? 'best-stat' : ''}">${(p.fir || 0).toFixed(2)}%</td>
+                        <td class="${p.gir === bestGir && bestGir > 0 ? 'best-stat' : ''}">${(p.gir || 0).toFixed(2)}%</td>
+                        <td class="${p.scram === bestScr && bestScr > 0 ? 'best-stat' : ''}">${(p.scram || 0).toFixed(2)}%</td>
+                        <td class="${p.ntp === bestNtp ? 'best-stat' : ''}">${(p.ntp || 0).toFixed(2)}y</td>
+                        <td>${Math.round((sP / ties) * multiplier)}</td><td style="color:var(--emerald); font-weight:bold">$${Math.round(sM / ties).toLocaleString()}</td></tr>`;
+                }
+                i += ties; rank += ties;
+            }
+            document.getElementById('leaderboard-body').innerHTML = html;
+        });
 
         // SUBMIT SCORE
         document.getElementById('submitScoreBtn').onclick = async (e) => {
