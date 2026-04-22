@@ -252,7 +252,7 @@
         </div>
     </div>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, updateDoc, getDoc, getDocs, onSnapshot, query, orderBy, limit, writeBatch, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -270,7 +270,7 @@
         const settingsDoc = doc(db, "settings", "current_event");
         const scoresCol = collection(db, "live_tournament");
         const seasonCol = collection(db, "season_stats");
-        const historyCol = collection(db, "history");
+        const archivesCol = collection(db, "history");
 
         const payoutTable = [0.18, 0.108, 0.068, 0.048, 0.04, 0.036, 0.0335, 0.031, 0.029, 0.027, 0.025, 0.023, 0.021, 0.019, 0.018, 0.017, 0.016, 0.015, 0.014, 0.013];
         const ptsTable = [500, 300, 190, 135, 110, 100, 95, 90, 85, 80, 75, 70, 65, 60, 57, 54, 51, 48, 45, 42];
@@ -296,11 +296,20 @@
             document.getElementById('course-par').innerText = data.par || "--";
             document.getElementById('total-prize-pool').innerText = `$${(parseInt(data.pool) || 0).toLocaleString()}`;
             if (data.date) document.getElementById('event-date').innerText = data.date.split('-').reverse().join('/');
+            
+            // TIMER FIX: Don't kill the page when dist < 0
             if (data.closingTimestamp) {
                 if (window.tourTimer) clearInterval(window.tourTimer);
                 window.tourTimer = setInterval(() => {
                     const dist = data.closingTimestamp - new Date().getTime();
-                    document.getElementById("countdown").innerText = dist < 0 ? "SUBMISSIONS CLOSED" : Math.floor(dist/86400000)+"d "+Math.floor((dist%86400000)/3600000)+"h "+Math.floor((dist%3600000)/60000)+"m Remaining";
+                    const countdownEl = document.getElementById("countdown");
+                    if (dist < 0) {
+                        countdownEl.innerText = "TOURNAMENT FINISHED - AWAITING ARCHIVE";
+                        countdownEl.style.color = "var(--gold)";
+                    } else {
+                        countdownEl.innerText = Math.floor(dist/86400000)+"d "+Math.floor((dist%86400000)/3600000)+"h "+Math.floor((dist%3600000)/60000)+"m Remaining";
+                        countdownEl.style.color = "#b71c1c";
+                    }
                 }, 1000);
             }
         });
@@ -309,7 +318,6 @@
 		document.getElementById('archiveEventBtn').onclick = async () => {
             const sSnap = await getDoc(settingsDoc);
             if (!sSnap.exists()) return alert("Settings not found!");
-            
             const s = sSnap.data();
             const cleanVenueName = s.venue || "Unknown Venue";
 
@@ -327,18 +335,15 @@
                 let psRaw = []; 
                 qSnap.forEach(d => psRaw.push({...d.data(), id: d.id}));
 
-                // 1. Identify Best Stats for $10k Bonuses
                 const bestFir = Math.max(...psRaw.map(p => p.fir || 0));
                 const bestGir = Math.max(...psRaw.map(p => p.gir || 0));
                 const bestScr = Math.max(...psRaw.map(p => p.scram || 0));
                 const validNtp = psRaw.filter(p => p.ntp > 0).map(p => p.ntp);
                 const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
 
-                // 2. Calculate Ranks & Standard Payouts
                 let ps = psRaw.map(p => {
                     const rs = [p.r1, p.r2, p.r3, p.r4].filter(r => r > 0);
-                    const gross = rs.reduce((a, b) => a + b, 0);
-                    const net = rs.length > 0 ? gross - (parseInt(p.hcap) || 0) : 0;
+                    const net = rs.length > 0 ? (rs.reduce((a, b) => a + b, 0)) - (parseInt(p.hcap) || 0) : 0;
                     const tp = rs.length > 0 ? net - (par * rs.length) : 999;
                     return { ...p, tp, act: rs.length };
                 }).sort((a, b) => a.tp - b.tp);
@@ -347,22 +352,14 @@
                 while(i < ps.length) {
                     if(ps[i].act === 0) { i++; continue; }
                     let ties = 0; while(i+ties < ps.length && ps[i+ties].tp === ps[i].tp) ties++;
-                    
                     let sP=0, sM=0; 
-                    for(let pX=rank; pX < rank+ties; pX++) { 
-                        if(pX <= 20) { 
-                            sP += ptsTable[pX-1]; 
-                            sM += (payoutTable[pX-1] * pool); 
-                        }
-                    }
+                    for(let pX=rank; pX < rank+ties; pX++) { if(pX <= 20) { sP += ptsTable[pX-1]; sM += (payoutTable[pX-1] * pool); } }
 
                     const avgPts = Math.round((sP / ties) * ptsMultiplier);
                     const avgMoney = Math.round(sM / ties);
 
                     for(let j=0; j < ties; j++) {
                         const p = ps[i+j];
-                        
-                        // Check for $10k Bonuses
                         let totalWeekEarnings = avgMoney;
                         if (p.fir === bestFir && bestFir > 0) totalWeekEarnings += 10000;
                         if (p.gir === bestGir && bestGir > 0) totalWeekEarnings += 10000;
@@ -371,45 +368,33 @@
 
                         const pRef = doc(db, "season_stats", p.id);
                         batch.set(pRef, { 
-                            name: p.name, 
-                            pts: increment(avgPts), 
-                            earnings: increment(totalWeekEarnings), 
-                            events: increment(1),
-                            console: p.console || ""
+                            name: p.name, pts: increment(avgPts), earnings: increment(totalWeekEarnings), 
+                            events: increment(1), console: p.console || ""
                         }, { merge: true });
 
                         historyData.push({ 
-                            name: p.name, 
-                            pts: avgPts, 
-                            earned: totalWeekEarnings, 
-                            toPar: p.tp 
+                            name: p.name, pts: avgPts, earned: totalWeekEarnings, 
+                            toPar: p.tp, console: p.console || "" 
                         });
                     }
                     i += ties; rank += ties;
                 }
 
-                // 3. Save to History and Reset
                 batch.set(doc(collection(db, "history")), { 
-                    venue: cleanVenueName, 
-                    date: s.date || "", 
-                    timestamp: serverTimestamp(), 
-                    results: historyData 
+                    venue: cleanVenueName, date: s.date || "", 
+                    timestamp: serverTimestamp(), results: historyData, isSignature: s.isSignature || false
                 });
 
                 batch.update(settingsDoc, { venue: "Tournament Closed", pool: 0, isSignature: false, closingTimestamp: null });
                 qSnap.forEach(d => batch.delete(d.ref));
-
                 await batch.commit(); 
-                alert("Archive Successful! Bonuses Included.");
-            } catch (err) {
-                console.error("Archive Error:", err);
-                alert("Archive Failed.");
-            }
+                alert("Archive Successful!");
+            } catch (err) { console.error(err); alert("Archive Failed."); }
         };
 
-        // --- ADMIN: CLEAR LIVE BOARD ---
+        // ADMIN: CLEAR LIVE BOARD
         document.getElementById('clearBoardBtn').onclick = async () => {
-            if(!confirm("Wipe ALL live scores? This cannot be undone.")) return;
+            if(!confirm("Wipe ALL live scores?")) return;
             const qSnap = await getDocs(scoresCol);
             const batch = writeBatch(db);
             qSnap.forEach(d => batch.delete(d.ref));
@@ -417,69 +402,61 @@
             alert("Board Cleared.");
         };
 
-        // LIVE LEADERBOARD (Dynamic Rounds)
+        // LIVE LEADERBOARD (Dynamic Column Hiding)
         onSnapshot(scoresCol, async (snap) => {
-            const sSnap = await getDoc(settingsDoc);
-            const par = parseInt(sSnap.data().par) || 72, pool = parseInt(sSnap.data().pool) || 0, multiplier = sSnap.data().isSignature ? 2 : 1;
+			const sSnap = await getDoc(settingsDoc);
+			const par = parseInt(sSnap.data().par) || 72, pool = parseInt(sSnap.data().pool) || 0, multiplier = sSnap.data().isSignature ? 2 : 1;
 
-            let ps = [];
-            let hasR3 = false;
-            let hasR4 = false;
+			let ps = [];
+            let hasR3 = false, hasR4 = false;
 
-            snap.forEach(d => {
-                const p = d.data();
-                const rs = [p.r1, p.r2, p.r3, p.r4].filter(v => v > 0);
-                
-                // Check if R3 or R4 actually have data
-                if (p.r3 > 0) hasR3 = true;
-                if (p.r4 > 0) hasR4 = true;
+			snap.forEach(d => {
+				const p = d.data();
+				const rs = [p.r1, p.r2, p.r3, p.r4].filter(v => v > 0);
+                if (p.r3 > 0) hasR3 = true; if (p.r4 > 0) hasR4 = true;
+				const net = rs.length > 0 ? (rs.reduce((a, b) => a + b, 0)) - p.hcap : 0;
+				ps.push({ ...p, net, tp: rs.length > 0 ? net - (par * rs.length) : 999, act: rs.length });
+			});
 
-                const net = rs.length > 0 ? (rs.reduce((a, b) => a + b, 0)) - p.hcap : 0;
-                ps.push({ ...p, net, tp: rs.length > 0 ? net - (par * rs.length) : 999, act: rs.length });
-            });
+            // Toggle Header IDs if they exist in HTML
+            if(document.getElementById('th-r3')) document.getElementById('th-r3').style.display = hasR3 ? '' : 'none';
+            if(document.getElementById('th-r4')) document.getElementById('th-r4').style.display = hasR4 ? '' : 'none';
 
-            // Toggle Header Visibility
-            document.getElementById('th-r3').style.display = hasR3 ? '' : 'none';
-            document.getElementById('th-r4').style.display = hasR4 ? '' : 'none';
+			const bestFir = Math.max(...ps.map(p => p.fir || 0));
+			const bestGir = Math.max(...ps.map(p => p.gir || 0));
+			const bestScr = Math.max(...ps.map(p => p.scram || 0));
+			const validNtp = ps.filter(p => p.ntp > 0).map(p => p.ntp);
+			const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
 
-            const bestFir = Math.max(...ps.map(p => p.fir || 0));
-            const bestGir = Math.max(...ps.map(p => p.gir || 0));
-            const bestScr = Math.max(...ps.map(p => p.scram || 0));
-            const validNtp = ps.filter(p => p.ntp > 0).map(p => p.ntp);
-            const bestNtp = validNtp.length > 0 ? Math.min(...validNtp) : null;
+			ps.sort((a, b) => a.tp - b.tp);
+			let html = "", i = 0, rank = 1;
 
-            ps.sort((a, b) => a.tp - b.tp);
-            let html = "", i = 0, rank = 1;
-
-            while (i < ps.length) {
-                if (ps[i].act === 0) { i++; continue; }
-                let ties = 0; while (i + ties < ps.length && ps[i + ties].tp === ps[i].tp) ties++;
-                const rankDisplay = ties > 1 ? `T${rank}` : rank;
-
-                let sP = 0, sM = 0;
-                for (let pX = rank; pX < rank + ties; pX++) { if (pX <= 20) { sP += ptsTable[pX - 1]; sM += (payoutTable[pX - 1] * pool); } }
-                
-                for (let j = 0; j < ties; j++) {
-                    const p = ps[i + j];
-                    const icon = p.console ? `<i class="${p.console}"></i>` : "";
-                    
-                    // Dynamic Round Cells
+			while (i < ps.length) {
+				if (ps[i].act === 0) { i++; continue; }
+				let ties = 0; while (i + ties < ps.length && ps[i + ties].tp === ps[i].tp) ties++;
+				const rankDisplay = ties > 1 ? `T${rank}` : rank;
+				let sP = 0, sM = 0;
+				for (let pX = rank; pX < rank + ties; pX++) { if (pX <= 20) { sP += ptsTable[pX - 1]; sM += (payoutTable[pX - 1] * pool); } }
+				
+				for (let j = 0; j < ties; j++) {
+					const p = ps[i + j];
+					const icon = p.console ? `<i class="${p.console}"></i>` : "";
                     const r3Cell = hasR3 ? `<td>${p.r3||'-'}</td>` : "";
                     const r4Cell = hasR4 ? `<td>${p.r4||'-'}</td>` : "";
 
-                    html += `<tr><td>${rankDisplay}</td><td class="player-cell">${icon}${p.name}</td><td>${p.hcap}</td>
-                        <td>${p.r1||'-'}</td><td>${p.r2||'-'}</td>${r3Cell}${r4Cell}
-                        <td>${p.net}</td><td style="color:${p.tp < 0 ? '#b71c1c' : (p.tp === 0 ? '#2e7d32' : '#333')}; font-weight:bold">${p.tp === 0 ? 'E' : (p.tp > 0 ? '+'+p.tp : p.tp)}</td>
-                        <td class="${p.fir === bestFir && bestFir > 0 ? 'best-stat' : ''}">${(p.fir || 0).toFixed(2)}%</td>
-                        <td class="${p.gir === bestGir && bestGir > 0 ? 'best-stat' : ''}">${(p.gir || 0).toFixed(2)}%</td>
-                        <td class="${p.scram === bestScr && bestScr > 0 ? 'best-stat' : ''}">${(p.scram || 0).toFixed(2)}%</td>
-                        <td class="${p.ntp === bestNtp ? 'best-stat' : ''}">${(p.ntp || 0).toFixed(2)}y</td>
-                        <td>${Math.round((sP / ties) * multiplier)}</td><td style="color:var(--emerald); font-weight:bold">$${Math.round(sM / ties).toLocaleString()}</td></tr>`;
-                }
-                i += ties; rank += ties;
-            }
-            document.getElementById('leaderboard-body').innerHTML = html;
-        });
+					html += `<tr><td>${rankDisplay}</td><td class="player-cell">${icon}${p.name}</td><td>${p.hcap}</td>
+						<td>${p.r1||'-'}</td><td>${p.r2||'-'}</td>${r3Cell}${r4Cell}
+						<td>${p.net}</td><td style="color:${p.tp < 0 ? '#b71c1c' : (p.tp === 0 ? '#2e7d32' : '#333')}; font-weight:bold">${p.tp === 0 ? 'E' : (p.tp > 0 ? '+'+p.tp : p.tp)}</td>
+						<td class="${p.fir === bestFir && bestFir > 0 ? 'best-stat' : ''}">${(p.fir || 0).toFixed(2)}%</td>
+						<td class="${p.gir === bestGir && bestGir > 0 ? 'best-stat' : ''}">${(p.gir || 0).toFixed(2)}%</td>
+						<td class="${p.scram === bestScr && bestScr > 0 ? 'best-stat' : ''}">${(p.scram || 0).toFixed(2)}%</td>
+						<td class="${p.ntp === bestNtp ? 'best-stat' : ''}">${(p.ntp || 0).toFixed(2)}y</td>
+						<td>${Math.round((sP / ties) * multiplier)}</td><td style="color:var(--emerald); font-weight:bold">$${Math.round(sM / ties).toLocaleString()}</td></tr>`;
+				}
+				i += ties; rank += ties;
+			}
+			document.getElementById('leaderboard-body').innerHTML = html;
+		});
 
         // SUBMIT SCORE
         document.getElementById('submitScoreBtn').onclick = async (e) => {
@@ -505,56 +482,31 @@
             c.style.display = c.style.display === "block" ? "none" : "block";
         };
 
+        // SEASON STANDINGS
         onSnapshot(query(seasonCol, orderBy("pts", "desc")), (snap) => {
-            let players = [];
-            snap.forEach(d => players.push(d.data()));
-
-            const totalPlayers = players.length;
-            // Calculate the 50% cutoff index
-            const qualificationCutoff = Math.ceil(totalPlayers / 2);
-
+            let players = []; snap.forEach(d => players.push(d.data()));
+            const qualificationCutoff = Math.ceil(players.length / 2);
             let html = "";
             for (let i = 0; i < players.length; i++) {
                 const p = players[i];
-                
-                // Determine rank and tie status
-                let rank = i + 1;
-                let isTied = false;
-                if ((players[i-1] && players[i-1].pts === p.pts) || (players[i+1] && players[i+1].pts === p.pts)) {
-                    isTied = true;
-                }
-
-                // Adjust rank display if tied
-                let actualRank = 1;
-                for(let j=0; j<i; j++) { if(players[j].pts > p.pts) actualRank++; }
+                let actualRank = 1; for(let j=0; j<i; j++) { if(players[j].pts > p.pts) actualRank++; }
+                const isTied = (players[i-1] && players[i-1].pts === p.pts) || (players[i+1] && players[i+1].pts === p.pts);
                 const rankDisplay = isTied ? `T${actualRank}` : actualRank;
-
-                // Qualification Logic: Add 'Q' suffix if in the top 50%
-                // We use 'i < qualificationCutoff' to target the top half
-                const qSuffix = (i < qualificationCutoff && totalPlayers > 0) ? " <span style='color:var(--gold); font-size:10px;'>Q</span>" : "";
-
-                html += `<tr>
-                    <td>${rankDisplay}</td>
-                    <td class="player-cell">
-                        ${p.console ? `<i class="${p.console}"></i>` : ""}${p.name}${qSuffix}
-                    </td>
-                    <td>${p.events}</td>
-                    <td>${p.pts}</td>
-                    <td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td>
-                </tr>`;
+                const qSuffix = (i < qualificationCutoff && players.length > 0) ? " <span style='color:var(--gold); font-size:10px;'>Q</span>" : "";
+                html += `<tr><td>${rankDisplay}</td><td class="player-cell">${p.console ? `<i class="${p.console}"></i>` : ""}${p.name}${qSuffix}</td><td>${p.events}</td><td>${p.pts}</td><td style="text-align:right">$${(p.earnings||0).toLocaleString()}</td></tr>`;
             }
             document.getElementById('season-body').innerHTML = html;
         });
 	
-		// --- TOURNAMENT HISTORY LISTENER ---
-        onSnapshot(query(historyCol, orderBy("timestamp", "desc")), (snap) => {
+		// TOURNAMENT HISTORY (With Ranking & Icons)
+        onSnapshot(query(archivesCol, orderBy("timestamp", "desc")), (snap) => {
             const container = document.getElementById('history-container');
             let html = "";
-
             snap.forEach(doc => {
                 const event = doc.data();
                 const dateDisplay = event.date ? event.date.split('-').reverse().join('/') : "No Date";
                 const isSig = event.isSignature ? '<i class="fa fa-star" style="color:var(--gold)"></i> ' : '';
+                const sortedResults = [...event.results].sort((a, b) => (a.toPar || 0) - (b.toPar || 0));
 
                 html += `
                     <div class="history-accordion">
@@ -566,17 +518,23 @@
                             <table style="width:100%; min-width: unset; font-size: 13px;">
                                 <thead style="background:#f4f4f4; color:#333;">
                                     <tr>
+                                        <th style="text-align:left; padding:5px; width:30px;">#</th>
                                         <th style="text-align:left; padding:5px;">Player</th>
-                                        <th>To Par</th>
-                                        <th>Pts</th>
+                                        <th>NET</th>
+                                        <th>PTS</th>
                                         <th style="text-align:right;">Earnings</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${event.results.map(r => `
+                                    ${sortedResults.map((r, idx) => `
                                         <tr>
-                                            <td style="text-align:left; padding:5px; font-weight:bold;">${r.name}</td>
-                                            <td style="color:${r.toPar < 0 ? '#b71c1c' : (r.toPar === 0 ? '#2e7d32' : '#333')}">${r.toPar === 0 ? 'E' : (r.toPar > 0 ? '+'+r.toPar : r.toPar)}</td>
+                                            <td style="padding:5px; font-weight:bold; color:#666;">${idx+1}</td>
+                                            <td style="text-align:left; padding:5px; font-weight:bold;">
+                                                ${r.console ? `<i class="${r.console}" style="margin-right:8px; font-size:0.85em;"></i>` : ""}${r.name}
+                                            </td>
+                                            <td style="color:${r.toPar < 0 ? '#b71c1c' : (r.toPar === 0 ? '#2e7d32' : '#333')}">
+                                                ${r.toPar === 0 ? 'E' : (r.toPar > 0 ? '+'+r.toPar : r.toPar)}
+                                            </td>
                                             <td>${r.pts}</td>
                                             <td style="text-align:right;">$${(r.earned || 0).toLocaleString()}</td>
                                         </tr>
@@ -586,7 +544,6 @@
                         </div>
                     </div>`;
             });
-
             container.innerHTML = html || "<p style='text-align:center; color:#999;'>No archived events found.</p>";
         });
 
