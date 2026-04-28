@@ -148,13 +148,31 @@
         .history-header { background: var(--emerald); color: white; padding: 12px 15px; cursor: pointer; display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; }
         .history-content { display: none; background: white; padding: 15px; }
         .history-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f2f2f2; font-size: 13px; }
-
+		
         #backToTop { position: fixed; bottom: 20px; right: 20px; background: var(--emerald); color: white; border-radius: 50%; width: 50px; height: 50px; display: none; align-items: center; justify-content: center; border: 2px solid var(--gold); cursor: pointer; z-index: 1000; }
 
         .season-btn-container { margin-top: 60px; padding: 30px 15px; text-align: center; border-top: 1px solid #ddd; }
         .btn-archive { display: inline-block; width: auto; min-width: 250px; padding: 16px 32px; background-color: #555; color: white !important; text-decoration: none; text-transform: uppercase; font-weight: bold; font-size: 14px; letter-spacing: 1px; border-radius: 4px; border-bottom: 4px solid #333; transition: all 0.3s ease; }
         .btn-archive:hover { background-color: var(--emerald); border-bottom-color: #0d3d0f; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .btn-archive:active { transform: translateY(2px); border-bottom-width: 1px; }
+		
+		/* Halloween */
+		body.theme-halloween { --emerald: #ff6600; background-color: #1a1a1a; color: #eee; }
+		body.theme-halloween .card { background: #222; border: 1px solid #444; }
+		body.theme-halloween #current-venue::before { content: "🎃 "; }
+		body.theme-halloween #current-venue::after { content: " 👻"; }
+
+		/* Christmas */
+		body.theme-christmas { --emerald: #c62828; }
+		body.theme-christmas #current-venue::before { content: "🎄 "; }
+		body.theme-christmas #current-venue::after { content: " 🎅"; }
+		body.theme-christmas .header { background: linear-gradient(135deg, #c62828, #2e7d32); }
+
+		/* St. Patrick's */
+		body.theme-stpatricks { --emerald: #2e7d32; }
+		body.theme-stpatricks #current-venue::before { content: "🍀 "; }
+		body.theme-stpatricks #current-venue::after { content: " 🍺"; }
+		body.theme-stpatricks .btn-primary { background: #1b5e20; }
     </style>
 </head>
 <body>
@@ -193,6 +211,15 @@
                     <label style="margin: 0; color: var(--gold); font-size: 13px;">Signature Event (2x Pts)</label>
                 </div>
             </div>
+			<div class="admin-item">
+				<label>Active Theme</label>
+				<select id="admin-theme-select" class="admin-input">
+					<option value="none">Standard Emerald</option>
+					<option value="theme-halloween">Halloween 🎃</option>
+					<option value="theme-christmas">Christmas 🎄</option>
+					<option value="theme-stpatricks">St. Patrick's 🍀</option>
+				</select>
+			</div>
             <div style="margin-top:15px;">
                 <label>Scrolling Ticker Text (Separate events with | )</label>
                 <input type="text" id="admin-ticker">
@@ -285,7 +312,7 @@
             const updateData = { lastUpdate: serverTimestamp(), isSignature: document.getElementById('admin-signature').checked };
             const v = document.getElementById('admin-venue').value, p = document.getElementById('admin-par').value, d = document.getElementById('admin-date-picker').value, pl = document.getElementById('admin-pool').value, t = document.getElementById('admin-ticker').value, ct = document.getElementById('admin-close-time').value;
             if(v) updateData.venue = v; if(p) updateData.par = p; if(d) updateData.date = d; if(pl) updateData.pool = pl; if(t) updateData.tickerText = t; if(ct) updateData.closingTimestamp = new Date(ct).getTime();
-            
+            updateData.theme = document.getElementById('admin-theme-select').value;
             try { await updateDoc(settingsDoc, updateData); alert("Updated!"); }
             catch(e) { await setDoc(settingsDoc, updateData, {merge:true}); alert("Saved!"); }
         };
@@ -301,6 +328,16 @@
             document.getElementById('course-par').innerText = data.par || "--";
             document.getElementById('total-prize-pool').innerText = `$${(parseInt(data.pool) || 0).toLocaleString()}`;
             if (data.date) document.getElementById('event-date').innerText = data.date.split('-').reverse().join('/');
+			if (data.theme) {
+			// Remove any old theme classes
+			document.body.classList.remove('theme-halloween', 'theme-christmas', 'theme-stpatricks');
+			// Add the new one if it's not "none"
+			if (data.theme !== 'none') {
+				document.body.classList.add(data.theme);
+			}
+			// Sync the admin dropdown so it shows the current theme
+			document.getElementById('admin-theme-select').value = data.theme;
+		}
             
             // TIMER FIX: Don't kill the page when dist < 0
             if (data.closingTimestamp) {
@@ -509,52 +546,59 @@
             let html = "";
             snap.forEach(doc => {
                 const event = doc.data();
-                const dateDisplay = event.date ? event.date.split('-').reverse().join('/') : "No Date";
-                const isSig = event.isSignature ? '<i class="fa fa-star" style="color:var(--gold)"></i> ' : '';
-                const sortedResults = [...event.results].sort((a, b) => (a.toPar || 0) - (b.toPar || 0));
-
+                // We ensure the content div starts with display: none
                 html += `
-                    <div class="history-accordion">
-                        <div class="history-header" onclick="this.classList.toggle('active'); const content = this.nextElementSibling; content.style.display = content.style.display === 'block' ? 'none' : 'block';">
-                            <span>${isSig}${event.venue}</span>
-                            <span>${dateDisplay} <i class="fa fa-chevron-down" style="margin-left:10px"></i></span>
-                        </div>
-                        <div class="history-content">
-                            <table style="width:100%; min-width: unset; font-size: 13px;">
-                                <thead style="background:#f4f4f4; color:#333;">
-                                    <tr>
-                                        <th style="text-align:left; padding:5px; width:30px;">#</th>
-                                        <th style="text-align:left; padding:5px;">Player</th>
-                                        <th>NET</th>
-                                        <th>PTS</th>
-                                        <th style="text-align:right;">Earnings</th>
+                <div class="history-accordion" style="margin-bottom:10px;">
+                    <div class="history-header" 
+                         onclick="this.classList.toggle('active'); 
+                                  const content = this.nextElementSibling; 
+                                  content.style.display = (content.style.display === 'block') ? 'none' : 'block';">
+                        <span>${event.venue}</span>
+                        <span>${event.date || ''} <i class="fa fa-chevron-down"></i></span>
+                    </div>
+                    <div class="history-content" style="display:none; padding:10px; border:1px solid #eee; border-top:none; border-radius:0 0 8px 8px; background:#fff;">
+                        <table style="width:100%; font-size:0.9em; border-collapse:collapse;">
+                            <thead style="background:#f9f9f9;">
+                                <tr>
+                                    <th style="text-align:left; padding:5px;">Player</th>
+                                    <th style="text-align:center;">NET</th>
+                                    <th style="text-align:right;">PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${event.results.sort((a,b) => a.toPar - b.toPar).map(r => `
+                                    <tr style="border-bottom:1px solid #eee;">
+                                        <td style="padding:8px 5px;">${r.console ? `<i class="${r.console}" style="font-size:0.8em; margin-right:5px;"></i>`:''}${r.name}</td>
+                                        <td style="text-align:center; font-weight:bold;">${r.toPar > 0 ? '+'+r.toPar : (r.toPar === 0 ? 'E' : r.toPar)}</td>
+                                        <td style="text-align:right;">${r.pts}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    ${sortedResults.map((r, idx) => `
-                                        <tr>
-                                            <td style="padding:5px; font-weight:bold; color:#666;">${idx+1}</td>
-                                            <td style="text-align:left; padding:5px; font-weight:bold;">
-                                                ${r.console ? `<i class="${r.console}" style="margin-right:8px; font-size:0.85em;"></i>` : ""}${r.name}
-                                            </td>
-                                            <td style="color:${r.toPar < 0 ? '#b71c1c' : (r.toPar === 0 ? '#2e7d32' : '#333')}">
-                                                ${r.toPar === 0 ? 'E' : (r.toPar > 0 ? '+'+r.toPar : r.toPar)}
-                                            </td>
-                                            <td>${r.pts}</td>
-                                            <td style="text-align:right;">$${(r.earned || 0).toLocaleString()}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>`;
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
             });
-            container.innerHTML = html || "<p style='text-align:center; color:#999;'>No archived events found.</p>";
+            container.innerHTML = html || "<p style='text-align:center; color:#999;'>No history available.</p>";
         });
 
         // ADMIN ACCESS
         let count = 0; document.getElementById('admin-trigger').onclick = () => { if(++count === 5) { document.getElementById('admin-panel').style.display = 'block'; count = 0; }};
-        window.onscroll = () => { document.getElementById('backToTop').style.display = window.scrollY > 400 ? 'flex' : 'none'; };
+        document.getElementById('backToTop').onclick = () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+};
+
+// SHOW/HIDE BUTTON ON SCROLL
+window.onscroll = () => {
+    const btn = document.getElementById('backToTop');
+    if (window.scrollY > 400) {
+        btn.style.display = 'flex';
+    } else {
+        btn.style.display = 'none';
+    }
+};
     </script>
 </body>
 </html>
